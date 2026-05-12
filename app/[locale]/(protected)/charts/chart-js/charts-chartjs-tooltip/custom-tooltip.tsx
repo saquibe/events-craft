@@ -27,25 +27,20 @@ ChartJS.register(
   Tooltip,
   Legend,
   ArcElement,
-  PointElement
+  PointElement,
 );
 
-const footer = (tooltipItems: TooltipItem<'line'>[]) => {
+const footer = (tooltipItems: TooltipItem<"line">[]) => {
   let sum = 0;
 
   tooltipItems.forEach(function (tooltipItem) {
-    sum += tooltipItem.parsed.y;
+    sum += tooltipItem.parsed.y ?? 0;
   });
   return "Sum: " + sum;
 };
 
 const CustomTooltip = ({ height = 350 }) => {
-
   const { theme: mode } = useTheme();
-
-
-
-
 
   const data: any = {
     labels: ["January", "February", "March", "April", "May", "Jun", "July"],
@@ -70,7 +65,8 @@ const CustomTooltip = ({ height = 350 }) => {
       legend: {
         position: "top",
         labels: {
-          color: mode === 'light' ? colors["default-600"] : colors["default-300"],
+          color:
+            mode === "light" ? colors["default-600"] : colors["default-300"],
         },
       },
       tooltip: {
@@ -82,14 +78,15 @@ const CustomTooltip = ({ height = 350 }) => {
     scales: {
       y: {
         border: {
-          display: false
+          display: false,
         },
         grid: {
           drawTicks: false,
           display: false,
         },
         ticks: {
-          color: mode === 'light' ? colors["default-600"] : colors["default-300"],
+          color:
+            mode === "light" ? colors["default-600"] : colors["default-300"],
         },
       },
       x: {
@@ -99,7 +96,8 @@ const CustomTooltip = ({ height = 350 }) => {
         },
 
         ticks: {
-          color: mode === 'light' ? colors["default-600"] : colors["default-300"],
+          color:
+            mode === "light" ? colors["default-600"] : colors["default-300"],
         },
       },
     },

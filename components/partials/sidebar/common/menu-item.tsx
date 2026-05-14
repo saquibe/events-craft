@@ -2,7 +2,7 @@
 import React, { CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
-import { Link } from "@/i18n/routing";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { GripVertical } from "lucide-react";
 
@@ -61,13 +61,13 @@ const MenuItem = ({
         variant={active ? "default" : "ghost"}
         color={active ? "default" : "secondary"}
         fullWidth
-                     className={cn(
-                                          "hover:ring-transparent hover:ring-offset-0 justify-start text-sm font-medium capitalize group md:hover:px-8 h-auto py-3 md:px-3 px-3",
-                                          {
-                                            "bg-secondary text-default hover:bg-secondary":
-                                              active && config.sidebarColor !== "light",
-                                          }
-                                        )}
+        className={cn(
+          "hover:ring-transparent hover:ring-offset-0 justify-start text-sm font-medium capitalize group md:hover:px-8 h-auto py-3 md:px-3 px-3",
+          {
+            "bg-secondary text-default hover:bg-secondary":
+              active && config.sidebarColor !== "light",
+          },
+        )}
         asChild
         size={collapsed ? "icon" : "default"}
       >
@@ -83,7 +83,7 @@ const MenuItem = ({
               {...listeners}
               className={cn(
                 "inset-t-0 absolute me-1 h-5 w-5 ltr:-translate-x-6 rtl:translate-x-6 invisible opacity-0 group-hover:opacity-100 transition-all group-hover:visible group-hover:ltr:-translate-x-5 group-hover:rtl:translate-x-5",
-                {}
+                {},
               )}
             />
           )}
@@ -112,7 +112,7 @@ const MenuItem = ({
           {
             "bg-secondary text-default hover:bg-secondary":
               active && config.sidebarColor !== "light",
-          }
+          },
         )}
         asChild
       >

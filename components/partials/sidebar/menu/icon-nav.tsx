@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Link } from "@/i18n/routing";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useConfig } from "@/hooks/use-config";
 
@@ -28,7 +28,7 @@ const IconNav = ({ menuList }: IconNavProps) => {
         {
           [`dark theme-${config.sidebarColor}`]:
             config.sidebarColor !== "light",
-        }
+        },
       )}
     >
       <div className="text-center py-5">
@@ -64,7 +64,7 @@ const IconNav = ({ menuList }: IconNavProps) => {
                                 {
                                   "bg-default-100 dark:bg-secondary  hover:bg-default-200/80 dark:hover:bg-menu-arrow-active ring-1 ring-default-200 dark:ring-menu-arrow-active":
                                     active,
-                                }
+                                },
                               )}
                             >
                               <Link href={href}>
@@ -92,7 +92,7 @@ const IconNav = ({ menuList }: IconNavProps) => {
                                 {
                                   "bg-default-100 dark:bg-secondary  hover:bg-default-200/80 dark:hover:bg-menu-arrow-active ring-1 ring-default-200 dark:ring-menu-arrow-active":
                                     active,
-                                }
+                                },
                               )}
                             >
                               <Link href={href}>
@@ -108,7 +108,7 @@ const IconNav = ({ menuList }: IconNavProps) => {
                         <TooltipContent side="right">{label}</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                  )
+                  ),
                 )}
               </li>
             ))}

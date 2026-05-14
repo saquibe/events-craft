@@ -1,12 +1,11 @@
+import React from "react";
+import DashCodeLogo from "@/components/dascode-logo";
 
-import React from 'react'
-import { DocsThemeConfig } from 'nextra-theme-docs'
-import DashCodeLogo from '@/components/dascode-logo';
-const config: DocsThemeConfig = {
+const config = {
   logo: (
-    <span className=" inline-flex gap-2.5 items-center">
-      <DashCodeLogo className="  text-default-900 h-8 w-8 [&>path:nth-child(3)]:text-background [&>path:nth-child(2)]:text-background" />
-      <span className="  text-lg font-bold text-default ">Dashcode</span>
+    <span className="inline-flex gap-2.5 items-center">
+      <DashCodeLogo className="text-default-900 h-8 w-8 [&>path:nth-child(3)]:text-background [&>path:nth-child(2)]:text-background" />
+      <span className="text-lg font-bold text-default">Dashcode</span>
     </span>
   ),
   project: {
@@ -15,7 +14,7 @@ const config: DocsThemeConfig = {
   banner: {
     key: "1.0-release",
     text: (
-      <a href="/dashboard" target="_blank">
+      <a href="/dashboard" target="_blank" rel="noopener noreferrer">
         🎉 Dashcode
       </a>
     ),
@@ -24,21 +23,16 @@ const config: DocsThemeConfig = {
     text: (
       <span>
         {new Date().getFullYear()} ©{" "}
-        <a href="https://codeshaper.net/" target="_blank">
+        <a
+          href="https://codeshaper.net/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           CodeShaper
         </a>
         .
       </span>
     ),
-  },
-  themeSwitch: {
-    useOptions() {
-      return {
-        light: 'Light',
-        dark: 'Dark',
-        system: 'System', // Add this line
-      };
-    },
   },
   useNextSeoProps() {
     return {
@@ -47,4 +41,4 @@ const config: DocsThemeConfig = {
   },
 };
 
-export default config
+export default config;

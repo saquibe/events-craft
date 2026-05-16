@@ -135,9 +135,9 @@ export default function AdminLoginPage() {
                 </Link>
               </div>
               <div className="text-center 2xl:mb-10 mb-4">
-                <h4 className="font-medium">Admin Sign In</h4>
+                <h4 className="font-medium">Admin Login</h4>
                 <div className="text-default-500 text-base">
-                  Sign in to access admin dashboard
+                  Administrator and Team Login
                 </div>
               </div>
 
@@ -196,16 +196,7 @@ export default function AdminLoginPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      className="rounded border-default-300 text-[#e15a29] focus:ring-[#e15a29]"
-                    />
-                    <span className="ml-2 text-sm text-default-600">
-                      Remember me
-                    </span>
-                  </label>
+                <div className="flex justify-end">
                   <a
                     href="#"
                     className="text-sm text-[#e15a29] hover:underline"
@@ -216,9 +207,9 @@ export default function AdminLoginPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-[#e15a29] hover:bg-[#e15a29]/90"
+                  className="w-full bg-[#e15a29] hover:bg-[#e15a29]/90 text-white"
                 >
-                  Sign In
+                  Login
                 </Button>
               </form>
 

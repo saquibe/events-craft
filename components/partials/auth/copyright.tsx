@@ -1,6 +1,7 @@
 const Copyright = () => {
   const currentYear = new Date().getFullYear();
-  return <>Copyright {currentYear}, Events Craft All Rights Reserved.</>;
+
+  return <>© EventsCraft, {currentYear} | Privacy Policy | Terms of Service</>;
 };
 
 export default Copyright;

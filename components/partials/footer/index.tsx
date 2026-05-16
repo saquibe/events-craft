@@ -10,20 +10,9 @@ const DashCodeFooter = () => {
   return (
     <FooterContent>
       <div className="md:flex justify-between text-default-600 hidden">
-        <div className="text-center md:ltr:text-start md:rtl:text-right text-sm">
-          COPYRIGHT &copy; {new Date().getFullYear()} Events Craft, All rights
-          Reserved
-        </div>
-        <div className="md:ltr:text-right md:rtl:text-end text-center text-sm">
-          Powered by{" "}
-          <a
-            // href="https://codeshaper.net"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#e15a29] font-semibold"
-          >
-            SaaSCraft
-          </a>
+        <div className="w-full text-center text-sm">
+          © EventsCraft, {new Date().getFullYear()} | Privacy Policy | Terms of
+          Service
         </div>
       </div>
       <div className="flex md:hidden justify-around items-center">

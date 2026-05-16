@@ -1,3 +1,4 @@
+//app/(main)/layout.tsx
 import Header from "@/components/partials/header";
 import Footer from "@/components/partials/footer";
 
@@ -8,7 +9,7 @@ export default function MainLayout({
 }) {
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <main className="min-h-screen">{children}</main>
       <Footer />
     </>

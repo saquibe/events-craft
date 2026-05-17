@@ -6,6 +6,10 @@
 }
 
 @theme inline {
+  --color-primary: hsl(var(--primary));
+  --color-primary-dark: hsl(var(--primary-dark));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
   --color-border: hsl(var(--border));
   --color-menu-arrow: hsl(var(--menu-arrow));
   --color-menu-arrow-active: hsl(var(--menu-arrow-active));
@@ -104,9 +108,10 @@
     --brand-light: 17 100% 96%;
     --brand-dark: 17 100% 42%;
 
-    --primary: var(--brand);
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 17 100% 45%;
+    --primary: 17 100% 50%;
+    --primary-dark: 17 100% 40%;
+    --primary-hover: 24 94% 43%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;

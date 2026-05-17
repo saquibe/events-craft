@@ -1,4 +1,3 @@
-//app/(main)/page.tsx
 "use client";
 
 import Image from "next/image";
@@ -12,7 +11,6 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-
 import {
   Card,
   CardContent,
@@ -20,6 +18,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  SimpleTabs,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+  SimpleTabsContent,
+} from "@/components/ui/simple-tabs";
 
 import { useState } from "react";
 import clsx from "clsx";
@@ -29,7 +33,7 @@ const events = [
   {
     id: "1",
     title:
-      "4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026",
+      "4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026",
     description:
       "Join the biggest medical conference of the year with industry leaders and innovative speakers.",
     startDate: new Date("2026-05-29"),
@@ -219,7 +223,6 @@ const events = [
   },
 ];
 
-const TABS = ["Upcoming Events", "Past Events"];
 const ITEMS_PER_PAGE = 9;
 
 function formatDateRange(startDate: Date, endDate: Date) {
@@ -236,14 +239,13 @@ function formatDateRange(startDate: Date, endDate: Date) {
 }
 
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState("Upcoming Events");
+  const [activeTab, setActiveTab] = useState("upcoming");
   const [currentPage, setCurrentPage] = useState(1);
 
   const upcomingEvents = events.filter((event) => !event.isPast);
   const pastEvents = events.filter((event) => event.isPast);
 
-  const filteredEvents =
-    activeTab === "Upcoming Events" ? upcomingEvents : pastEvents;
+  const filteredEvents = activeTab === "upcoming" ? upcomingEvents : pastEvents;
 
   const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
 
@@ -271,163 +273,266 @@ export default function HomePage() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Events Grid */}
       <div className="container mx-auto px-4 py-12">
-        {/* Tabs */}
-        <div className="flex gap-6 mb-8">
-          {TABS.map((tab) => {
-            const count =
-              tab === "Upcoming Events"
-                ? upcomingEvents.length
-                : pastEvents.length;
-
-            return (
-              <button
-                key={tab}
-                onClick={() => handleTabChange(tab)}
-                className={clsx(
-                  "pb-2 transition-all cursor-pointer text-lg font-semibold",
-                  activeTab === tab
-                    ? "border-b-2 border-primary text-primary"
-                    : "text-muted-foreground hover:text-primary",
-                )}
-              >
-                {tab} ({count})
-              </button>
-            );
-          })}
-        </div>
-
-        {filteredEvents.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">
-              No {activeTab.toLowerCase()} found
-            </p>
+        {/* Tabs using SimpleTabs component */}
+        <SimpleTabs
+          value={activeTab}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
+          <div className="flex justify-start">
+            <SimpleTabsList>
+              <SimpleTabsTrigger value="upcoming">
+                Upcoming Events ({upcomingEvents.length})
+              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="past">
+                Past Events ({pastEvents.length})
+              </SimpleTabsTrigger>
+            </SimpleTabsList>
           </div>
-        ) : (
-          <>
-            {/* Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentEvents.map((event) => (
-                <Card
-                  key={event.id}
-                  className="group overflow-hidden border-border bg-card hover:shadow-lg transition-all duration-300 flex flex-col"
-                >
-                  {/* Image */}
-                  <div className="relative h-52 overflow-hidden">
-                    <Image
-                      src={event.image}
-                      alt={event.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
 
-                  {/* Header */}
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl font-semibold line-clamp-2">
-                      {event.title}
-                    </CardTitle>
-                  </CardHeader>
-
-                  {/* Content */}
-                  <CardContent className="space-y-3 flex-grow">
-                    <div className="space-y-3">
-                      {/* Date */}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CalendarDays className="h-4 w-4 text-primary" />
-                        <span>
-                          {formatDateRange(event.startDate, event.endDate)}
-                        </span>
+          <SimpleTabsContent value="upcoming" className="mt-6">
+            {filteredEvents.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground text-lg">
+                  No upcoming events found
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {currentEvents.map((event) => (
+                    <Card
+                      key={event.id}
+                      className="group overflow-hidden border border-border bg-card hover:border-primary/30 hover:bg-muted/20 transition-all duration-300 flex flex-col"
+                    >
+                      {/* Image */}
+                      <div className="relative h-52 overflow-hidden">
+                        <Image
+                          src={event.image}
+                          alt={event.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
                       </div>
 
-                      {/* Venue */}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 text-primary" />
-                        <span className="line-clamp-2">
-                          {event.venue || event.location}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
+                      {/* Header */}
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl font-semibold line-clamp-3">
+                          {event.title}
+                        </CardTitle>
+                      </CardHeader>
 
-                  {/* Footer */}
-                  <CardFooter>
-                    <Link
-                      href={
-                        activeTab === "Upcoming Events" ? "/admin/login" : "#"
-                      }
-                      className="w-full"
-                    >
-                      <Button
-                        className={clsx(
-                          "w-full font-medium transition-all duration-200 cursor-pointer",
-                          activeTab === "Upcoming Events"
-                            ? "bg-primary hover:bg-primary/80 text-primary-foreground"
-                            : "bg-muted text-muted-foreground border border-border hover:bg-muted/80 cursor-not-allowed",
-                        )}
-                      >
-                        {activeTab === "Upcoming Events"
-                          ? "Register"
-                          : "Event Closed"}
-                      </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+                      {/* Content */}
+                      <CardContent className="space-y-3 flex-grow">
+                        <div className="space-y-3">
+                          {/* Date */}
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <CalendarDays className="h-4 w-4 text-primary" />
+                            <span>
+                              {formatDateRange(event.startDate, event.endDate)}
+                            </span>
+                          </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-12">
-                <Button
-                  variant="outline"
-                  color="primary"
-                  size="sm"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </Button>
+                          {/* Venue */}
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <MapPin className="h-4 w-4 text-primary" />
+                            <span className="line-clamp-2">
+                              {event.venue || event.location}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
 
-                <div className="flex gap-2">
-                  {getPageNumbers().map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      color="primary"
-                      size="sm"
-                      onClick={() => setCurrentPage(page)}
-                    >
-                      {page}
-                    </Button>
+                      {/* Footer */}
+                      <CardFooter>
+                        <Link href="/admin/login" className="w-full">
+                          <Button color="primary" className="w-full">
+                            Register
+                          </Button>
+                        </Link>
+                      </CardFooter>
+                    </Card>
                   ))}
                 </div>
 
-                <Button
-                  variant="outline"
-                  color="primary"
-                  size="sm"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-12">
+                    <Button
+                      variant="outline"
+                      color="primary"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
 
-            {/* Results */}
-            <div className="text-center text-sm text-muted-foreground mt-4">
-              Showing {startIndex + 1} -{" "}
-              {Math.min(endIndex, filteredEvents.length)} of{" "}
-              {filteredEvents.length} events
-            </div>
-          </>
-        )}
+                    <div className="flex gap-2">
+                      {getPageNumbers().map((page) => (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "outline"}
+                          color="primary"
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </Button>
+                      ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      color="primary"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Results */}
+                <div className="text-center text-sm text-muted-foreground mt-4">
+                  Showing {startIndex + 1} -{" "}
+                  {Math.min(endIndex, filteredEvents.length)} of{" "}
+                  {filteredEvents.length} events
+                </div>
+              </>
+            )}
+          </SimpleTabsContent>
+
+          <SimpleTabsContent value="past" className="mt-6">
+            {filteredEvents.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground text-lg">
+                  No past events found
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {currentEvents.map((event) => (
+                    <Card
+                      key={event.id}
+                      className="group overflow-hidden border-border bg-card hover:shadow-lg transition-all duration-300 flex flex-col opacity-80"
+                    >
+                      {/* Image */}
+                      <div className="relative h-52 overflow-hidden">
+                        <Image
+                          src={event.image}
+                          alt={event.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300 grayscale"
+                        />
+                      </div>
+
+                      {/* Header */}
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl font-semibold line-clamp-2">
+                          {event.title}
+                        </CardTitle>
+                      </CardHeader>
+
+                      {/* Content */}
+                      <CardContent className="space-y-3 flex-grow">
+                        <div className="space-y-3">
+                          {/* Date */}
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <CalendarDays className="h-4 w-4 text-primary" />
+                            <span>
+                              {formatDateRange(event.startDate, event.endDate)}
+                            </span>
+                          </div>
+
+                          {/* Venue */}
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <MapPin className="h-4 w-4 text-primary" />
+                            <span className="line-clamp-2">
+                              {event.venue || event.location}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+
+                      {/* Footer */}
+                      <CardFooter>
+                        <Button
+                          className="w-full bg-muted text-muted-foreground border border-border hover:bg-muted/80 cursor-not-allowed"
+                          disabled
+                        >
+                          Event Closed
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-12">
+                    <Button
+                      variant="outline"
+                      color="primary"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+
+                    <div className="flex gap-2">
+                      {getPageNumbers().map((page) => (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "outline"}
+                          color="primary"
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </Button>
+                      ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      color="primary"
+                      size="sm"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Results */}
+                <div className="text-center text-sm text-muted-foreground mt-4">
+                  Showing {startIndex + 1} -{" "}
+                  {Math.min(endIndex, filteredEvents.length)} of{" "}
+                  {filteredEvents.length} events
+                </div>
+              </>
+            )}
+          </SimpleTabsContent>
+        </SimpleTabs>
       </div>
 
       {/* Company Section */}

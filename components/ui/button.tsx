@@ -11,36 +11,36 @@ const buttonVariants = cva(
     variants: {
       color: {
         default:
-          "bg-default text-default-foreground hover:bg-default/90 dark:disabled:bg-default-500",
+          "bg-default text-default-foreground hover:bg-default/80 dark:disabled:bg-default-500",
 
         primary:
-          "bg-primary text-primary-foreground border border-transparent shadow-sm hover:bg-primary-hover hover:shadow-md hover:-translate-y-[1px] hover:scale-[1.01]",
+          "bg-primary text-primary-foreground border border-transparent shadow-sm hover:bg-primary-dark hover:shadow-md transition-all duration-300 ease-in-out",
 
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/90 border border-transparent",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-transparent",
 
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 border border-transparent",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/80 border border-transparent",
 
         warning:
-          "bg-warning text-warning-foreground hover:bg-warning/90 border border-transparent",
+          "bg-warning text-warning-foreground hover:bg-warning/80 border border-transparent",
 
-        info: "bg-info text-info-foreground hover:bg-info/90 border border-transparent",
+        info: "bg-info text-info-foreground hover:bg-info/80 border border-transparent",
 
         success:
-          "bg-success text-success-foreground hover:bg-success/90 border border-transparent",
+          "bg-success text-success-foreground hover:bg-success/80 border border-transparent",
       },
 
       variant: {
         default: "",
 
         outline:
-          "border border-default text-default bg-transparent hover:bg-default hover:text-default-foreground",
+          "border border-default text-default bg-transparent hover:bg-default/10 hover:text-default-foreground",
 
-        soft: "text-default bg-default/10 hover:bg-default hover:text-default-foreground",
+        soft: "text-default bg-default/10 hover:bg-default/20 hover:text-default-foreground",
 
         ghost:
-          "text-default bg-transparent hover:bg-default hover:text-default-foreground",
+          "text-default bg-transparent hover:bg-default/10 hover:text-default-foreground",
 
         shadow: "shadow-md",
       },
@@ -77,125 +77,120 @@ const buttonVariants = cva(
         variant: "outline",
         color: "primary",
         className:
-          "border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground hover:border-primary hover:brightness-90",
+          "border-primary text-primary bg-transparent hover:bg-primary-dark/10 hover:text-primary-dark hover:border-primary-dark",
       },
 
       {
         variant: "outline",
         color: "secondary",
         className:
-          "border-secondary text-secondary bg-transparent hover:bg-secondary hover:text-secondary-foreground",
+          "border-secondary text-secondary bg-transparent hover:bg-secondary/10 hover:text-secondary",
       },
 
       {
         variant: "outline",
         color: "success",
         className:
-          "text-success border-success hover:text-success-foreground hover:border-success hover:bg-success",
+          "text-success border-success hover:bg-success/10 hover:text-success",
       },
 
       {
         variant: "outline",
         color: "info",
-        className:
-          "text-info border-info hover:text-info-foreground hover:border-info hover:bg-info",
+        className: "text-info border-info hover:bg-info/10 hover:text-info",
       },
 
       {
         variant: "outline",
         color: "warning",
         className:
-          "text-warning border-warning hover:text-warning-foreground hover:border-warning hover:bg-warning",
+          "text-warning border-warning hover:bg-warning/10 hover:text-warning",
       },
 
       {
         variant: "outline",
         color: "destructive",
         className:
-          "text-destructive border-destructive hover:text-destructive-foreground hover:border-destructive hover:bg-destructive",
+          "text-destructive border-destructive hover:bg-destructive/10 hover:text-destructive",
       },
 
       {
         variant: "soft",
         color: "primary",
         className:
-          "text-primary bg-primary/10 hover:bg-primary hover:text-primary-foreground",
+          "text-primary bg-primary/10 hover:bg-primary-dark/20 hover:text-primary-dark",
       },
 
       {
         variant: "soft",
         color: "secondary",
         className:
-          "bg-secondary/90 hover:bg-secondary/80 hover:text-secondary-foreground",
+          "bg-secondary/10 hover:bg-secondary/20 hover:text-secondary-foreground",
       },
 
       {
         variant: "soft",
         color: "success",
         className:
-          "text-success bg-success/10 hover:bg-success hover:text-success-foreground",
+          "text-success bg-success/10 hover:bg-success/20 hover:text-success",
       },
 
       {
         variant: "soft",
         color: "info",
-        className:
-          "text-info bg-info/10 hover:bg-info hover:text-info-foreground",
+        className: "text-info bg-info/10 hover:bg-info/20 hover:text-info",
       },
 
       {
         variant: "soft",
         color: "warning",
         className:
-          "text-warning bg-warning/10 hover:bg-warning hover:text-warning-foreground",
+          "text-warning bg-warning/10 hover:bg-warning/20 hover:text-warning",
       },
 
       {
         variant: "soft",
         color: "destructive",
         className:
-          "text-destructive bg-destructive/10 hover:bg-destructive hover:text-destructive-foreground",
+          "text-destructive bg-destructive/10 hover:bg-destructive/20 hover:text-destructive",
       },
 
       {
         variant: "ghost",
         color: "primary",
         className:
-          "text-primary hover:bg-primary hover:text-primary-foreground",
+          "text-primary hover:bg-primary-dark/10 hover:text-primary-dark",
       },
 
       {
         variant: "ghost",
         color: "secondary",
-        className:
-          "hover:text-secondary-foreground hover:bg-secondary text-secondary-foreground",
+        className: "text-secondary hover:bg-secondary/10 hover:text-secondary",
       },
 
       {
         variant: "ghost",
         color: "success",
-        className:
-          "text-success hover:text-success-foreground hover:bg-success",
+        className: "text-success hover:bg-success/10 hover:text-success",
       },
 
       {
         variant: "ghost",
         color: "info",
-        className: "text-info hover:text-info-foreground hover:bg-info",
+        className: "text-info hover:bg-info/10 hover:text-info",
       },
 
       {
         variant: "ghost",
         color: "warning",
-        className:
-          "text-warning hover:text-warning-foreground hover:bg-warning",
+        className: "text-warning hover:bg-warning/10 hover:text-warning",
       },
 
       {
         variant: "ghost",
         color: "destructive",
         className:
-          "text-destructive hover:text-destructive-foreground hover:bg-destructive",
+          "text-destructive hover:bg-destructive/10 hover:text-destructive",
       },
     ],
 

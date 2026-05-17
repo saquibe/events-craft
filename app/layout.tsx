@@ -1,18 +1,34 @@
+//app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+
 import { ThemeProvider } from "@/providers/theme-provider";
 import MountedProvider from "@/providers/mounted.provider";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import DirectionProvider from "@/providers/direction-provider";
 import AuthProvider from "@/providers/auth.provider";
 
-const inter = Inter({ subsets: ["latin"] });
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
-  title: "Events Craft",
-  description: "created by SaasCraft Studio",
+  title: {
+    default: "EventsCraft",
+    template: "%s | EventsCraft",
+  },
+  description: "Crafting seamless event experiences",
+  keywords: [
+    "EventsCraft",
+    "Event Management",
+    "Conference Management",
+    "Medical Conferences",
+    "Event Registration",
+  ],
 };
 
 export default function RootLayout({
@@ -22,19 +38,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} dashcode-app`}>
+      <body
+        className={`
+          ${inter.variable}
+          ${inter.className}
+          dashcode-app
+          bg-background
+          text-foreground
+          antialiased
+          min-h-screen
+        `}
+      >
         <AuthProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
-            enableSystem
+            defaultTheme="light"
+            enableSystem={false}
             disableTransitionOnChange
           >
             <MountedProvider>
               <DirectionProvider direction="ltr">{children}</DirectionProvider>
             </MountedProvider>
+
             <Toaster />
-            <SonnerToaster />
+            <SonnerToaster richColors />
           </ThemeProvider>
         </AuthProvider>
       </body>

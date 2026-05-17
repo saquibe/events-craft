@@ -4,18 +4,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Calendar,
   MapPin,
-  Users,
-  Search,
   MapPinned,
   CalendarDays,
-  Clock,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import {
   Card,
   CardContent,
@@ -23,7 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 import { useState } from "react";
 import clsx from "clsx";
 
@@ -245,83 +242,42 @@ export default function HomePage() {
   const upcomingEvents = events.filter((event) => !event.isPast);
   const pastEvents = events.filter((event) => event.isPast);
 
-  const getFilteredEvents = () => {
-    switch (activeTab) {
-      case "Upcoming Events":
-        return upcomingEvents;
-      case "Past Events":
-        return pastEvents;
-      default:
-        return upcomingEvents;
-    }
-  };
+  const filteredEvents =
+    activeTab === "Upcoming Events" ? upcomingEvents : pastEvents;
 
-  const filteredEvents = getFilteredEvents();
   const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
+
   const currentEvents = filteredEvents.slice(startIndex, endIndex);
 
-  // Reset to page 1 when tab changes
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setCurrentPage(1);
   };
 
-  // Generate page numbers to display
   const getPageNumbers = () => {
     const pageNumbers = [];
-    const maxPagesToShow = 5;
 
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) {
-          pageNumbers.push(i);
-        }
-        pageNumbers.push("...");
-        pageNumbers.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pageNumbers.push(1);
-        pageNumbers.push("...");
-        for (let i = totalPages - 3; i <= totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        pageNumbers.push(1);
-        pageNumbers.push("...");
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pageNumbers.push(i);
-        }
-        pageNumbers.push("...");
-        pageNumbers.push(totalPages);
-      }
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(i);
     }
 
     return pageNumbers;
   };
 
   return (
-    <div className="min-h-screen bg-default-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Events Grid */}
       <div className="container mx-auto px-4 py-12">
         {/* Tabs */}
-        <div className="flex gap-6 text-sm font-medium text-blue-900 mb-8">
+        <div className="flex gap-6 mb-8">
           {TABS.map((tab) => {
-            let count = 0;
-            switch (tab) {
-              case "Upcoming Events":
-                count = upcomingEvents.length;
-                break;
-              case "Past Events":
-                count = pastEvents.length;
-                break;
-              default:
-                count = 0;
-            }
+            const count =
+              tab === "Upcoming Events"
+                ? upcomingEvents.length
+                : pastEvents.length;
 
             return (
               <button
@@ -330,8 +286,8 @@ export default function HomePage() {
                 className={clsx(
                   "pb-2 transition-all cursor-pointer text-lg font-semibold",
                   activeTab === tab
-                    ? "border-b-2 border-[#e15a29] text-[#e15a29]"
-                    : "text-gray-500 hover:text-[#e15a29]",
+                    ? "border-b-2 border-primary text-primary"
+                    : "text-muted-foreground hover:text-primary",
                 )}
               >
                 {tab} ({count})
@@ -342,52 +298,50 @@ export default function HomePage() {
 
         {filteredEvents.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">
+            <p className="text-muted-foreground text-lg">
               No {activeTab.toLowerCase()} found
             </p>
           </div>
         ) : (
           <>
+            {/* Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentEvents.map((event) => (
                 <Card
                   key={event.id}
-                  className="group hover:shadow-lg transition-all duration-300 overflow-hidden h-full flex flex-col"
+                  className="group overflow-hidden border-border bg-card hover:shadow-lg transition-all duration-300 flex flex-col"
                 >
-                  <div className="relative h-48 overflow-hidden">
+                  {/* Image */}
+                  <div className="relative h-52 overflow-hidden">
                     <Image
                       src={event.image}
                       alt={event.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    {/* Show Event Closed badge for past events */}
-                    {/* {event.isPast && (
-                      <Badge className="absolute top-3 right-3 bg-gray-200 text-gray-700 hover:bg-gray-200 px-2 py-1 text-xs font-medium border border-gray-300">
-                        Event Closed
-                      </Badge>
-                    )} */}
                   </div>
 
+                  {/* Header */}
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl font-semibold line-clamp-2">
                       {event.title}
                     </CardTitle>
                   </CardHeader>
 
+                  {/* Content */}
                   <CardContent className="space-y-3 flex-grow">
-                    <div className="space-y-2">
-                      {/* Date Range */}
-                      <div className="flex items-center gap-2 text-sm text-default-600">
-                        <CalendarDays className="h-4 w-4 text-[#e15a29]" />
+                    <div className="space-y-3">
+                      {/* Date */}
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <CalendarDays className="h-4 w-4 text-primary" />
                         <span>
                           {formatDateRange(event.startDate, event.endDate)}
                         </span>
                       </div>
 
-                      {/* Location/Venue */}
-                      <div className="flex items-center gap-2 text-sm text-default-600">
-                        <MapPin className="h-4 w-4 text-[#e15a29]" />
+                      {/* Venue */}
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 text-primary" />
                         <span className="line-clamp-2">
                           {event.venue || event.location}
                         </span>
@@ -395,6 +349,7 @@ export default function HomePage() {
                     </div>
                   </CardContent>
 
+                  {/* Footer */}
                   <CardFooter>
                     <Link
                       href={
@@ -404,10 +359,10 @@ export default function HomePage() {
                     >
                       <Button
                         className={clsx(
-                          "w-full font-medium transition-all duration-200",
+                          "w-full font-medium transition-all duration-200 cursor-pointer",
                           activeTab === "Upcoming Events"
-                            ? "bg-[#e15a29] hover:bg-[#e15a29]/90 text-white cursor-pointer"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300 cursor-pointer",
+                            ? "bg-primary hover:bg-primary/80 text-primary-foreground"
+                            : "bg-muted text-muted-foreground border border-border hover:bg-muted/80 cursor-not-allowed",
                         )}
                       >
                         {activeTab === "Upcoming Events"
@@ -425,33 +380,25 @@ export default function HomePage() {
               <div className="flex justify-center items-center gap-2 mt-12">
                 <Button
                   variant="outline"
+                  color="primary"
                   size="sm"
                   onClick={() =>
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={currentPage === 1}
-                  className="cursor-pointer disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
 
                 <div className="flex gap-2">
-                  {getPageNumbers().map((page, index) => (
+                  {getPageNumbers().map((page) => (
                     <Button
-                      key={index}
+                      key={page}
                       variant={currentPage === page ? "default" : "outline"}
+                      color="primary"
                       size="sm"
-                      onClick={() =>
-                        typeof page === "number" && setCurrentPage(page)
-                      }
-                      disabled={page === "..."}
-                      className={clsx(
-                        "min-w-[40px] cursor-pointer",
-                        currentPage === page &&
-                          "bg-[#e15a29] hover:bg-[#e15a29]/90",
-                        page === "..." && "cursor-default",
-                      )}
+                      onClick={() => setCurrentPage(page)}
                     >
                       {page}
                     </Button>
@@ -460,12 +407,12 @@ export default function HomePage() {
 
                 <Button
                   variant="outline"
+                  color="primary"
                   size="sm"
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
                   disabled={currentPage === totalPages}
-                  className="cursor-pointer disabled:cursor-not-allowed"
                 >
                   Next
                   <ChevronRight className="h-4 w-4" />
@@ -473,8 +420,8 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* Showing results info */}
-            <div className="text-center text-sm text-gray-500 mt-4">
+            {/* Results */}
+            <div className="text-center text-sm text-muted-foreground mt-4">
               Showing {startIndex + 1} -{" "}
               {Math.min(endIndex, filteredEvents.length)} of{" "}
               {filteredEvents.length} events
@@ -483,46 +430,51 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Company Info Section - Logo and Address */}
-      <div className="bg-gradient-to-r from-[#e15a29]/5 to-[#e15a29]/10 py-16 mt-12">
+      {/* Company Section */}
+      <div className="bg-gradient-to-r from-primary/5 to-primary/10 py-16 mt-12 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8 max-w-5xl mx-auto">
-            {/* Logo and Company Name */}
+            {/* Company */}
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg">
                 <Image
                   src="/images/all-img/login-bg-2.jpg"
-                  alt="Meety Events Logo"
+                  alt="EventsCraft Logo"
                   width={64}
                   height={64}
                   className="w-full h-full object-cover"
                 />
               </div>
+
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">
-                  Meety Events Private Limited
+                <h2 className="text-2xl font-bold text-foreground">
+                  EventsCraft Private Limited
                 </h2>
-                <p className="text-gray-500 text-sm">
-                  Creating memorable experiences
+
+                <p className="text-muted-foreground text-sm">
+                  Crafting seamless event experiences
                 </p>
               </div>
             </div>
 
-            {/* Vertical Divider */}
-            <div className="hidden md:block w-px h-16 bg-gray-300"></div>
+            {/* Divider */}
+            <div className="hidden md:block w-px h-16 bg-border" />
 
-            {/* Office Address */}
+            {/* Address */}
             <div className="flex items-start gap-3">
-              <MapPinned className="h-5 w-5 text-[#e15a29] mt-1 flex-shrink-0" />
+              <MapPinned className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+
               <div>
-                <p className="text-gray-700 font-medium">Registered Office</p>
-                <p className="text-gray-500 text-sm">
+                <p className="text-foreground font-medium">Registered Office</p>
+
+                <p className="text-muted-foreground text-sm">
                   Office No. 207, HITEX 2nd Floor,
                   <br />
                   HITEX Trade Fair Office Building,
                   <br />
                   Izzatnagar, Hyderabad – 500084
-                  <br />– India
+                  <br />
+                  India
                 </p>
               </div>
             </div>

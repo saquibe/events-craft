@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { InputColor } from "@/lib/type";
 
 export const inputVariants = cva(
-  " w-full  bg-background  rounded py-2 px-3 h-9 border text-sm font-normal border border-solid border-default-200 outline-hidden focus:outline-hidden  file:border-0 file:bg-transparent file:text-sm file:font-medium read-only:bg-default-200 disabled:cursor-not-allowed disabled:opacity-50  transition-all duration-300 ",
+  "w-full bg-background rounded-lg py-2 px-3 h-9 border text-sm font-normal border border-default-200 text-foreground outline-none focus:outline-none focus:ring-0 focus:border-primary focus-visible:border-primary file:border-0 file:bg-transparent file:text-sm file:font-medium read-only:bg-default-200 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300",
   {
     variants: {
       color: {
@@ -35,38 +35,28 @@ export const inputVariants = cva(
       color: "default",
       size: "default",
     },
-  }
+  },
 );
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement>,
-  VariantProps<typeof inputVariants> {
-  color?: InputColor
-  size?: any
+  extends
+    React.InputHTMLAttributes<HTMLInputElement>,
+    VariantProps<typeof inputVariants> {
+  color?: InputColor;
+  size?: any;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      className,
-      type,
-      size,
-      color,
-      ...props
-    },
-    ref
-  ) =>
+  ({ className, type, size, color, ...props }, ref) => (
     <div className="flex-1 w-full">
       <input
         type={type}
-        className={cn(
-          inputVariants({ color, size }),
-          className
-        )}
+        className={cn(inputVariants({ color, size }), className)}
         ref={ref}
         {...props}
       />
     </div>
+  ),
 );
 Input.displayName = "Input";
 

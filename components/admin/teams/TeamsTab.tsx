@@ -54,6 +54,12 @@ export function TeamsTab({ teams, onUpdateTeam, onDeleteTeam }: TeamsTabProps) {
         }
       />
 
+      {/* Description text */}
+      <p className="text-muted-foreground text-sm mb-6">
+        The table below shows all of the team members associated with Meety
+        Events.
+      </p>
+
       {teams.length === 0 ? (
         <EmptyState
           title="No team members"

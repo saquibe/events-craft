@@ -134,7 +134,8 @@ const events = [
     location: "NIMHANS, Bengaluru",
     venue: "NIMHANS Auditorium",
     attendees: 350,
-    image: "https://images.unsplash.com/photo-1580281657527-47b7b0988d83",
+    image:
+      "https://images.unsplash.com/photo-1561489396-888724a1543d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     category: "Medical",
     isPast: false,
   },
@@ -307,12 +308,13 @@ export default function HomePage() {
                       className="group overflow-hidden border border-border bg-card hover:border-primary/30 hover:bg-muted/20 transition-all duration-300 flex flex-col"
                     >
                       {/* Image */}
-                      <div className="relative h-52 overflow-hidden">
+                      <div className="relative aspect-video overflow-hidden bg-muted">
                         <Image
                           src={event.image}
                           alt={event.title}
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
                       </div>
 

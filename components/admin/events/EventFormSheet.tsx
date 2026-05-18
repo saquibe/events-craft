@@ -18,6 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Image from "next/image";
+import ReactCrop, { Crop } from "react-image-crop";
+// import "react-image-crop/dist/ReactCrop.css";
 import type { Event } from "../common/types";
 
 interface EventFormData {
@@ -55,6 +58,15 @@ export function EventFormSheet({
     endDateTime: "",
     eventType: "",
     status: "Draft",
+  });
+
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [crop, setCrop] = useState<Crop>({
+    unit: "%",
+    width: 100,
+    height: 100,
+    x: 0,
+    y: 0,
   });
 
   useEffect(() => {
@@ -109,16 +121,59 @@ export function EventFormSheet({
             />
           </div>
 
-          {/* Event Logo */}
-          <div>
-            <Label className="text-foreground">Event Logo URL</Label>
+          {/* Event Logo Upload */}
+          <div className="space-y-3">
+            <Label className="text-foreground">Event Logo</Label>
+
             <Input
-              value={formData.eventLogo}
-              onChange={(e) =>
-                setFormData({ ...formData, eventLogo: e.target.value })
-              }
-              placeholder="Enter logo URL"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+
+                if (file) {
+                  const imageUrl = URL.createObjectURL(file);
+
+                  setSelectedImage(imageUrl);
+
+                  setFormData({
+                    ...formData,
+                    eventLogo: imageUrl,
+                  });
+                }
+              }}
             />
+
+            {selectedImage && (
+              <div className="space-y-3">
+                {/* Crop Area */}
+                <div className="overflow-hidden rounded-xl border border-default-200">
+                  <ReactCrop
+                    crop={crop}
+                    onChange={(c) => setCrop(c)}
+                    aspect={1}
+                  >
+                    <img
+                      src={selectedImage}
+                      alt="Event Logo"
+                      className="max-h-[300px] w-full object-contain"
+                    />
+                  </ReactCrop>
+                </div>
+
+                {/* Preview */}
+                <div className="flex justify-center">
+                  <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-default-200 bg-muted">
+                    <Image
+                      src={selectedImage}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Venue */}
@@ -203,14 +258,14 @@ export function EventFormSheet({
               <SelectContent>
                 <SelectItem value="Exhibition">Exhibition</SelectItem>
                 <SelectItem value="Conference">Conference</SelectItem>
-                <SelectItem value="Workshop">Workshop</SelectItem>
-                <SelectItem value="Seminar">Seminar</SelectItem>
+                {/* <SelectItem value="Workshop">Workshop</SelectItem>
+                <SelectItem value="Seminar">Seminar</SelectItem> */}
               </SelectContent>
             </Select>
           </div>
 
           {/* Status */}
-          <div>
+          {/* <div>
             <Label className="text-foreground">Status</Label>
             <Select
               value={formData.status}
@@ -228,7 +283,7 @@ export function EventFormSheet({
                 <SelectItem value="Draft Deleted">Draft Deleted</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
 
           {/* Actions */}
           <div className="flex gap-3 pt-4">

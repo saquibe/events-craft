@@ -53,6 +53,11 @@ export function VenuesTab({
         }
       />
 
+      {/* Description text */}
+      <p className="text-muted-foreground text-sm mb-6">
+        The table below shows all of the venues available for your events.
+      </p>
+
       {venues.length === 0 ? (
         <EmptyState
           title="No venues"

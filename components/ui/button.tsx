@@ -35,7 +35,7 @@ const buttonVariants = cva(
         default: "",
 
         outline:
-          "border border-default text-default bg-transparent hover:bg-default/10 hover:text-default-foreground",
+          "border border-default text-default bg-transparent hover:bg-default/10 hover:text-default",
 
         soft: "text-default bg-default/10 hover:bg-default/20 hover:text-default-foreground",
 

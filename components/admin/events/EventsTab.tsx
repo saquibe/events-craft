@@ -69,12 +69,16 @@ export function EventsTab({
         }
       />
 
+      {/* Description text */}
+      <p className="text-muted-foreground text-sm mb-6">
+        The table below shows all of the events owned by Meety Events.
+      </p>
+
       <SimpleTabs
         value={activeTab}
         onValueChange={setActiveTab}
         className="w-full"
       >
-        {/* Override the alignment here */}
         <div className="flex justify-start">
           <SimpleTabsList>
             <SimpleTabsTrigger value="upcoming">

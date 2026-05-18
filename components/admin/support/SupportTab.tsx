@@ -47,6 +47,11 @@ export function SupportTab({ tickets, onUpdateTicket }: SupportTabProps) {
         }
       />
 
+      {/* Description text */}
+      <p className="text-muted-foreground text-sm mb-6">
+        The table below shows all of the support tickets raised by users.
+      </p>
+
       {tickets.length === 0 ? (
         <EmptyState
           title="No support tickets"

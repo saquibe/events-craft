@@ -74,7 +74,7 @@ export function EventsTable({
                       </div>
                     )}
 
-                    <span className="font-medium text-foreground line-clamp-3">
+                    <span className="font-medium text-foreground">
                       {event.eventName}
                     </span>
                   </div>

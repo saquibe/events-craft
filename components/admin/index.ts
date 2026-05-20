@@ -26,3 +26,7 @@ export { VenueFormSheet } from "./venues/VenueFormSheet";
 export { SupportTab } from "./support/SupportTab";
 export { SupportTable } from "./support/SupportTable";
 export { SupportFormSheet } from "./support/SupportFormSheet";
+
+// Organizer
+export { OrganizerTab } from "./organizer/OrganizerTab";
+export type { Organizer } from "./organizer/types";

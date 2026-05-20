@@ -17,6 +17,8 @@ import {
   type Team,
   type Venue,
   type SupportTicket,
+  Organizer,
+  OrganizerTab,
 } from "@/components/admin";
 
 // Dummy Data
@@ -136,6 +138,10 @@ export default function AdminDashboard() {
   const [teams, setTeams] = useState<Team[]>(initialTeams);
   const [venues, setVenues] = useState<Venue[]>(initialVenues);
   const [tickets, setTickets] = useState<SupportTicket[]>(initialTickets);
+  const initialOrganizer: Organizer | null = null;
+  const [organizer, setOrganizer] = useState<Organizer | null>(
+    initialOrganizer,
+  );
 
   useEffect(() => {
     const isAuth = localStorage.getItem("adminAuth");
@@ -170,6 +176,10 @@ export default function AdminDashboard() {
     setTickets(tickets.map((t) => (t.id === id ? { ...t, ...data } : t)));
   };
 
+  const handleUpdateOrganizer = (id: string, data: Partial<Organizer>) => {
+    setOrganizer({ ...organizer, ...data, id } as Organizer);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -187,6 +197,9 @@ export default function AdminDashboard() {
                 <SimpleTabsTrigger value="venues">Venues</SimpleTabsTrigger>
                 <SimpleTabsTrigger value="support">
                   Support Tickets
+                </SimpleTabsTrigger>
+                <SimpleTabsTrigger value="organizer">
+                  Organizer
                 </SimpleTabsTrigger>
               </SimpleTabsList>
             </div>
@@ -219,6 +232,13 @@ export default function AdminDashboard() {
 
           <SimpleTabsContent value="support" className="mt-6">
             <SupportTab tickets={tickets} onUpdateTicket={handleUpdateTicket} />
+          </SimpleTabsContent>
+
+          <SimpleTabsContent value="organizer" className="mt-6">
+            <OrganizerTab
+              organizer={organizer}
+              onUpdateOrganizer={handleUpdateOrganizer}
+            />
           </SimpleTabsContent>
         </SimpleTabs>
       </div>

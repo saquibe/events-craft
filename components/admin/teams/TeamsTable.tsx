@@ -74,7 +74,7 @@ export function TeamsTable({
                       </AvatarFallback>
                     </Avatar>
 
-                    <span className="font-medium text-foreground line-clamp-3">
+                    <span className="font-medium text-foreground">
                       {team.firstName} {team.lastName}
                     </span>
                   </div>

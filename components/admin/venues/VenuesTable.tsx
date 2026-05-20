@@ -73,7 +73,7 @@ export function VenuesTable({
                       </div>
                     )}
 
-                    <span className="font-medium text-foreground line-clamp-3">
+                    <span className="font-medium text-foreground">
                       {venue.venueName}
                     </span>
                   </div>

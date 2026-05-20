@@ -18,29 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Organizer } from "./types";
-
-interface OrganizerFormData {
-  orgLogo: string;
-  orgBanner: string;
-  orgName: string;
-  orgAbout: string;
-  orgWebsite: string;
-  orgAddress1: string;
-  orgAddress2: string;
-  orgCity: string;
-  orgState: string;
-  orgCountry: string;
-  orgZip: string;
-  orgTaxId: string;
-  orgFb: string;
-  orgLin: string;
-  orgX: string;
-  orgCode: string;
-  orgValidFrom: string;
-  orgValidTill: string;
-  orgEventNo: number;
-}
+import type { Organizer, OrganizerFormData } from "./types";
+import Image from "next/image";
+import ReactCrop, { Crop } from "react-image-crop";
 
 interface OrganizerFormSheetProps {
   open: boolean;
@@ -77,6 +57,18 @@ export function OrganizerFormSheet({
     orgEventNo: 0,
   });
 
+  const [selectedLogo, setSelectedLogo] = useState<string>("");
+  const [croppedLogo, setCroppedLogo] = useState<string>("");
+  const [logoRef, setLogoRef] = useState<HTMLImageElement | null>(null);
+
+  const [logoCrop, setLogoCrop] = useState<Crop>({
+    unit: "%",
+    width: 100,
+    height: 100,
+    x: 0,
+    y: 0,
+  });
+
   useEffect(() => {
     if (editingOrganizer) {
       setFormData({
@@ -103,248 +95,313 @@ export function OrganizerFormSheet({
     }
   }, [editingOrganizer]);
 
+  const handleLogoCropSave = async () => {
+    if (!logoRef || !logoCrop.width || !logoCrop.height) return;
+
+    const canvas = document.createElement("canvas");
+
+    const scaleX = logoRef.naturalWidth / logoRef.width;
+    const scaleY = logoRef.naturalHeight / logoRef.height;
+
+    canvas.width = logoCrop.width;
+    canvas.height = logoCrop.height;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      logoRef,
+      logoCrop.x * scaleX,
+      logoCrop.y * scaleY,
+      logoCrop.width * scaleX,
+      logoCrop.height * scaleY,
+      0,
+      0,
+      logoCrop.width,
+      logoCrop.height,
+    );
+
+    const base64Image = canvas.toDataURL("image/jpeg");
+
+    setCroppedLogo(base64Image);
+
+    setFormData({
+      ...formData,
+      orgLogo: base64Image,
+    });
+  };
+
   const handleSubmit = () => {
     onSave(formData);
     onOpenChange(false);
   };
 
   const countries = [
-    "Afghanistan",
-    "Albania",
-    "Algeria",
-    "Argentina",
-    "Australia",
-    "Austria",
-    "Bangladesh",
-    "Belgium",
-    "Brazil",
-    "Canada",
-    "China",
-    "Denmark",
-    "Egypt",
-    "Finland",
-    "France",
-    "Germany",
-    "Greece",
-    "Hong Kong",
-    "Iceland",
     "India",
-    "Indonesia",
-    "Iran",
-    "Iraq",
-    "Ireland",
-    "Israel",
-    "Italy",
-    "Japan",
-    "Kuwait",
-    "Malaysia",
-    "Maldives",
-    "Mexico",
-    "Nepal",
-    "Netherlands",
-    "New Zealand",
-    "Nigeria",
-    "Norway",
-    "Oman",
-    "Pakistan",
-    "Philippines",
-    "Poland",
-    "Portugal",
-    "Qatar",
-    "Russia",
-    "Saudi Arabia",
-    "Singapore",
-    "South Africa",
-    "South Korea",
-    "Spain",
-    "Sri Lanka",
-    "Sweden",
-    "Switzerland",
-    "Thailand",
-    "Turkey",
-    "UAE",
-    "UK",
     "USA",
-    "Vietnam",
+    "UK",
+    "UAE",
+    "Canada",
+    "Australia",
+    "Germany",
+    "France",
+    "Singapore",
+    "Malaysia",
+    "Thailand",
+    "Sri Lanka",
+    "Nepal",
+    "Bangladesh",
   ];
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-2xl overflow-y-auto bg-background border-border">
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto bg-background border-border">
         <SheetHeader>
           <SheetTitle className="text-foreground">
             {editingOrganizer ? "Edit Organizer" : "Organizer Settings"}
           </SheetTitle>
         </SheetHeader>
         <div className="mt-6 space-y-4">
-          {/* Organizer Logo */}
-          <div>
-            <Label className="text-foreground">Organizer Logo URL</Label>
-            <Input
-              value={formData.orgLogo}
-              onChange={(e) =>
-                setFormData({ ...formData, orgLogo: e.target.value })
-              }
-              placeholder="Enter logo URL"
-            />
-          </div>
+          {/* Basic Info */}
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label className="text-foreground">
+                Organizer Logo <span className="text-destructive">*</span>
+              </Label>
 
-          {/* Organizer Banner */}
-          <div>
-            <Label className="text-foreground">Organizer Banner URL</Label>
-            <Input
-              value={formData.orgBanner}
-              onChange={(e) =>
-                setFormData({ ...formData, orgBanner: e.target.value })
-              }
-              placeholder="Enter banner URL"
-            />
-          </div>
-
-          {/* Organizer Name */}
-          <div>
-            <Label className="text-foreground">Organizer Name</Label>
-            <Input
-              value={formData.orgName}
-              onChange={(e) =>
-                setFormData({ ...formData, orgName: e.target.value })
-              }
-              placeholder="Enter organizer name"
-            />
-          </div>
-
-          {/* About the Organizer */}
-          <div>
-            <Label className="text-foreground">About the Organizer</Label>
-            <Textarea
-              value={formData.orgAbout}
-              onChange={(e) =>
-                setFormData({ ...formData, orgAbout: e.target.value })
-              }
-              placeholder="Tell us about the organizer"
-              rows={4}
-            />
-          </div>
-
-          {/* Website */}
-          <div>
-            <Label className="text-foreground">Website</Label>
-            <Input
-              value={formData.orgWebsite}
-              onChange={(e) =>
-                setFormData({ ...formData, orgWebsite: e.target.value })
-              }
-              placeholder="https://example.com"
-            />
-          </div>
-
-          {/* Address Line 1 */}
-          <div>
-            <Label className="text-foreground">Address Line 1</Label>
-            <Input
-              value={formData.orgAddress1}
-              onChange={(e) =>
-                setFormData({ ...formData, orgAddress1: e.target.value })
-              }
-              placeholder="Street address"
-            />
-          </div>
-
-          {/* Address Line 2 */}
-          <div>
-            <Label className="text-foreground">Address Line 2</Label>
-            <Input
-              value={formData.orgAddress2}
-              onChange={(e) =>
-                setFormData({ ...formData, orgAddress2: e.target.value })
-              }
-              placeholder="Apartment, suite, unit, etc. (optional)"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            {/* City */}
-            <div>
-              <Label className="text-foreground">City</Label>
               <Input
-                value={formData.orgCity}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+
+                  if (file) {
+                    const imageUrl = URL.createObjectURL(file);
+
+                    setSelectedLogo(imageUrl);
+                  }
+                }}
+              />
+
+              {selectedLogo && (
+                <div className="space-y-4">
+                  {/* Crop Area */}
+                  <div className="overflow-hidden rounded-xl border border-border">
+                    <ReactCrop
+                      crop={logoCrop}
+                      onChange={(c) => setLogoCrop(c)}
+                      aspect={1}
+                    >
+                      <img
+                        ref={setLogoRef}
+                        src={selectedLogo}
+                        alt="Organizer Logo"
+                        className="max-h-[300px] w-full object-contain"
+                      />
+                    </ReactCrop>
+                  </div>
+
+                  {/* Save Crop Button */}
+                  <div className="flex justify-end">
+                    <Button
+                      color="primary"
+                      onClick={handleLogoCropSave}
+                      className="cursor-pointer"
+                    >
+                      Save Logo
+                    </Button>
+                  </div>
+
+                  {/* Preview */}
+                  <div className="flex justify-center">
+                    <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-border bg-muted">
+                      <Image
+                        src={croppedLogo || selectedLogo}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label className="text-foreground">
+                Organizer Banner URL <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                value={formData.orgBanner}
                 onChange={(e) =>
-                  setFormData({ ...formData, orgCity: e.target.value })
+                  setFormData({ ...formData, orgBanner: e.target.value })
                 }
-                placeholder="City"
+                placeholder="Enter banner URL"
               />
             </div>
 
-            {/* State */}
             <div>
-              <Label className="text-foreground">State</Label>
+              <Label className="text-foreground">
+                Organizer Name <span className="text-destructive">*</span>
+              </Label>
               <Input
-                value={formData.orgState}
+                value={formData.orgName}
                 onChange={(e) =>
-                  setFormData({ ...formData, orgState: e.target.value })
+                  setFormData({ ...formData, orgName: e.target.value })
                 }
-                placeholder="State / Province"
+                placeholder="Enter organizer name"
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {/* Country */}
             <div>
-              <Label className="text-foreground">Country</Label>
-              <Select
-                value={formData.orgCountry}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, orgCountry: value })
+              <Label className="text-foreground">
+                About the Organizer <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                value={formData.orgAbout}
+                onChange={(e) =>
+                  setFormData({ ...formData, orgAbout: e.target.value })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-                <SelectContent>
-                  {countries.map((country) => (
-                    <SelectItem key={country} value={country}>
-                      {country}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Tell us about the organizer"
+                rows={4}
+              />
             </div>
 
-            {/* Zip Code */}
             <div>
-              <Label className="text-foreground">Zip Code</Label>
+              <Label className="text-foreground">
+                Website <span className="text-destructive">*</span>
+              </Label>
               <Input
-                value={formData.orgZip}
+                value={formData.orgWebsite}
                 onChange={(e) =>
-                  setFormData({ ...formData, orgZip: e.target.value })
+                  setFormData({ ...formData, orgWebsite: e.target.value })
                 }
-                placeholder="Postal code"
+                placeholder="https://example.com"
+              />
+            </div>
+
+            <div>
+              <Label className="text-foreground">
+                Tax ID <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                value={formData.orgTaxId}
+                onChange={(e) =>
+                  setFormData({ ...formData, orgTaxId: e.target.value })
+                }
+                placeholder="GST / VAT / Tax ID"
               />
             </div>
           </div>
 
-          {/* Tax ID */}
-          <div>
-            <Label className="text-foreground">Tax ID</Label>
-            <Input
-              value={formData.orgTaxId}
-              onChange={(e) =>
-                setFormData({ ...formData, orgTaxId: e.target.value })
-              }
-              placeholder="GST / VAT / Tax ID"
-            />
+          {/* Address */}
+          <div className="space-y-4 pt-2 border-t border-border">
+            <Label className="text-foreground text-base font-semibold">
+              Address
+            </Label>
+
+            <div>
+              <Label className="text-foreground">
+                Address Line 1 <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                value={formData.orgAddress1}
+                onChange={(e) =>
+                  setFormData({ ...formData, orgAddress1: e.target.value })
+                }
+                placeholder="Street address"
+              />
+            </div>
+
+            <div>
+              <Label className="text-foreground">Address Line 2</Label>
+              <Input
+                value={formData.orgAddress2}
+                onChange={(e) =>
+                  setFormData({ ...formData, orgAddress2: e.target.value })
+                }
+                placeholder="Apartment, suite, unit, etc."
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-foreground">
+                  City <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  value={formData.orgCity}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgCity: e.target.value })
+                  }
+                  placeholder="City"
+                />
+              </div>
+
+              <div>
+                <Label className="text-foreground">
+                  State <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  value={formData.orgState}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgState: e.target.value })
+                  }
+                  placeholder="State / Province"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-foreground">
+                  Country <span className="text-destructive">*</span>
+                </Label>
+                <Select
+                  value={formData.orgCountry}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, orgCountry: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((country) => (
+                      <SelectItem key={country} value={country}>
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-foreground">
+                  Zip Code <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  value={formData.orgZip}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgZip: e.target.value })
+                  }
+                  placeholder="Postal code"
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Social Media Links */}
-          <div className="space-y-4 pt-2">
+          {/* Social Media */}
+          <div className="space-y-4 pt-2 border-t border-border">
             <Label className="text-foreground text-base font-semibold">
               Social Media
             </Label>
 
-            {/* Facebook */}
             <div>
-              <Label className="text-foreground">Facebook</Label>
+              <Label className="text-foreground">
+                Facebook <span className="text-destructive">*</span>
+              </Label>
               <Input
                 value={formData.orgFb}
                 onChange={(e) =>
@@ -354,9 +411,10 @@ export function OrganizerFormSheet({
               />
             </div>
 
-            {/* LinkedIn */}
             <div>
-              <Label className="text-foreground">LinkedIn</Label>
+              <Label className="text-foreground">
+                LinkedIn <span className="text-destructive">*</span>
+              </Label>
               <Input
                 value={formData.orgLin}
                 onChange={(e) =>
@@ -366,9 +424,10 @@ export function OrganizerFormSheet({
               />
             </div>
 
-            {/* X (Twitter) */}
             <div>
-              <Label className="text-foreground">X (formerly Twitter)</Label>
+              <Label className="text-foreground">
+                X (formerly Twitter) <span className="text-destructive">*</span>
+              </Label>
               <Input
                 value={formData.orgX}
                 onChange={(e) =>
@@ -379,61 +438,73 @@ export function OrganizerFormSheet({
             </div>
           </div>
 
-          {/* Organizer Code */}
-          <div>
-            <Label className="text-foreground">Organizer Code</Label>
-            <Input
-              value={formData.orgCode}
-              onChange={(e) =>
-                setFormData({ ...formData, orgCode: e.target.value })
-              }
-              placeholder="Unique organizer code"
-            />
-          </div>
+          {/* License */}
+          <div className="space-y-4 pt-2 border-t border-border">
+            <Label className="text-foreground text-base font-semibold">
+              EventsCraft License
+            </Label>
 
-          <div className="grid grid-cols-2 gap-4">
-            {/* Validity From */}
             <div>
-              <Label className="text-foreground">Validity From</Label>
+              <Label className="text-foreground">
+                Organizer Code <span className="text-destructive">*</span>
+              </Label>
               <Input
-                type="date"
-                value={formData.orgValidFrom}
+                value={formData.orgCode}
                 onChange={(e) =>
-                  setFormData({ ...formData, orgValidFrom: e.target.value })
+                  setFormData({ ...formData, orgCode: e.target.value })
                 }
+                placeholder="Unique organizer code"
               />
             </div>
 
-            {/* Validity Till */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-foreground">
+                  Validity From <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  type="date"
+                  value={formData.orgValidFrom}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgValidFrom: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <Label className="text-foreground">
+                  Validity Till <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  type="date"
+                  value={formData.orgValidTill}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgValidTill: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+
             <div>
-              <Label className="text-foreground">Validity Till</Label>
+              <Label className="text-foreground">
+                Number of Events <span className="text-destructive">*</span>
+              </Label>
               <Input
-                type="date"
-                value={formData.orgValidTill}
+                type="number"
+                value={formData.orgEventNo}
                 onChange={(e) =>
-                  setFormData({ ...formData, orgValidTill: e.target.value })
+                  setFormData({
+                    ...formData,
+                    orgEventNo: parseInt(e.target.value) || 0,
+                  })
                 }
+                placeholder="Total events organized"
               />
             </div>
           </div>
 
-          {/* Number of Events */}
-          <div>
-            <Label className="text-foreground">Number of Events</Label>
-            <Input
-              type="number"
-              value={formData.orgEventNo}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  orgEventNo: parseInt(e.target.value) || 0,
-                })
-              }
-              placeholder="Total events organized"
-            />
-          </div>
-
-          <div className="flex gap-3 pt-4">
+          {/* Actions */}
+          <div className="flex gap-3 pt-4 border-t border-border">
             <Button
               onClick={handleSubmit}
               color="primary"

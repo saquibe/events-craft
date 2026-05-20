@@ -131,6 +131,34 @@ const initialTickets: SupportTicket[] = [
   },
 ];
 
+const initialOrganizer: Organizer = {
+  id: "1",
+  // Profile Fields
+  orgLogo:
+    "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=100&auto=format&fit=crop&q=60",
+  orgBanner:
+    "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&auto=format&fit=crop&q=60",
+  orgName: "Meety Events Private Limited",
+  orgAbout:
+    "Meety Events is a premier event management company specializing in medical conferences, corporate events, and trade exhibitions. With over 10 years of experience, we have successfully organized 500+ events across India.",
+  orgWebsite: "https://meetyevents.com",
+  orgAddress1: "Office No. 207, HITEX 2nd Floor",
+  orgAddress2: "HITEX Trade Fair Office Building",
+  orgCity: "Hyderabad",
+  orgState: "Telangana",
+  orgCountry: "India",
+  orgZip: "500084",
+  orgTaxId: "GSTIN: 36AAACA1234A1Z",
+  orgFb: "https://facebook.com/meetyevents",
+  orgLin: "https://linkedin.com/company/meetyevents",
+  orgX: "https://x.com/meetyevents",
+  // License Fields
+  orgCode: "MEETY2024",
+  orgValidFrom: "2024-01-01",
+  orgValidTill: "2026-12-31",
+  orgEventNo: 24,
+};
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("events");
@@ -138,10 +166,7 @@ export default function AdminDashboard() {
   const [teams, setTeams] = useState<Team[]>(initialTeams);
   const [venues, setVenues] = useState<Venue[]>(initialVenues);
   const [tickets, setTickets] = useState<SupportTicket[]>(initialTickets);
-  const initialOrganizer: Organizer | null = null;
-  const [organizer, setOrganizer] = useState<Organizer | null>(
-    initialOrganizer,
-  );
+  const [organizer, setOrganizer] = useState<Organizer>(initialOrganizer);
 
   useEffect(() => {
     const isAuth = localStorage.getItem("adminAuth");

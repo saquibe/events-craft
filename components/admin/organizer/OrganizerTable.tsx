@@ -1,7 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { MapPin, ExternalLink } from "lucide-react";
+import {
+  Building2,
+  MapPin,
+  Globe,
+  Calendar,
+  Link as LinkIcon,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -11,15 +17,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { Edit, ExternalLink } from "lucide-react";
 import type { Organizer } from "./types";
 
-interface ProfileTableProps {
+interface OrganizerTableProps {
   organizer: Organizer;
   onEdit: () => void;
 }
 
-export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
+export function OrganizerTable({ organizer, onEdit }: OrganizerTableProps) {
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString();
+  };
+
   return (
     <div className="bg-card rounded-lg border border-border overflow-hidden">
       <Table>
@@ -31,7 +42,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
         </TableHeader>
         <TableBody>
           {/* Logo & Banner */}
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               Organizer Logo
             </TableCell>
@@ -50,7 +61,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             </TableCell>
           </TableRow>
 
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               Organizer Banner
             </TableCell>
@@ -70,7 +81,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
           </TableRow>
 
           {/* Basic Info */}
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               Organizer Name
             </TableCell>
@@ -79,14 +90,14 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             </TableCell>
           </TableRow>
 
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               About
             </TableCell>
             <TableCell>{organizer.orgAbout || "-"}</TableCell>
           </TableRow>
 
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               Website
             </TableCell>
@@ -107,7 +118,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             </TableCell>
           </TableRow>
 
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               Tax ID
             </TableCell>
@@ -115,7 +126,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
           </TableRow>
 
           {/* Address */}
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               Address
             </TableCell>
@@ -137,7 +148,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
           </TableRow>
 
           {/* Social Media */}
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               Facebook
             </TableCell>
@@ -157,7 +168,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             </TableCell>
           </TableRow>
 
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               LinkedIn
             </TableCell>
@@ -177,7 +188,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             </TableCell>
           </TableRow>
 
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               X (Twitter)
             </TableCell>
@@ -197,8 +208,44 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             </TableCell>
           </TableRow>
 
+          {/* License */}
+          <TableRow className="border-border">
+            <TableCell className="font-semibold text-foreground">
+              Organizer Code
+            </TableCell>
+            <TableCell className="font-mono">
+              {organizer.orgCode || "-"}
+            </TableCell>
+          </TableRow>
+
+          <TableRow className="border-border">
+            <TableCell className="font-semibold text-foreground">
+              Validity Period
+            </TableCell>
+            <TableCell>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                <span>
+                  {formatDate(organizer.orgValidFrom)} →{" "}
+                  {formatDate(organizer.orgValidTill)}
+                </span>
+              </div>
+            </TableCell>
+          </TableRow>
+
+          <TableRow className="border-border">
+            <TableCell className="font-semibold text-foreground">
+              Total Events
+            </TableCell>
+            <TableCell>
+              <span className="font-semibold text-xl text-primary">
+                {organizer.orgEventNo || 0}
+              </span>
+            </TableCell>
+          </TableRow>
+
           {/* Actions */}
-          <TableRow className="border-border hover:bg-muted/50">
+          <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               Actions
             </TableCell>
@@ -210,7 +257,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
                 className="text-primary"
               >
                 <Edit className="h-4 w-4 mr-1" />
-                Edit Profile
+                Edit Organizer
               </Button>
             </TableCell>
           </TableRow>

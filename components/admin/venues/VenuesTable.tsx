@@ -32,8 +32,7 @@ export function VenuesTable({
       <Table>
         <TableHeader>
           <TableRow className="border-border hover:bg-muted/50">
-            <TableHead className="text-foreground">Photo</TableHead>
-            <TableHead className="text-foreground">Name</TableHead>
+            <TableHead className="text-foreground">Venue</TableHead>
             <TableHead className="text-foreground">City</TableHead>
             <TableHead className="text-foreground">Country</TableHead>
             <TableHead className="text-foreground">Status</TableHead>
@@ -43,69 +42,84 @@ export function VenuesTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {venues.map((venue) => (
-            <TableRow
-              key={venue.id}
-              className="border-border hover:bg-muted/50"
-            >
-              <TableCell>
-                {venue.venueImage ? (
-                  <Image
-                    src={venue.venueImage}
-                    alt={venue.venueName}
-                    width={40}
-                    height={40}
-                    className="rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                    <MapPin className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                )}
-              </TableCell>
-              <TableCell className="font-medium text-foreground">
-                {venue.venueName}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {venue.city}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {venue.country}
-              </TableCell>
-              <TableCell>
-                <StatusBadge status={venue.status} />
-              </TableCell>
-              <TableCell className="text-right">
-                <ActionDropdown
-                  actions={[
-                    {
-                      label: "Edit",
-                      icon: ActionIcons.edit,
-                      onClick: () => onEdit(venue),
-                    },
-                    {
-                      label: venue.status === "Active" ? "Suspend" : "Activate",
-                      icon:
-                        venue.status === "Active"
-                          ? ActionIcons.suspend
-                          : ActionIcons.activate,
-                      onClick: () =>
-                        onStatusChange(
-                          venue.id,
-                          venue.status === "Active" ? "Inactive" : "Active",
-                        ),
-                    },
-                    {
-                      label: "Delete",
-                      icon: ActionIcons.delete,
-                      onClick: () => onDelete(venue.id),
-                      variant: "destructive",
-                    },
-                  ]}
-                />
+          {venues.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={5}
+                className="h-32 text-center text-muted-foreground"
+              >
+                No venues found
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            venues.map((venue) => (
+              <TableRow
+                key={venue.id}
+                className="border-border hover:bg-muted/50"
+              >
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    {venue.venueImage ? (
+                      <Image
+                        src={venue.venueImage}
+                        alt={venue.venueName}
+                        width={60}
+                        height={60}
+                        className="rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                        <MapPin className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+
+                    <span className="font-medium text-foreground line-clamp-3">
+                      {venue.venueName}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {venue.city}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {venue.country}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={venue.status} />
+                </TableCell>
+                <TableCell className="text-right">
+                  <ActionDropdown
+                    actions={[
+                      {
+                        label: "Edit",
+                        icon: ActionIcons.edit,
+                        onClick: () => onEdit(venue),
+                      },
+                      {
+                        label:
+                          venue.status === "Active" ? "Suspend" : "Activate",
+                        icon:
+                          venue.status === "Active"
+                            ? ActionIcons.suspend
+                            : ActionIcons.activate,
+                        onClick: () =>
+                          onStatusChange(
+                            venue.id,
+                            venue.status === "Active" ? "Inactive" : "Active",
+                          ),
+                      },
+                      // {
+                      //   label: "Delete",
+                      //   icon: ActionIcons.delete,
+                      //   onClick: () => onDelete(venue.id),
+                      //   variant: "destructive",
+                      // },
+                    ]}
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

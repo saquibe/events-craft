@@ -69,8 +69,7 @@ export function EventsTab({
         }
       />
 
-      {/* Description text */}
-      <p className="text-muted-foreground text-sm mb-6">
+      <p className="text-muted-foreground text-sm font-normal mb-6">
         The table below shows all of the events owned by Meety Events.
       </p>
 
@@ -79,44 +78,36 @@ export function EventsTab({
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <div className="flex justify-start">
-          <SimpleTabsList>
-            <SimpleTabsTrigger value="upcoming">
-              Upcoming Events ({upcomingEvents.length})
-            </SimpleTabsTrigger>
-            <SimpleTabsTrigger value="past">
-              Past Events ({pastEvents.length})
-            </SimpleTabsTrigger>
-          </SimpleTabsList>
+        {/* Sub-tabs - LEFT ALIGNED with bottom border */}
+        <div className="border-b border-border">
+          <div className="flex justify-start">
+            <SimpleTabsList>
+              <SimpleTabsTrigger value="upcoming">
+                Upcoming Events ({upcomingEvents.length})
+              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="past">
+                Past Events ({pastEvents.length})
+              </SimpleTabsTrigger>
+            </SimpleTabsList>
+          </div>
         </div>
 
         <SimpleTabsContent value="upcoming" className="mt-6">
-          {upcomingEvents.length === 0 ? (
-            <EmptyState
-              title="No upcoming events"
-              description="Create your first event to get started"
-            />
-          ) : (
-            <EventsTable
-              events={upcomingEvents}
-              onEdit={handleEdit}
-              onDelete={onDeleteEvent}
-              onStatusChange={(id, status) => onUpdateEvent(id, { status })}
-            />
-          )}
+          <EventsTable
+            events={upcomingEvents}
+            onEdit={handleEdit}
+            onDelete={onDeleteEvent}
+            onStatusChange={(id, status) => onUpdateEvent(id, { status })}
+          />
         </SimpleTabsContent>
 
         <SimpleTabsContent value="past" className="mt-6">
-          {pastEvents.length === 0 ? (
-            <EmptyState title="No past events" />
-          ) : (
-            <EventsTable
-              events={pastEvents}
-              onEdit={handleEdit}
-              onDelete={onDeleteEvent}
-              onStatusChange={(id, status) => onUpdateEvent(id, { status })}
-            />
-          )}
+          <EventsTable
+            events={pastEvents}
+            onEdit={handleEdit}
+            onDelete={onDeleteEvent}
+            onStatusChange={(id, status) => onUpdateEvent(id, { status })}
+          />
         </SimpleTabsContent>
       </SimpleTabs>
 

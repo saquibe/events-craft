@@ -68,6 +68,8 @@ export function EventFormSheet({
     x: 0,
     y: 0,
   });
+  const [croppedImage, setCroppedImage] = useState<string>("");
+  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
     if (editingEvent) {
@@ -95,6 +97,43 @@ export function EventFormSheet({
     }
   }, [editingEvent]);
 
+  const handleCropSave = async () => {
+    if (!imageRef || !crop.width || !crop.height) return;
+
+    const canvas = document.createElement("canvas");
+
+    const scaleX = imageRef.naturalWidth / imageRef.width;
+    const scaleY = imageRef.naturalHeight / imageRef.height;
+
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      imageRef,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height,
+    );
+
+    const base64Image = canvas.toDataURL("image/jpeg");
+
+    setCroppedImage(base64Image);
+
+    setFormData({
+      ...formData,
+      eventLogo: base64Image,
+    });
+  };
+
   const handleSubmit = () => {
     onSave(formData);
     onOpenChange(false);
@@ -111,7 +150,9 @@ export function EventFormSheet({
         <div className="mt-6 space-y-4">
           {/* Event Name */}
           <div>
-            <Label className="text-foreground">Event Name</Label>
+            <Label className="text-foreground">
+              Event Name <span className="text-destructive">*</span>
+            </Label>
             <Input
               value={formData.eventName}
               onChange={(e) =>
@@ -123,7 +164,9 @@ export function EventFormSheet({
 
           {/* Event Logo Upload */}
           <div className="space-y-3">
-            <Label className="text-foreground">Event Logo</Label>
+            <Label className="text-foreground">
+              Event Logo <span className="text-destructive">*</span>
+            </Label>
 
             <Input
               type="file"
@@ -154,18 +197,28 @@ export function EventFormSheet({
                     aspect={1}
                   >
                     <img
+                      ref={setImageRef}
                       src={selectedImage}
                       alt="Event Logo"
                       className="max-h-[300px] w-full object-contain"
                     />
                   </ReactCrop>
                 </div>
+                <div className="flex justify-end pt-3">
+                  <Button
+                    onClick={handleCropSave}
+                    color="primary"
+                    className="cursor-pointer"
+                  >
+                    Save Crop
+                  </Button>
+                </div>
 
                 {/* Preview */}
                 <div className="flex justify-center">
                   <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-default-200 bg-muted">
                     <Image
-                      src={selectedImage}
+                      src={croppedImage || selectedImage}
                       alt="Preview"
                       fill
                       className="object-cover"
@@ -178,7 +231,9 @@ export function EventFormSheet({
 
           {/* Venue */}
           <div>
-            <Label className="text-foreground">Venue</Label>
+            <Label className="text-foreground">
+              Venue <span className="text-destructive">*</span>
+            </Label>
             <Select
               value={formData.venueName}
               onValueChange={(value) =>
@@ -200,7 +255,9 @@ export function EventFormSheet({
 
           {/* Time Zone */}
           <div>
-            <Label className="text-foreground">Event Time Zone</Label>
+            <Label className="text-foreground">
+              Event Time Zone <span className="text-destructive">*</span>
+            </Label>
             <Select
               value={formData.timeZone}
               onValueChange={(value) =>
@@ -221,7 +278,9 @@ export function EventFormSheet({
 
           {/* Start Date & Time */}
           <div>
-            <Label className="text-foreground">Start Date & Time</Label>
+            <Label className="text-foreground">
+              Start Date & Time <span className="text-destructive">*</span>
+            </Label>
             <Input
               type="datetime-local"
               value={formData.startDateTime}
@@ -233,7 +292,9 @@ export function EventFormSheet({
 
           {/* End Date & Time */}
           <div>
-            <Label className="text-foreground">End Date & Time</Label>
+            <Label className="text-foreground">
+              End Date & Time <span className="text-destructive">*</span>
+            </Label>
             <Input
               type="datetime-local"
               value={formData.endDateTime}
@@ -245,7 +306,9 @@ export function EventFormSheet({
 
           {/* Event Type */}
           <div>
-            <Label className="text-foreground">Event Type</Label>
+            <Label className="text-foreground">
+              Event Type <span className="text-destructive">*</span>
+            </Label>
             <Select
               value={formData.eventType}
               onValueChange={(value) =>

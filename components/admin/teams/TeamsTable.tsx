@@ -33,8 +33,7 @@ export function TeamsTable({
       <Table>
         <TableHeader>
           <TableRow className="border-border hover:bg-muted/50">
-            <TableHead className="text-foreground">Photo</TableHead>
-            <TableHead className="text-foreground">Name</TableHead>
+            <TableHead className="text-foreground">Team Member</TableHead>
             <TableHead className="text-foreground">Email</TableHead>
             <TableHead className="text-foreground">Mobile</TableHead>
             <TableHead className="text-foreground">Organization</TableHead>
@@ -46,71 +45,93 @@ export function TeamsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {teams.map((team) => (
-            <TableRow key={team.id} className="border-border hover:bg-muted/50">
-              <TableCell>
-                <Avatar>
-                  <AvatarImage src={team.profilePhoto} />
-                  <AvatarFallback>
-                    {team.firstName[0]}
-                    {team.lastName[0]}
-                  </AvatarFallback>
-                </Avatar>
-              </TableCell>
-              <TableCell className="font-medium text-foreground">
-                {team.firstName} {team.lastName}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {team.email}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {team.mobile}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {team.organization}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {team.designation}
-              </TableCell>
-              <TableCell>
-                <StatusBadge status={team.status} />
-              </TableCell>
-              <TableCell className="text-right">
-                <ActionDropdown
-                  actions={[
-                    {
-                      label: "Edit",
-                      icon: ActionIcons.edit,
-                      onClick: () => onEdit(team),
-                    },
-                    {
-                      label: "Resend Invitation",
-                      icon: ActionIcons.resendInvite,
-                      onClick: () => onResendInvite(team.id),
-                    },
-                    {
-                      label: team.status === "active" ? "Suspend" : "Activate",
-                      icon:
-                        team.status === "active"
-                          ? ActionIcons.suspend
-                          : ActionIcons.activate,
-                      onClick: () =>
-                        onStatusChange(
-                          team.id,
-                          team.status === "active" ? "inactive" : "active",
-                        ),
-                    },
-                    {
-                      label: "Delete",
-                      icon: ActionIcons.delete,
-                      onClick: () => onDelete(team.id),
-                      variant: "destructive",
-                    },
-                  ]}
-                />
+          {teams.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={7}
+                className="h-32 text-center text-muted-foreground"
+              >
+                No teams found.
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            teams.map((team) => (
+              <TableRow
+                key={team.id}
+                className="border-border hover:bg-muted/50"
+              >
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage
+                        src={team.profilePhoto}
+                        className="object-cover"
+                      />
+
+                      <AvatarFallback>
+                        {team.firstName[0]}
+                        {team.lastName[0]}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <span className="font-medium text-foreground line-clamp-3">
+                      {team.firstName} {team.lastName}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {team.email}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {team.mobile}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {team.organization}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {team.designation}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={team.status} />
+                </TableCell>
+                <TableCell className="text-right">
+                  <ActionDropdown
+                    actions={[
+                      {
+                        label: "Edit",
+                        icon: ActionIcons.edit,
+                        onClick: () => onEdit(team),
+                      },
+                      {
+                        label: "Resend Invitation",
+                        icon: ActionIcons.resendInvite,
+                        onClick: () => onResendInvite(team.id),
+                      },
+                      {
+                        label:
+                          team.status === "active" ? "Suspend" : "Activate",
+                        icon:
+                          team.status === "active"
+                            ? ActionIcons.suspend
+                            : ActionIcons.activate,
+                        onClick: () =>
+                          onStatusChange(
+                            team.id,
+                            team.status === "active" ? "inactive" : "active",
+                          ),
+                      },
+                      // {
+                      //   label: "Delete",
+                      //   icon: ActionIcons.delete,
+                      //   onClick: () => onDelete(team.id),
+                      //   variant: "destructive",
+                      // },
+                    ]}
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

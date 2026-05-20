@@ -7,6 +7,12 @@ import { EmptyState } from "../common/EmptyState";
 import { TeamsTable } from "./TeamsTable";
 import { TeamFormSheet } from "./TeamFormSheet";
 import type { Team } from "./types";
+import {
+  SimpleTabs,
+  SimpleTabsContent,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+} from "@/components/ui/simple-tabs";
 
 interface TeamsTabProps {
   teams: Team[];
@@ -17,6 +23,11 @@ interface TeamsTabProps {
 export function TeamsTab({ teams, onUpdateTeam, onDeleteTeam }: TeamsTabProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  const [activeTab, setActiveTab] = useState("active");
+
+  const activeTeams = teams.filter((team) => team.status === "active");
+
+  const suspendedTeams = teams.filter((team) => team.status === "inactive");
 
   const handleSave = (data: Omit<Team, "id">) => {
     if (editingTeam) {
@@ -55,25 +66,50 @@ export function TeamsTab({ teams, onUpdateTeam, onDeleteTeam }: TeamsTabProps) {
       />
 
       {/* Description text */}
-      <p className="text-muted-foreground text-sm mb-6">
+      <p className="text-muted-foreground text-sm font-normal mb-6">
         The table below shows all of the team members associated with Meety
         Events.
       </p>
 
-      {teams.length === 0 ? (
-        <EmptyState
-          title="No team members"
-          description="Add your first team member to get started"
-        />
-      ) : (
-        <TeamsTable
-          teams={teams}
-          onEdit={handleEdit}
-          onDelete={onDeleteTeam}
-          onStatusChange={(id, status) => onUpdateTeam(id, { status })}
-          onResendInvite={handleResendInvite}
-        />
-      )}
+      <SimpleTabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <div className="border-b border-border">
+          <div className="flex justify-start">
+            <SimpleTabsList>
+              <SimpleTabsTrigger value="active">
+                Active ({activeTeams.length})
+              </SimpleTabsTrigger>
+
+              <SimpleTabsTrigger value="suspended">
+                Suspended ({suspendedTeams.length})
+              </SimpleTabsTrigger>
+            </SimpleTabsList>
+          </div>
+        </div>
+
+        <SimpleTabsContent value="active" className="mt-6">
+          <TeamsTable
+            teams={activeTeams}
+            onEdit={handleEdit}
+            onDelete={onDeleteTeam}
+            onStatusChange={(id, status) => onUpdateTeam(id, { status })}
+            onResendInvite={handleResendInvite}
+          />
+        </SimpleTabsContent>
+
+        <SimpleTabsContent value="suspended" className="mt-6">
+          <TeamsTable
+            teams={suspendedTeams}
+            onEdit={handleEdit}
+            onDelete={onDeleteTeam}
+            onStatusChange={(id, status) => onUpdateTeam(id, { status })}
+            onResendInvite={handleResendInvite}
+          />
+        </SimpleTabsContent>
+      </SimpleTabs>
 
       <TeamFormSheet
         open={isSheetOpen}

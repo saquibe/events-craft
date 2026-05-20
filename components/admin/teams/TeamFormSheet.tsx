@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import ReactCrop, { Crop } from "react-image-crop";
 import {
   Sheet,
   SheetContent,
@@ -58,6 +60,18 @@ export function TeamFormSheet({
     status: "active",
   });
 
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [croppedImage, setCroppedImage] = useState<string>("");
+  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
+
+  const [crop, setCrop] = useState<Crop>({
+    unit: "%",
+    width: 80,
+    height: 80,
+    x: 10,
+    y: 10,
+  });
+
   useEffect(() => {
     if (editingTeam) {
       setFormData({
@@ -88,6 +102,43 @@ export function TeamFormSheet({
     }
   }, [editingTeam]);
 
+  const handleCropSave = async () => {
+    if (!imageRef || !crop.width || !crop.height) return;
+
+    const canvas = document.createElement("canvas");
+
+    const scaleX = imageRef.naturalWidth / imageRef.width;
+    const scaleY = imageRef.naturalHeight / imageRef.height;
+
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      imageRef,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height,
+    );
+
+    const base64Image = canvas.toDataURL("image/jpeg");
+
+    setCroppedImage(base64Image);
+
+    setFormData({
+      ...formData,
+      profilePhoto: base64Image,
+    });
+  };
+
   const handleSubmit = () => {
     onSave(formData);
     onOpenChange(false);
@@ -104,7 +155,9 @@ export function TeamFormSheet({
         <div className="mt-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-foreground">First Name</Label>
+              <Label className="text-foreground">
+                First Name <span className="text-destructive">*</span>
+              </Label>
               <Input
                 value={formData.firstName}
                 onChange={(e) =>
@@ -114,7 +167,9 @@ export function TeamFormSheet({
               />
             </div>
             <div>
-              <Label className="text-foreground">Last Name</Label>
+              <Label className="text-foreground">
+                Last Name <span className="text-destructive">*</span>
+              </Label>
               <Input
                 value={formData.lastName}
                 onChange={(e) =>
@@ -126,7 +181,9 @@ export function TeamFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Email</Label>
+            <Label className="text-foreground">
+              Email <span className="text-destructive">*</span>
+            </Label>
             <Input
               type="email"
               value={formData.email}
@@ -138,7 +195,7 @@ export function TeamFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Organization (Optional)</Label>
+            <Label className="text-foreground">Organization</Label>
             <Input
               value={formData.organization}
               onChange={(e) =>
@@ -149,7 +206,7 @@ export function TeamFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Designation (Optional)</Label>
+            <Label className="text-foreground">Designation</Label>
             <Input
               value={formData.designation}
               onChange={(e) =>
@@ -160,7 +217,7 @@ export function TeamFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Mobile (Optional)</Label>
+            <Label className="text-foreground">Mobile Number</Label>
             <Input
               value={formData.mobile}
               onChange={(e) =>
@@ -171,7 +228,7 @@ export function TeamFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Location (Optional)</Label>
+            <Label className="text-foreground">Location</Label>
             <Input
               value={formData.location}
               onChange={(e) =>
@@ -181,21 +238,72 @@ export function TeamFormSheet({
             />
           </div>
 
-          <div>
-            <Label className="text-foreground">
-              Profile Photo URL (Optional)
-            </Label>
+          <div className="space-y-3">
+            <Label className="text-foreground">Profile Photo</Label>
+
             <Input
-              value={formData.profilePhoto}
-              onChange={(e) =>
-                setFormData({ ...formData, profilePhoto: e.target.value })
-              }
-              placeholder="Image URL"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+
+                if (file) {
+                  const imageUrl = URL.createObjectURL(file);
+
+                  setSelectedImage(imageUrl);
+                }
+              }}
             />
+
+            {selectedImage && (
+              <div className="space-y-4">
+                {/* Crop Area */}
+                <div className="overflow-hidden rounded-xl border border-border">
+                  <ReactCrop
+                    crop={crop}
+                    onChange={(c) => setCrop(c)}
+                    aspect={1}
+                    circularCrop
+                  >
+                    <img
+                      ref={setImageRef}
+                      src={selectedImage}
+                      alt="Profile"
+                      className="max-h-[300px] w-full object-contain"
+                    />
+                  </ReactCrop>
+                </div>
+
+                {/* Save Crop Button */}
+                <div className="flex justify-end">
+                  <Button
+                    color="primary"
+                    onClick={handleCropSave}
+                    className="cursor-pointer"
+                  >
+                    Save Crop
+                  </Button>
+                </div>
+
+                {/* Avatar Preview */}
+                <div className="flex justify-center">
+                  <div className="relative h-24 w-24 overflow-hidden rounded-full border border-border bg-muted">
+                    <Image
+                      src={croppedImage || selectedImage}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
-            <Label className="text-foreground">Status</Label>
+            <Label className="text-foreground">
+              Status <span className="text-destructive">*</span>
+            </Label>
             <Select
               value={formData.status}
               onValueChange={(value) =>

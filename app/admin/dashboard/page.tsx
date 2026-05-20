@@ -1,4 +1,3 @@
-//app/admin/dashboard/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,7 +13,6 @@ import {
   TeamsTab,
   VenuesTab,
   SupportTab,
-  StatsCards,
   type Event,
   type Team,
   type Venue,
@@ -26,7 +24,8 @@ const initialEvents: Event[] = [
   {
     id: "1",
     eventName: "ABCON 2026",
-    eventLogo: "",
+    eventLogo:
+      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D",
     venueName: "HITEX",
     timeZone: "IST",
     startDateTime: "2026-12-06T10:00",
@@ -37,8 +36,10 @@ const initialEvents: Event[] = [
   },
   {
     id: "2",
-    eventName: "Medical Conference 2026",
-    eventLogo: "",
+    eventName:
+      "Medical Conference 2026 Medical Conference 2026 Medical Conference 2026",
+    eventLogo:
+      "https://plus.unsplash.com/premium_photo-1663089174939-5870e2e8d62e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZXZlbnR8ZW58MHx8MHx8fDA%3D",
     venueName: "HICC",
     timeZone: "IST",
     startDateTime: "2026-11-15T09:00",
@@ -59,20 +60,22 @@ const initialTeams: Team[] = [
     designation: "Event Manager",
     mobile: "+91 9876543210",
     location: "Hyderabad",
-    profilePhoto: "",
+    profilePhoto:
+      "https://images.unsplash.com/photo-1695927621677-ec96e048dce2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZSUyMHBob3RvfGVufDB8fDB8fHww",
     role: "team",
     status: "active",
   },
   {
     id: "2",
-    firstName: "Jane",
+    firstName: "Jane Smith",
     lastName: "Smith",
     email: "jane@example.com",
     organization: "Events Co",
     designation: "Coordinator",
     mobile: "+91 9876543211",
     location: "Mumbai",
-    profilePhoto: "",
+    profilePhoto:
+      "https://plus.unsplash.com/premium_photo-1690407617542-2f210cf20d7e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBob3RvfGVufDB8fDB8fHww",
     role: "team",
     status: "active",
   },
@@ -86,19 +89,21 @@ const initialVenues: Venue[] = [
     city: "Hyderabad",
     country: "India",
     website: "https://hitex.in",
-    venueImage: "",
+    venueImage:
+      "https://images.unsplash.com/photo-1521543387600-c745f8e83d77?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8dmVudWV8ZW58MHx8MHx8fDA%3D",
     googleMapLink: "",
     distanceFrom: [{ from: "Airport", unit: "15 km" }],
     status: "Active",
   },
   {
     id: "2",
-    venueName: "HICC",
+    venueName: "Hyderabad International Convention Centre Hyderabad",
     venueAddress: "Hyderabad International Convention Centre",
     city: "Hyderabad",
     country: "India",
     website: "https://hicc.com",
-    venueImage: "",
+    venueImage:
+      "https://media.istockphoto.com/id/1302442919/photo/luxury-beach-villa-at-night.webp?a=1&b=1&s=612x612&w=0&k=20&c=b0GO1cEmtHSuwmdlmkJGZVhiBoAtn-gNp6LYcPg12AQ=",
     googleMapLink: "",
     distanceFrom: [{ from: "Airport", unit: "20 km" }],
     status: "Active",
@@ -137,7 +142,6 @@ export default function AdminDashboard() {
     if (!isAuth) router.push("/admin/login");
   }, [router]);
 
-  // Event Handlers
   const handleUpdateEvent = (id: string, data: Partial<Event>) => {
     setEvents(events.map((e) => (e.id === id ? { ...e, ...data } : e)));
   };
@@ -146,7 +150,6 @@ export default function AdminDashboard() {
     setEvents(events.filter((e) => e.id !== id));
   };
 
-  // Team Handlers
   const handleUpdateTeam = (id: string, data: Partial<Team>) => {
     setTeams(teams.map((t) => (t.id === id ? { ...t, ...data } : t)));
   };
@@ -155,7 +158,6 @@ export default function AdminDashboard() {
     setTeams(teams.filter((t) => t.id !== id));
   };
 
-  // Venue Handlers
   const handleUpdateVenue = (id: string, data: Partial<Venue>) => {
     setVenues(venues.map((v) => (v.id === id ? { ...v, ...data } : v)));
   };
@@ -164,7 +166,6 @@ export default function AdminDashboard() {
     setVenues(venues.filter((v) => v.id !== id));
   };
 
-  // Ticket Handlers
   const handleUpdateTicket = (id: string, data: Partial<SupportTicket>) => {
     setTickets(tickets.map((t) => (t.id === id ? { ...t, ...data } : t)));
   };
@@ -172,21 +173,24 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* <StatsCards /> */}
-
         <SimpleTabs
           value={activeTab}
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <SimpleTabsList>
-            <SimpleTabsTrigger value="events">Events</SimpleTabsTrigger>
-            <SimpleTabsTrigger value="teams">Teams</SimpleTabsTrigger>
-            <SimpleTabsTrigger value="venues">Venues</SimpleTabsTrigger>
-            <SimpleTabsTrigger value="support">
-              Support Tickets
-            </SimpleTabsTrigger>
-          </SimpleTabsList>
+          {/* Main tabs - CENTERED with bottom border */}
+          <div className="border-b border-border">
+            <div className="flex justify-center">
+              <SimpleTabsList>
+                <SimpleTabsTrigger value="events">Events</SimpleTabsTrigger>
+                <SimpleTabsTrigger value="teams">Teams</SimpleTabsTrigger>
+                <SimpleTabsTrigger value="venues">Venues</SimpleTabsTrigger>
+                <SimpleTabsTrigger value="support">
+                  Support Tickets
+                </SimpleTabsTrigger>
+              </SimpleTabsList>
+            </div>
+          </div>
 
           <SimpleTabsContent value="events" className="mt-6">
             <EventsTab

@@ -7,7 +7,7 @@ export interface Event {
   startDateTime: string;
   endDateTime: string;
   eventType: string;
-  status: "Draft" | "Published" | "Completed" | "Draft Deleted";
+  status: "Draft" | "Published" | "Completed" | "Suspended";
   city: string;
 }
 

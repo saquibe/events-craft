@@ -7,6 +7,12 @@ import { EmptyState } from "../common/EmptyState";
 import { SupportTable } from "./SupportTable";
 import { SupportFormSheet } from "./SupportFormSheet";
 import type { SupportTicket } from "./types";
+import {
+  SimpleTabs,
+  SimpleTabsContent,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+} from "@/components/ui/simple-tabs";
 
 interface SupportTabProps {
   tickets: SupportTicket[];
@@ -15,6 +21,11 @@ interface SupportTabProps {
 
 export function SupportTab({ tickets, onUpdateTicket }: SupportTabProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("open");
+
+  const openTickets = tickets.filter((ticket) => ticket.status !== "Closed");
+
+  const closedTickets = tickets.filter((ticket) => ticket.status === "Closed");
 
   const handleSave = (data: Omit<SupportTicket, "id" | "createdAt">) => {
     const newTicket: SupportTicket = {
@@ -48,22 +59,45 @@ export function SupportTab({ tickets, onUpdateTicket }: SupportTabProps) {
       />
 
       {/* Description text */}
-      <p className="text-muted-foreground text-sm mb-6">
+      <p className="text-muted-foreground text-sm font-normal mb-6">
         The table below shows all of the support tickets raised by users.
       </p>
 
-      {tickets.length === 0 ? (
-        <EmptyState
-          title="No support tickets"
-          description="Create your first support ticket"
-        />
-      ) : (
-        <SupportTable
-          tickets={tickets}
-          onStatusChange={handleStatusChange}
-          onReply={handleReply}
-        />
-      )}
+      <SimpleTabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <div className="border-b border-border">
+          <div className="flex justify-start">
+            <SimpleTabsList>
+              <SimpleTabsTrigger value="open">
+                Open ({openTickets.length})
+              </SimpleTabsTrigger>
+
+              <SimpleTabsTrigger value="closed">
+                Closed ({closedTickets.length})
+              </SimpleTabsTrigger>
+            </SimpleTabsList>
+          </div>
+        </div>
+
+        <SimpleTabsContent value="open" className="mt-6">
+          <SupportTable
+            tickets={openTickets}
+            onStatusChange={handleStatusChange}
+            onReply={handleReply}
+          />
+        </SimpleTabsContent>
+
+        <SimpleTabsContent value="closed" className="mt-6">
+          <SupportTable
+            tickets={closedTickets}
+            onStatusChange={handleStatusChange}
+            onReply={handleReply}
+          />
+        </SimpleTabsContent>
+      </SimpleTabs>
 
       <SupportFormSheet
         open={isSheetOpen}

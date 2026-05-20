@@ -39,49 +39,60 @@ export function SupportTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tickets.map((ticket) => (
-            <TableRow
-              key={ticket.id}
-              className="border-border hover:bg-muted/50"
-            >
-              <TableCell className="font-medium text-foreground">
-                #{ticket.id.slice(0, 8)}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {ticket.module}
-              </TableCell>
-              <TableCell className="max-w-xs truncate text-muted-foreground">
-                {ticket.details}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {new Date(ticket.createdAt).toLocaleDateString()}
-              </TableCell>
-              <TableCell>
-                <StatusBadge status={ticket.status} />
-              </TableCell>
-              <TableCell className="text-right">
-                <ActionDropdown
-                  actions={[
-                    {
-                      label: "Reply",
-                      icon: ActionIcons.reply,
-                      onClick: () => onReply(ticket.id),
-                    },
-                    {
-                      label: "In Progress",
-                      icon: ActionIcons.activate,
-                      onClick: () => onStatusChange(ticket.id, "In Progress"),
-                    },
-                    {
-                      label: "Close",
-                      icon: ActionIcons.publish,
-                      onClick: () => onStatusChange(ticket.id, "Closed"),
-                    },
-                  ]}
-                />
+          {tickets.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                className="h-32 text-center text-muted-foreground"
+              >
+                No support tickets found
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            tickets.map((ticket) => (
+              <TableRow
+                key={ticket.id}
+                className="border-border hover:bg-muted/50"
+              >
+                <TableCell className="font-medium text-foreground">
+                  #{ticket.id.slice(0, 8)}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {ticket.module}
+                </TableCell>
+                <TableCell className="max-w-xs truncate text-muted-foreground">
+                  {ticket.details}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {new Date(ticket.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={ticket.status} />
+                </TableCell>
+                <TableCell className="text-right">
+                  <ActionDropdown
+                    actions={[
+                      {
+                        label: "Reply",
+                        icon: ActionIcons.reply,
+                        onClick: () => onReply(ticket.id),
+                      },
+                      {
+                        label: "In Progress",
+                        icon: ActionIcons.activate,
+                        onClick: () => onStatusChange(ticket.id, "In Progress"),
+                      },
+                      {
+                        label: "Close",
+                        icon: ActionIcons.publish,
+                        onClick: () => onStatusChange(ticket.id, "Closed"),
+                      },
+                    ]}
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

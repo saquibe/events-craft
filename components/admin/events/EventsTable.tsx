@@ -32,8 +32,7 @@ export function EventsTable({
       <Table>
         <TableHeader>
           <TableRow className="border-border hover:bg-muted/50">
-            <TableHead className="text-foreground">Logo</TableHead>
-            <TableHead className="text-foreground">Name</TableHead>
+            <TableHead className="text-foreground">Event</TableHead>
             <TableHead className="text-foreground">Date</TableHead>
             <TableHead className="text-foreground">City</TableHead>
             <TableHead className="text-foreground">Type</TableHead>
@@ -44,71 +43,90 @@ export function EventsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {events.map((event) => (
-            <TableRow
-              key={event.id}
-              className="border-border hover:bg-muted/50"
-            >
-              <TableCell>
-                {event.eventLogo ? (
-                  <Image
-                    src={event.eventLogo}
-                    alt={event.eventName}
-                    width={40}
-                    height={40}
-                    className="rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                )}
-              </TableCell>
-              <TableCell className="font-medium text-foreground">
-                {event.eventName}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {new Date(event.startDateTime).toLocaleDateString()} to{" "}
-                {new Date(event.endDateTime).toLocaleDateString()}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {event.city}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {event.eventType}
-              </TableCell>
-              <TableCell>
-                <StatusBadge status={event.status} />
-              </TableCell>
-              <TableCell className="text-right">
-                <ActionDropdown
-                  actions={[
-                    {
-                      label: "Edit",
-                      icon: ActionIcons.edit,
-                      onClick: () => onEdit(event),
-                    },
-                    {
-                      label: "Publish",
-                      icon: ActionIcons.publish,
-                      onClick: () => onStatusChange(event.id, "Published"),
-                    },
-                    {
-                      label: "Draft",
-                      icon: ActionIcons.draft,
-                      onClick: () => onStatusChange(event.id, "Draft"),
-                    },
-                    {
-                      label: "Delete",
-                      icon: ActionIcons.delete,
-                      onClick: () => onDelete(event.id),
-                      variant: "destructive",
-                    },
-                  ]}
-                />
+          {events.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                className="h-32 text-center text-muted-foreground"
+              >
+                No events found
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            events.map((event) => (
+              <TableRow
+                key={event.id}
+                className="border-border hover:bg-muted/50"
+              >
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    {event.eventLogo ? (
+                      <Image
+                        src={event.eventLogo}
+                        alt={event.eventName}
+                        width={60}
+                        height={60}
+                        className="rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                        <Calendar className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+
+                    <span className="font-medium text-foreground line-clamp-3">
+                      {event.eventName}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {new Date(event.startDateTime).toLocaleDateString()} to{" "}
+                  {new Date(event.endDateTime).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {event.city}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {event.eventType}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={event.status} />
+                </TableCell>
+                <TableCell className="text-right">
+                  <ActionDropdown
+                    actions={[
+                      {
+                        label: "Edit",
+                        icon: ActionIcons.edit,
+                        onClick: () => onEdit(event),
+                      },
+                      {
+                        label: "Suspend",
+                        icon: ActionIcons.suspend,
+                        onClick: () => onStatusChange(event.id, "Suspended"),
+                      },
+                      {
+                        label: "Draft",
+                        icon: ActionIcons.draft,
+                        onClick: () => onStatusChange(event.id, "Draft"),
+                      },
+                      // {
+                      //   label: "Publish",
+                      //   icon: ActionIcons.publish,
+                      //   onClick: () => onStatusChange(event.id, "Published"),
+                      // },
+                      // {
+                      //   label: "Delete",
+                      //   icon: ActionIcons.delete,
+                      //   onClick: () => onDelete(event.id),
+                      //   variant: "destructive",
+                      // },
+                    ]}
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

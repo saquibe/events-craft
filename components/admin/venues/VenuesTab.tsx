@@ -7,6 +7,12 @@ import { EmptyState } from "../common/EmptyState";
 import { VenuesTable } from "./VenuesTable";
 import { VenueFormSheet } from "./VenueFormSheet";
 import type { Venue } from "./types";
+import {
+  SimpleTabs,
+  SimpleTabsContent,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+} from "@/components/ui/simple-tabs";
 
 interface VenuesTabProps {
   venues: Venue[];
@@ -21,6 +27,11 @@ export function VenuesTab({
 }: VenuesTabProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingVenue, setEditingVenue] = useState<Venue | null>(null);
+  const [activeTab, setActiveTab] = useState("active");
+
+  const activeVenues = venues.filter((venue) => venue.status === "Active");
+
+  const suspendedVenues = venues.filter((venue) => venue.status === "Inactive");
 
   const handleSave = (data: Omit<Venue, "id">) => {
     if (editingVenue) {
@@ -54,23 +65,47 @@ export function VenuesTab({
       />
 
       {/* Description text */}
-      <p className="text-muted-foreground text-sm mb-6">
+      <p className="text-muted-foreground text-sm font-normal mb-6">
         The table below shows all of the venues available for your events.
       </p>
 
-      {venues.length === 0 ? (
-        <EmptyState
-          title="No venues"
-          description="Add your first venue to get started"
-        />
-      ) : (
-        <VenuesTable
-          venues={venues}
-          onEdit={handleEdit}
-          onDelete={onDeleteVenue}
-          onStatusChange={(id, status) => onUpdateVenue(id, { status })}
-        />
-      )}
+      <SimpleTabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <div className="border-b border-border">
+          <div className="flex justify-start">
+            <SimpleTabsList>
+              <SimpleTabsTrigger value="active">
+                Active ({activeVenues.length})
+              </SimpleTabsTrigger>
+
+              <SimpleTabsTrigger value="suspended">
+                Suspended ({suspendedVenues.length})
+              </SimpleTabsTrigger>
+            </SimpleTabsList>
+          </div>
+        </div>
+
+        <SimpleTabsContent value="active" className="mt-6">
+          <VenuesTable
+            venues={activeVenues}
+            onEdit={handleEdit}
+            onDelete={onDeleteVenue}
+            onStatusChange={(id, status) => onUpdateVenue(id, { status })}
+          />
+        </SimpleTabsContent>
+
+        <SimpleTabsContent value="suspended" className="mt-6">
+          <VenuesTable
+            venues={suspendedVenues}
+            onEdit={handleEdit}
+            onDelete={onDeleteVenue}
+            onStatusChange={(id, status) => onUpdateVenue(id, { status })}
+          />
+        </SimpleTabsContent>
+      </SimpleTabs>
 
       <VenueFormSheet
         open={isSheetOpen}

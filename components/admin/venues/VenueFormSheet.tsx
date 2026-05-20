@@ -7,6 +7,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import Image from "next/image";
+import ReactCrop, { Crop } from "react-image-crop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,6 +60,18 @@ export function VenueFormSheet({
     status: "Active",
   });
 
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [croppedImage, setCroppedImage] = useState<string>("");
+  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
+
+  const [crop, setCrop] = useState<Crop>({
+    unit: "%",
+    width: 100,
+    height: 100,
+    x: 0,
+    y: 0,
+  });
+
   useEffect(() => {
     if (editingVenue) {
       setFormData({
@@ -85,6 +99,43 @@ export function VenueFormSheet({
       });
     }
   }, [editingVenue]);
+
+  const handleCropSave = async () => {
+    if (!imageRef || !crop.width || !crop.height) return;
+
+    const canvas = document.createElement("canvas");
+
+    const scaleX = imageRef.naturalWidth / imageRef.width;
+    const scaleY = imageRef.naturalHeight / imageRef.height;
+
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      imageRef,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height,
+    );
+
+    const base64Image = canvas.toDataURL("image/jpeg");
+
+    setCroppedImage(base64Image);
+
+    setFormData({
+      ...formData,
+      venueImage: base64Image,
+    });
+  };
 
   const handleSubmit = () => {
     onSave(formData);
@@ -125,7 +176,9 @@ export function VenueFormSheet({
         </SheetHeader>
         <div className="mt-6 space-y-4">
           <div>
-            <Label className="text-foreground">Venue Name</Label>
+            <Label className="text-foreground">
+              Venue Name <span className="text-destructive">*</span>
+            </Label>
             <Input
               value={formData.venueName}
               onChange={(e) =>
@@ -136,7 +189,9 @@ export function VenueFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Venue Address</Label>
+            <Label className="text-foreground">
+              Venue Address <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               value={formData.venueAddress}
               onChange={(e) =>
@@ -148,7 +203,9 @@ export function VenueFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">City</Label>
+            <Label className="text-foreground">
+              City <span className="text-destructive">*</span>
+            </Label>
             <Input
               value={formData.city}
               onChange={(e) =>
@@ -159,7 +216,9 @@ export function VenueFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Country</Label>
+            <Label className="text-foreground">
+              Country <span className="text-destructive">*</span>
+            </Label>
             <Select
               value={formData.country}
               onValueChange={(value) =>
@@ -179,7 +238,7 @@ export function VenueFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Website (Optional)</Label>
+            <Label className="text-foreground">Website</Label>
             <Input
               value={formData.website}
               onChange={(e) =>
@@ -189,20 +248,70 @@ export function VenueFormSheet({
             />
           </div>
 
-          <div>
-            <Label className="text-foreground">Venue Image URL</Label>
+          <div className="space-y-3">
+            <Label className="text-foreground">Venue Image</Label>
+
             <Input
-              value={formData.venueImage}
-              onChange={(e) =>
-                setFormData({ ...formData, venueImage: e.target.value })
-              }
-              placeholder="Image URL"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+
+                if (file) {
+                  const imageUrl = URL.createObjectURL(file);
+
+                  setSelectedImage(imageUrl);
+                }
+              }}
             />
+
+            {selectedImage && (
+              <div className="space-y-4">
+                {/* Crop Area */}
+                <div className="overflow-hidden rounded-xl border border-border">
+                  <ReactCrop
+                    crop={crop}
+                    onChange={(c) => setCrop(c)}
+                    aspect={1}
+                  >
+                    <img
+                      ref={setImageRef}
+                      src={selectedImage}
+                      alt="Venue"
+                      className="max-h-[300px] w-full object-contain"
+                    />
+                  </ReactCrop>
+                </div>
+
+                {/* Save Crop Button */}
+                <div className="flex justify-end">
+                  <Button
+                    color="primary"
+                    onClick={handleCropSave}
+                    className="cursor-pointer"
+                  >
+                    Save Crop
+                  </Button>
+                </div>
+
+                {/* Preview */}
+                <div className="flex justify-center">
+                  <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-border bg-muted">
+                    <Image
+                      src={croppedImage || selectedImage}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
             <Label className="text-foreground">
-              Google Map Link (Optional)
+              Google Map Link <span className="text-destructive">*</span>
             </Label>
             <Input
               value={formData.googleMapLink}
@@ -214,7 +323,12 @@ export function VenueFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Distance From</Label>
+            <div className="mb-2">
+              <Label className="text-foreground">
+                Distance From <span className="text-destructive">*</span>
+              </Label>
+            </div>
+
             {formData.distanceFrom.map((dist, idx) => (
               <div key={idx} className="flex gap-2 mt-2">
                 <Input
@@ -224,6 +338,7 @@ export function VenueFormSheet({
                     updateDistanceField(idx, "from", e.target.value)
                   }
                 />
+
                 <Input
                   placeholder="Distance"
                   value={dist.unit}
@@ -231,6 +346,7 @@ export function VenueFormSheet({
                     updateDistanceField(idx, "unit", e.target.value)
                   }
                 />
+
                 <Button
                   size="sm"
                   variant="outline"
@@ -241,6 +357,7 @@ export function VenueFormSheet({
                 </Button>
               </div>
             ))}
+
             <Button
               size="sm"
               variant="outline"
@@ -253,7 +370,9 @@ export function VenueFormSheet({
           </div>
 
           <div>
-            <Label className="text-foreground">Status</Label>
+            <Label className="text-foreground">
+              Status <span className="text-destructive">*</span>
+            </Label>
             <Select
               value={formData.status}
               onValueChange={(value) =>

@@ -1,6 +1,6 @@
 //app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -11,9 +11,10 @@ import AuthProvider from "@/providers/auth.provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 
-const inter = Inter({
+const nunito = Nunito({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["200", "300", "400", "600", "700", "800", "900"],
+  variable: "--font-nunito",
 });
 
 export const metadata: Metadata = {
@@ -40,8 +41,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`
-          ${inter.variable}
-          ${inter.className}
+          ${nunito.variable}
+          ${nunito.className}
           dashcode-app
           bg-background
           text-foreground

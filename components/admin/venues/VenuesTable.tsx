@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { MapPin } from "lucide-react";
+import { MapPin, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -27,101 +29,124 @@ export function VenuesTable({
   onDelete,
   onStatusChange,
 }: VenuesTableProps) {
-  return (
-    <div className="bg-card rounded-lg shadow border border-border overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="border-border hover:bg-muted/50">
-            <TableHead className="text-foreground">Venue</TableHead>
-            <TableHead className="text-foreground">City</TableHead>
-            <TableHead className="text-foreground">Country</TableHead>
-            <TableHead className="text-foreground">Status</TableHead>
-            <TableHead className="text-right text-foreground">
-              Actions
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {venues.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={5}
-                className="h-32 text-center text-muted-foreground"
-              >
-                No venues found
-              </TableCell>
-            </TableRow>
-          ) : (
-            venues.map((venue) => (
-              <TableRow
-                key={venue.id}
-                className="border-border hover:bg-muted/50"
-              >
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    {venue.venueImage ? (
-                      <Image
-                        src={venue.venueImage}
-                        alt={venue.venueName}
-                        width={60}
-                        height={60}
-                        className="rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                        <MapPin className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                    )}
+  const [searchTerm, setSearchTerm] = useState("");
 
-                    <span className="font-medium text-foreground">
-                      {venue.venueName}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {venue.city}
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {venue.country}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={venue.status} />
-                </TableCell>
-                <TableCell className="text-right">
-                  <ActionDropdown
-                    actions={[
-                      {
-                        label: "Edit",
-                        icon: ActionIcons.edit,
-                        onClick: () => onEdit(venue),
-                      },
-                      {
-                        label:
-                          venue.status === "Active" ? "Suspend" : "Activate",
-                        icon:
-                          venue.status === "Active"
-                            ? ActionIcons.suspend
-                            : ActionIcons.activate,
-                        onClick: () =>
-                          onStatusChange(
-                            venue.id,
-                            venue.status === "Active" ? "Inactive" : "Active",
-                          ),
-                      },
-                      // {
-                      //   label: "Delete",
-                      //   icon: ActionIcons.delete,
-                      //   onClick: () => onDelete(venue.id),
-                      //   variant: "destructive",
-                      // },
-                    ]}
-                  />
+  const filteredVenues = venues.filter((venue) =>
+    `${venue.venueName} ${venue.city} ${venue.country}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()),
+  );
+
+  return (
+    <div className="space-y-4">
+      {/* Search Bar */}
+      <div className="flex justify-end">
+        <div className="relative w-64">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search venues..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+      </div>
+
+      <div className="bg-card rounded-lg shadow border border-border overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-border hover:bg-muted/50">
+              <TableHead className="text-foreground">Venue</TableHead>
+              <TableHead className="text-foreground">City</TableHead>
+              <TableHead className="text-foreground">Country</TableHead>
+              <TableHead className="text-foreground">Status</TableHead>
+              <TableHead className="text-right text-foreground">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredVenues.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="h-32 text-center text-muted-foreground"
+                >
+                  {searchTerm ? "No matching venues found" : "No venues found"}
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ) : (
+              filteredVenues.map((venue) => (
+                <TableRow
+                  key={venue.id}
+                  className="border-border hover:bg-muted/50"
+                >
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      {venue.venueImage ? (
+                        <Image
+                          src={venue.venueImage}
+                          alt={venue.venueName}
+                          width={60}
+                          height={60}
+                          className="rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                          <MapPin className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      )}
+
+                      <span className="font-medium text-foreground">
+                        {venue.venueName}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {venue.city}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {venue.country}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={venue.status} />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <ActionDropdown
+                      actions={[
+                        {
+                          label: "Edit",
+                          icon: ActionIcons.edit,
+                          onClick: () => onEdit(venue),
+                        },
+                        {
+                          label:
+                            venue.status === "Active" ? "Suspend" : "Activate",
+                          icon:
+                            venue.status === "Active"
+                              ? ActionIcons.suspend
+                              : ActionIcons.activate,
+                          onClick: () =>
+                            onStatusChange(
+                              venue.id,
+                              venue.status === "Active" ? "Inactive" : "Active",
+                            ),
+                        },
+                        // {
+                        //   label: "Delete",
+                        //   icon: ActionIcons.delete,
+                        //   onClick: () => onDelete(venue.id),
+                        //   variant: "destructive",
+                        // },
+                      ]}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

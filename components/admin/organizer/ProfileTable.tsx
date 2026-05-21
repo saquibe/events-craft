@@ -23,10 +23,12 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
   return (
     <div className="bg-card rounded-lg border border-border overflow-hidden">
       <Table>
-        <TableHeader>
+        <TableHeader className="bg-muted/50">
           <TableRow className="border-border hover:bg-muted/50">
-            <TableHead className="text-foreground w-1/3">Field</TableHead>
-            <TableHead className="text-foreground">Details</TableHead>
+            <TableHead className="text-foreground w-1/3 font-bold">
+              Field
+            </TableHead>
+            <TableHead className="text-foreground font-bold">Details</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

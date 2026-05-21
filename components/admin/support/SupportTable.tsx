@@ -14,6 +14,8 @@ import {
 import { StatusBadge } from "../common/StatusBadge";
 import { ActionDropdown, ActionIcons } from "../common/ActionDropdown";
 import type { SupportTicket } from "./types";
+import { format } from "path";
+import { formatDate } from "@/lib/date";
 
 interface SupportTableProps {
   tickets: SupportTicket[];
@@ -51,14 +53,24 @@ export function SupportTable({
 
       <div className="bg-card rounded-lg shadow border border-border overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/50">
             <TableRow className="border-border hover:bg-muted/50">
-              <TableHead className="text-foreground">Ticket ID</TableHead>
-              <TableHead className="text-foreground">Module</TableHead>
-              <TableHead className="text-foreground">Details</TableHead>
-              <TableHead className="text-foreground">Created At</TableHead>
-              <TableHead className="text-foreground">Status</TableHead>
-              <TableHead className="text-right text-foreground">
+              <TableHead className="text-foreground font-bold">
+                Ticket ID
+              </TableHead>
+              <TableHead className="text-foreground font-bold">
+                Module
+              </TableHead>
+              <TableHead className="text-foreground font-bold">
+                Details
+              </TableHead>
+              <TableHead className="text-foreground font-bold">
+                Created At
+              </TableHead>
+              <TableHead className="text-foreground font-bold">
+                Status
+              </TableHead>
+              <TableHead className="text-right text-foreground font-bold">
                 Actions
               </TableHead>
             </TableRow>
@@ -79,7 +91,7 @@ export function SupportTable({
               filteredTickets.map((ticket) => (
                 <TableRow
                   key={ticket.id}
-                  className="border-border hover:bg-muted/50"
+                  className="border-border hover:bg-muted/50 h-20"
                 >
                   <TableCell className="font-medium text-foreground">
                     #{ticket.id.slice(0, 8)}
@@ -91,7 +103,7 @@ export function SupportTable({
                     {ticket.details}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {new Date(ticket.createdAt).toLocaleDateString()}
+                    {formatDate(ticket.createdAt)}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={ticket.status} />

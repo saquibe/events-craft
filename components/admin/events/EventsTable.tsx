@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "../common/StatusBadge";
 import { ActionDropdown, ActionIcons } from "../common/ActionDropdown";
 import type { Event } from "../common/types";
+import { formatEventDateTime } from "@/lib/date";
 
 interface EventsTableProps {
   events: Event[];
@@ -53,14 +54,16 @@ export function EventsTable({
 
       <div className="bg-card rounded-lg shadow border border-border overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/50">
             <TableRow className="border-border hover:bg-muted/50">
-              <TableHead className="text-foreground">Event</TableHead>
-              <TableHead className="text-foreground">Date</TableHead>
-              <TableHead className="text-foreground">City</TableHead>
-              <TableHead className="text-foreground">Type</TableHead>
-              <TableHead className="text-foreground">Status</TableHead>
-              <TableHead className="text-right text-foreground">
+              <TableHead className="text-foreground font-bold">Event</TableHead>
+              <TableHead className="text-foreground font-bold">Date</TableHead>
+              <TableHead className="text-foreground font-bold">City</TableHead>
+              <TableHead className="text-foreground font-bold">Type</TableHead>
+              <TableHead className="text-foreground font-bold">
+                Status
+              </TableHead>
+              <TableHead className="text-right text-foreground font-bold">
                 Actions
               </TableHead>
             </TableRow>
@@ -79,7 +82,7 @@ export function EventsTable({
               filteredEvents.map((event) => (
                 <TableRow
                   key={event.id}
-                  className="border-border hover:bg-muted/50"
+                  className="border-border hover:bg-muted/50 h-20"
                 >
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -103,8 +106,21 @@ export function EventsTable({
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {new Date(event.startDateTime).toLocaleDateString()} to{" "}
-                    {new Date(event.endDateTime).toLocaleDateString()}
+                    {(() => {
+                      const formatted = formatEventDateTime(
+                        event.startDateTime,
+                        event.endDateTime,
+                      );
+
+                      return (
+                        <div className="space-y-1">
+                          <div>{formatted.date}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {formatted.time}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {event.city}

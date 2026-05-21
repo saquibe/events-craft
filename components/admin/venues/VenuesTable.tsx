@@ -54,13 +54,17 @@ export function VenuesTable({
 
       <div className="bg-card rounded-lg shadow border border-border overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/50">
             <TableRow className="border-border hover:bg-muted/50">
-              <TableHead className="text-foreground">Venue</TableHead>
-              <TableHead className="text-foreground">City</TableHead>
-              <TableHead className="text-foreground">Country</TableHead>
-              <TableHead className="text-foreground">Status</TableHead>
-              <TableHead className="text-right text-foreground">
+              <TableHead className="text-foreground font-bold">Venue</TableHead>
+              <TableHead className="text-foreground font-bold">City</TableHead>
+              <TableHead className="text-foreground font-bold">
+                Country
+              </TableHead>
+              <TableHead className="text-foreground font-bold">
+                Status
+              </TableHead>
+              <TableHead className="text-right text-foreground font-bold">
                 Actions
               </TableHead>
             </TableRow>
@@ -79,7 +83,7 @@ export function VenuesTable({
               filteredVenues.map((venue) => (
                 <TableRow
                   key={venue.id}
-                  className="border-border hover:bg-muted/50"
+                  className="border-border hover:bg-muted/50 h-20"
                 >
                   <TableCell>
                     <div className="flex items-center gap-3">

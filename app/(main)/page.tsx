@@ -27,6 +27,7 @@ import {
 
 import { useState } from "react";
 import clsx from "clsx";
+import { formatDateRange } from "@/lib/date";
 
 // Dummy data directly in the page
 const events = [
@@ -225,19 +226,6 @@ const events = [
 ];
 
 const ITEMS_PER_PAGE = 9;
-
-function formatDateRange(startDate: Date, endDate: Date) {
-  const formatter = new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-
-  const startFormatted = formatter.format(startDate);
-  const endFormatted = formatter.format(endDate);
-
-  return `${startFormatted} – ${endFormatted}`;
-}
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState("upcoming");

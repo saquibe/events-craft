@@ -22,6 +22,7 @@ import Image from "next/image";
 import ReactCrop, { Crop } from "react-image-crop";
 // import "react-image-crop/dist/ReactCrop.css";
 import type { Event } from "../common/types";
+import { DateTimePicker } from "../common/DateTimePicker";
 
 interface EventFormData {
   eventName: string;
@@ -281,11 +282,13 @@ export function EventFormSheet({
             <Label className="text-foreground">
               Start Date & Time <span className="text-destructive">*</span>
             </Label>
-            <Input
-              type="datetime-local"
+            <DateTimePicker
               value={formData.startDateTime}
-              onChange={(e) =>
-                setFormData({ ...formData, startDateTime: e.target.value })
+              onChange={(value) =>
+                setFormData({
+                  ...formData,
+                  startDateTime: value,
+                })
               }
             />
           </div>
@@ -295,11 +298,13 @@ export function EventFormSheet({
             <Label className="text-foreground">
               End Date & Time <span className="text-destructive">*</span>
             </Label>
-            <Input
-              type="datetime-local"
+            <DateTimePicker
               value={formData.endDateTime}
-              onChange={(e) =>
-                setFormData({ ...formData, endDateTime: e.target.value })
+              onChange={(value) =>
+                setFormData({
+                  ...formData,
+                  endDateTime: value,
+                })
               }
             />
           </div>

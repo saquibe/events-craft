@@ -59,7 +59,7 @@ export function SupportTab({ tickets, onUpdateTicket }: SupportTabProps) {
       />
 
       {/* Description text */}
-      <p className="text-muted-foreground text-sm font-normal mb-6">
+      <p className="text-muted-foreground text-base font-normal mb-6">
         The table below shows all of the support tickets raised by users.
       </p>
 
@@ -71,13 +71,9 @@ export function SupportTab({ tickets, onUpdateTicket }: SupportTabProps) {
         <div className="border-b border-border">
           <div className="flex justify-start">
             <SimpleTabsList>
-              <SimpleTabsTrigger value="open">
-                Open ({openTickets.length})
-              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="open">Open</SimpleTabsTrigger>
 
-              <SimpleTabsTrigger value="closed">
-                Closed ({closedTickets.length})
-              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="closed">Closed</SimpleTabsTrigger>
             </SimpleTabsList>
           </div>
         </div>
@@ -85,6 +81,7 @@ export function SupportTab({ tickets, onUpdateTicket }: SupportTabProps) {
         <SimpleTabsContent value="open" className="mt-6">
           <SupportTable
             tickets={openTickets}
+            tabLabel="Open"
             onStatusChange={handleStatusChange}
             onReply={handleReply}
           />
@@ -93,6 +90,7 @@ export function SupportTab({ tickets, onUpdateTicket }: SupportTabProps) {
         <SimpleTabsContent value="closed" className="mt-6">
           <SupportTable
             tickets={closedTickets}
+            tabLabel="Closed"
             onStatusChange={handleStatusChange}
             onReply={handleReply}
           />

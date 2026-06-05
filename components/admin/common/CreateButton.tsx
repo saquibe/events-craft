@@ -10,7 +10,11 @@ interface CreateButtonProps {
 
 export function CreateButton({ onClick, label }: CreateButtonProps) {
   return (
-    <Button onClick={onClick} color="primary" className="cursor-pointer">
+    <Button
+      onClick={onClick}
+      color="primary"
+      className="cursor-pointer text-base"
+    >
       <Plus className="h-4 w-4 mr-2" />
       {label}
     </Button>

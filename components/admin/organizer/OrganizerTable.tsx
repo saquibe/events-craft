@@ -85,7 +85,7 @@ export function OrganizerTable({ organizer, onEdit }: OrganizerTableProps) {
             <TableCell className="font-semibold text-foreground">
               Organizer Name
             </TableCell>
-            <TableCell className="font-medium">
+            <TableCell className="font-medium text-base">
               {organizer.orgName || "-"}
             </TableCell>
           </TableRow>
@@ -245,7 +245,7 @@ export function OrganizerTable({ organizer, onEdit }: OrganizerTableProps) {
           </TableRow>
 
           {/* Actions */}
-          <TableRow className="border-border">
+          {/* <TableRow className="border-border">
             <TableCell className="font-semibold text-foreground">
               Actions
             </TableCell>
@@ -260,7 +260,7 @@ export function OrganizerTable({ organizer, onEdit }: OrganizerTableProps) {
                 Edit Organizer
               </Button>
             </TableCell>
-          </TableRow>
+          </TableRow> */}
         </TableBody>
       </Table>
     </div>

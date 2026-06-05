@@ -67,7 +67,7 @@ export function OrganizerTab({
         }
       />
 
-      <p className="text-muted-foreground text-sm font-normal mb-6">
+      <p className="text-muted-foreground text-base font-normal mb-6">
         The table below shows all of the organizer profile and license details.
       </p>
 

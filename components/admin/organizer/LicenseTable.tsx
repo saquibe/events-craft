@@ -41,7 +41,7 @@ export function LicenseTable({ organizer, onEdit }: LicenseTableProps) {
             <TableCell className="font-semibold text-foreground">
               Organizer Code
             </TableCell>
-            <TableCell className="font-mono">
+            <TableCell className="font-mono text-base">
               {organizer.orgCode || "-"}
             </TableCell>
           </TableRow>
@@ -51,7 +51,7 @@ export function LicenseTable({ organizer, onEdit }: LicenseTableProps) {
               Validity Period
             </TableCell>
             <TableCell>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-base">
                 <span>
                   {formatDateRange(
                     organizer.orgValidFrom,
@@ -74,7 +74,7 @@ export function LicenseTable({ organizer, onEdit }: LicenseTableProps) {
           </TableRow>
 
           {/* Actions */}
-          <TableRow className="border-border hover:bg-muted/50">
+          {/* <TableRow className="border-border hover:bg-muted/50">
             <TableCell className="font-semibold text-foreground">
               Actions
             </TableCell>
@@ -89,7 +89,7 @@ export function LicenseTable({ organizer, onEdit }: LicenseTableProps) {
                 Edit License
               </Button>
             </TableCell>
-          </TableRow>
+          </TableRow> */}
         </TableBody>
       </Table>
     </div>

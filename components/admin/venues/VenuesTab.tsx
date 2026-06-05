@@ -65,7 +65,7 @@ export function VenuesTab({
       />
 
       {/* Description text */}
-      <p className="text-muted-foreground text-sm font-normal mb-6">
+      <p className="text-muted-foreground text-base font-normal mb-6">
         The table below shows all of the venues available for your events.
       </p>
 
@@ -77,13 +77,9 @@ export function VenuesTab({
         <div className="border-b border-border">
           <div className="flex justify-start">
             <SimpleTabsList>
-              <SimpleTabsTrigger value="active">
-                Active ({activeVenues.length})
-              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="active">Active</SimpleTabsTrigger>
 
-              <SimpleTabsTrigger value="suspended">
-                Suspended ({suspendedVenues.length})
-              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="suspended">Suspended</SimpleTabsTrigger>
             </SimpleTabsList>
           </div>
         </div>

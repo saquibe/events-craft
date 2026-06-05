@@ -41,10 +41,16 @@ export function TeamsTable({
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
-      <div className="flex justify-end">
-        <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      {/* Team Count + Search */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-semibold">
+            Members ({filteredTeams.length})
+          </h3>
+        </div>
+
+        <div className="relative w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search teams..."
             value={searchTerm}
@@ -84,7 +90,7 @@ export function TeamsTable({
               <TableRow>
                 <TableCell
                   colSpan={7}
-                  className="h-32 text-center text-muted-foreground"
+                  className="h-32 text-center text-muted-foreground text-base"
                 >
                   {searchTerm ? "No matching teams found" : "No teams found"}
                 </TableCell>
@@ -108,24 +114,24 @@ export function TeamsTable({
                         </AvatarFallback>
                       </Avatar>
 
-                      <span className="font-medium text-foreground">
+                      <span className="font-medium text-foreground text-base">
                         {team.firstName} {team.lastName}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-base">
                     {team.email}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-base">
                     {team.mobile}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-base">
                     {team.organization}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-base">
                     {team.designation}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-muted-foreground text-base">
                     <StatusBadge status={team.status} />
                   </TableCell>
                   <TableCell className="text-right">

@@ -39,10 +39,16 @@ export function VenuesTable({
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
-      <div className="flex justify-end">
-        <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      {/* Venue Count + Search */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-semibold">
+            Venues ({filteredVenues.length})
+          </h3>
+        </div>
+
+        <div className="relative w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search venues..."
             value={searchTerm}
@@ -74,7 +80,7 @@ export function VenuesTable({
               <TableRow>
                 <TableCell
                   colSpan={5}
-                  className="h-32 text-center text-muted-foreground"
+                  className="h-32 text-center text-muted-foreground text-base"
                 >
                   {searchTerm ? "No matching venues found" : "No venues found"}
                 </TableCell>
@@ -101,18 +107,18 @@ export function VenuesTable({
                         </div>
                       )}
 
-                      <span className="font-medium text-foreground">
+                      <span className="font-medium text-foreground text-base">
                         {venue.venueName}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-base">
                     {venue.city}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-base">
                     {venue.country}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-muted-foreground text-base">
                     <StatusBadge status={venue.status} />
                   </TableCell>
                   <TableCell className="text-right">

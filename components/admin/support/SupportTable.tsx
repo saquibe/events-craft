@@ -19,12 +19,14 @@ import { formatDate } from "@/lib/date";
 
 interface SupportTableProps {
   tickets: SupportTicket[];
+  tabLabel: string;
   onStatusChange: (id: string, status: SupportTicket["status"]) => void;
   onReply: (id: string) => void;
 }
 
 export function SupportTable({
   tickets,
+  tabLabel,
   onStatusChange,
   onReply,
 }: SupportTableProps) {
@@ -38,10 +40,16 @@ export function SupportTable({
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
-      <div className="flex justify-end">
-        <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      {/* Ticket Count + Search */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-semibold">
+            {tabLabel} Tickets ({filteredTickets.length})
+          </h3>
+        </div>
+
+        <div className="relative w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search tickets..."
             value={searchTerm}
@@ -80,7 +88,7 @@ export function SupportTable({
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="h-32 text-center text-muted-foreground"
+                  className="h-32 text-center text-muted-foreground text-base"
                 >
                   {searchTerm
                     ? "No matching tickets found"
@@ -93,19 +101,19 @@ export function SupportTable({
                   key={ticket.id}
                   className="border-border hover:bg-muted/50 h-20"
                 >
-                  <TableCell className="font-medium text-foreground">
+                  <TableCell className="font-medium text-foreground text-base">
                     #{ticket.id.slice(0, 8)}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-base">
                     {ticket.module}
                   </TableCell>
-                  <TableCell className="max-w-xs truncate text-muted-foreground">
+                  <TableCell className="max-w-xs truncate text-muted-foreground text-base">
                     {ticket.details}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-base">
                     {formatDate(ticket.createdAt)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-muted-foreground text-base">
                     <StatusBadge status={ticket.status} />
                   </TableCell>
                   <TableCell className="text-right">

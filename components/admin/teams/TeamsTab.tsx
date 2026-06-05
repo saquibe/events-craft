@@ -56,17 +56,17 @@ export function TeamsTab({ teams, onUpdateTeam, onDeleteTeam }: TeamsTabProps) {
   return (
     <>
       <PageHeader
-        title="Team Members"
+        title="Members"
         action={
           <CreateButton
             onClick={() => setIsSheetOpen(true)}
-            label="Add Team Member"
+            label="Add Member"
           />
         }
       />
 
       {/* Description text */}
-      <p className="text-muted-foreground text-sm font-normal mb-6">
+      <p className="text-muted-foreground text-base font-normal mb-6">
         The table below shows all of the team members associated with Meety
         Events.
       </p>
@@ -79,13 +79,9 @@ export function TeamsTab({ teams, onUpdateTeam, onDeleteTeam }: TeamsTabProps) {
         <div className="border-b border-border">
           <div className="flex justify-start">
             <SimpleTabsList>
-              <SimpleTabsTrigger value="active">
-                Active ({activeTeams.length})
-              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="active">Active</SimpleTabsTrigger>
 
-              <SimpleTabsTrigger value="suspended">
-                Suspended ({suspendedTeams.length})
-              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="suspended">Suspended</SimpleTabsTrigger>
             </SimpleTabsList>
           </div>
         </div>

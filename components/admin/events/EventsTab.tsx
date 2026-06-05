@@ -69,7 +69,7 @@ export function EventsTab({
         }
       />
 
-      <p className="text-muted-foreground text-sm font-normal mb-6">
+      <p className="text-muted-foreground text-base font-normal mb-6">
         The table below shows all of the events owned by Meety Events.
       </p>
 
@@ -83,11 +83,9 @@ export function EventsTab({
           <div className="flex justify-start">
             <SimpleTabsList>
               <SimpleTabsTrigger value="upcoming">
-                Upcoming Events ({upcomingEvents.length})
+                Upcoming Events
               </SimpleTabsTrigger>
-              <SimpleTabsTrigger value="past">
-                Past Events ({pastEvents.length})
-              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="past">Past Events</SimpleTabsTrigger>
             </SimpleTabsList>
           </div>
         </div>

@@ -76,7 +76,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             <TableCell className="font-semibold text-foreground">
               Organizer Name
             </TableCell>
-            <TableCell className="font-medium">
+            <TableCell className="font-medium text-base">
               {organizer.orgName || "-"}
             </TableCell>
           </TableRow>
@@ -85,14 +85,16 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             <TableCell className="font-semibold text-foreground">
               About
             </TableCell>
-            <TableCell>{organizer.orgAbout || "-"}</TableCell>
+            <TableCell className="text-base">
+              {organizer.orgAbout || "-"}
+            </TableCell>
           </TableRow>
 
           <TableRow className="border-border hover:bg-muted/50">
             <TableCell className="font-semibold text-foreground">
               Website
             </TableCell>
-            <TableCell>
+            <TableCell className="text-base">
               {organizer.orgWebsite ? (
                 <a
                   href={organizer.orgWebsite}
@@ -113,7 +115,9 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             <TableCell className="font-semibold text-foreground">
               Tax ID
             </TableCell>
-            <TableCell>{organizer.orgTaxId || "-"}</TableCell>
+            <TableCell className="text-base">
+              {organizer.orgTaxId || "-"}
+            </TableCell>
           </TableRow>
 
           {/* Address */}
@@ -121,7 +125,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             <TableCell className="font-semibold text-foreground">
               Address
             </TableCell>
-            <TableCell>
+            <TableCell className="text-base">
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-0.5 text-primary" />
                 <div>
@@ -143,7 +147,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             <TableCell className="font-semibold text-foreground">
               Facebook
             </TableCell>
-            <TableCell>
+            <TableCell className="text-base">
               {organizer.orgFb ? (
                 <a
                   href={organizer.orgFb}
@@ -163,7 +167,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             <TableCell className="font-semibold text-foreground">
               LinkedIn
             </TableCell>
-            <TableCell>
+            <TableCell className="text-base">
               {organizer.orgLin ? (
                 <a
                   href={organizer.orgLin}
@@ -183,7 +187,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             <TableCell className="font-semibold text-foreground">
               X (Twitter)
             </TableCell>
-            <TableCell>
+            <TableCell className="text-base">
               {organizer.orgX ? (
                 <a
                   href={organizer.orgX}
@@ -200,11 +204,11 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
           </TableRow>
 
           {/* Actions */}
-          <TableRow className="border-border hover:bg-muted/50">
+          {/* <TableRow className="border-border hover:bg-muted/50">
             <TableCell className="font-semibold text-foreground">
               Actions
             </TableCell>
-            <TableCell>
+            <TableCell className="text-base">
               <Button
                 variant="ghost"
                 size="sm"
@@ -215,7 +219,7 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
                 Edit Profile
               </Button>
             </TableCell>
-          </TableRow>
+          </TableRow> */}
         </TableBody>
       </Table>
     </div>

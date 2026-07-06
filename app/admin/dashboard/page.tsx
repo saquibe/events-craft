@@ -21,115 +21,331 @@ import {
   OrganizerTab,
 } from "@/components/admin";
 
-// Dummy Data
-const initialEvents: Event[] = [
-  {
-    id: "1",
-    eventName: "ABCON 2026",
-    eventLogo:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D",
-    venueName: "HITEX",
+const EVENT_COUNT = 100; // Change this to 100, 500, 1000, etc.
+
+const eventNames = [
+  "Medical Conference",
+  "Tech Summit",
+  "AI Expo",
+  "Startup Meetup",
+  "Healthcare Summit",
+  "Education Expo",
+  "Cloud Conference",
+  "FinTech Summit",
+  "Business Expo",
+  "Developer Conference",
+  "Innovation Summit",
+  "Marketing Meetup",
+  "Cyber Security Summit",
+  "Data Science Conference",
+  "Blockchain Expo",
+  "Women Leadership Summit",
+  "Digital India Summit",
+  "Product Launch",
+  "Networking Event",
+  "Global Conference",
+];
+
+const venues = [
+  "HITEX",
+  "HICC",
+  "Pragati Maidan",
+  "Jio Convention Centre",
+  "BIEC",
+  "World Trade Center",
+  "Convention Hall A",
+  "Convention Hall B",
+];
+
+const cities = [
+  "Hyderabad",
+  "Bangalore",
+  "Mumbai",
+  "Delhi",
+  "Chennai",
+  "Pune",
+  "Kolkata",
+  "Ahmedabad",
+];
+
+const eventTypes = [
+  "Conference",
+  "Workshop",
+  "Seminar",
+  "Exhibition",
+  "Networking",
+  "Summit",
+];
+
+const statuses = ["Published", "Draft", "Suspended", "Completed"] as const;
+
+const eventImages = [
+  "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600",
+  "https://images.unsplash.com/photo-1511578314322-379afb476865?w=600",
+  "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600",
+  "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600",
+  "https://images.unsplash.com/photo-1515169067868-5387ec356754?w=600",
+  "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600",
+];
+
+const initialEvents: Event[] = Array.from({ length: EVENT_COUNT }, (_, i) => {
+  const month = String((i % 12) + 1).padStart(2, "0");
+  const day = String((i % 28) + 1).padStart(2, "0");
+
+  return {
+    id: String(i + 1),
+    eventName: `${eventNames[i % eventNames.length]} ${2026 + (i % 3)}`,
+    eventLogo: eventImages[i % eventImages.length],
+    venueName: venues[i % venues.length],
     timeZone: "IST",
-    startDateTime: "2026-12-06T10:00",
-    endDateTime: "2026-12-08T18:00",
-    eventType: "Conference",
-    status: "Published",
-    city: "Hyderabad",
-  },
-  {
-    id: "2",
-    eventName:
-      "Medical Conference 2026 Medical Conference 2026 Medical Conference 2026",
-    eventLogo:
-      "https://plus.unsplash.com/premium_photo-1663089174939-5870e2e8d62e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZXZlbnR8ZW58MHx8MHx8fDA%3D",
-    venueName: "HICC",
-    timeZone: "IST",
-    startDateTime: "2026-11-15T09:00",
-    endDateTime: "2026-11-17T18:00",
-    eventType: "Conference",
-    status: "Draft",
-    city: "Hyderabad",
-  },
+    startDateTime: `2026-${month}-${day}T09:00`,
+    endDateTime: `2026-${month}-${day}T18:00`,
+    eventType: eventTypes[i % eventTypes.length],
+    status: statuses[i % statuses.length],
+    city: cities[i % cities.length],
+  };
+});
+
+const TEAM_COUNT = 50;
+
+const firstNames = [
+  "John",
+  "Jane",
+  "Michael",
+  "Sarah",
+  "David",
+  "Emily",
+  "Daniel",
+  "Sophia",
+  "James",
+  "Olivia",
+  "William",
+  "Emma",
+  "Liam",
+  "Ava",
+  "Noah",
+  "Mia",
+  "Ethan",
+  "Isabella",
+  "Lucas",
+  "Charlotte",
 ];
 
-const initialTeams: Team[] = [
-  {
-    id: "1",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@example.com",
-    organization: "Tech Corp",
-    designation: "Event Manager",
-    mobile: "+91 9876543210",
-    location: "Hyderabad",
-    profilePhoto:
-      "https://images.unsplash.com/photo-1695927621677-ec96e048dce2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZSUyMHBob3RvfGVufDB8fDB8fHww",
+const lastNames = [
+  "Smith",
+  "Johnson",
+  "Brown",
+  "Williams",
+  "Jones",
+  "Miller",
+  "Davis",
+  "Wilson",
+  "Taylor",
+  "Thomas",
+];
+
+const organizations = [
+  "Tech Corp",
+  "Events Co",
+  "AIG Hospitals",
+  "Global Events",
+  "Event Masters",
+  "Conference Hub",
+  "Innovate India",
+  "Summit Solutions",
+];
+
+const designations = [
+  "Event Manager",
+  "Coordinator",
+  "Project Manager",
+  "Marketing Executive",
+  "Operations Lead",
+  "Volunteer",
+  "Administrator",
+  "Speaker Manager",
+];
+
+const locations = [
+  "Hyderabad",
+  "Mumbai",
+  "Bangalore",
+  "Delhi",
+  "Chennai",
+  "Pune",
+  "Kolkata",
+  "Ahmedabad",
+];
+
+const profilePhotos = [
+  "https://images.unsplash.com/photo-1695927621677-ec96e048dce2?w=600",
+  "https://plus.unsplash.com/premium_photo-1690407617542-2f210cf20d7e?w=600",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600",
+  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600",
+  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600",
+];
+
+const teamStatuses: Team["status"][] = ["active", "inactive"];
+
+const initialTeams: Team[] = Array.from({ length: TEAM_COUNT }, (_, i) => {
+  const firstName = firstNames[i % firstNames.length];
+  const lastName = lastNames[i % lastNames.length];
+
+  return {
+    id: String(i + 1),
+    firstName,
+    lastName,
+    email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i + 1}@example.com`,
+    organization: organizations[i % organizations.length],
+    designation: designations[i % designations.length],
+    mobile: `+91 ${9000000000 + i}`,
+    location: locations[i % locations.length],
+    profilePhoto: profilePhotos[i % profilePhotos.length],
     role: "team",
-    status: "active",
-  },
-  {
-    id: "2",
-    firstName: "Jane Smith",
-    lastName: "Smith",
-    email: "jane@example.com",
-    organization: "Events Co",
-    designation: "Coordinator",
-    mobile: "+91 9876543211",
-    location: "Mumbai",
-    profilePhoto:
-      "https://plus.unsplash.com/premium_photo-1690407617542-2f210cf20d7e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZSUyMHBob3RvfGVufDB8fDB8fHww",
-    role: "team",
-    status: "active",
-  },
+    status: teamStatuses[i % teamStatuses.length],
+  };
+});
+
+const VENUE_COUNT = 50;
+
+const venueNames = [
+  "HITEX",
+  "HICC",
+  "Pragati Maidan",
+  "Jio Convention Centre",
+  "BIEC",
+  "World Trade Center",
+  "Convention Hall A",
+  "Convention Hall B",
+  "Expo Center",
+  "Grand Convention",
 ];
 
-const initialVenues: Venue[] = [
-  {
-    id: "1",
-    venueName: "HITEX",
-    venueAddress: "HITEX Trade Fair Office Building",
-    city: "Hyderabad",
-    country: "India",
-    website: "https://hitex.in",
-    venueImage:
-      "https://images.unsplash.com/photo-1521543387600-c745f8e83d77?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8dmVudWV8ZW58MHx8MHx8fDA%3D",
-    googleMapLink: "",
-    distanceFrom: [{ from: "Airport", unit: "15 km" }],
-    status: "Active",
-  },
-  {
-    id: "2",
-    venueName: "Hyderabad International Convention Centre Hyderabad",
-    venueAddress: "Hyderabad International Convention Centre",
-    city: "Hyderabad",
-    country: "India",
-    website: "https://hicc.com",
-    venueImage:
-      "https://media.istockphoto.com/id/1302442919/photo/luxury-beach-villa-at-night.webp?a=1&b=1&s=612x612&w=0&k=20&c=b0GO1cEmtHSuwmdlmkJGZVhiBoAtn-gNp6LYcPg12AQ=",
-    googleMapLink: "",
-    distanceFrom: [{ from: "Airport", unit: "20 km" }],
-    status: "Active",
-  },
+const venueCities = [
+  "Hyderabad",
+  "Bangalore",
+  "Mumbai",
+  "Delhi",
+  "Chennai",
+  "Pune",
+  "Kolkata",
+  "Ahmedabad",
 ];
 
-const initialTickets: SupportTicket[] = [
-  {
-    id: "1",
-    module: "Event Creation",
-    details: "Unable to create new event",
-    uploadImage: "",
-    status: "Open",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    module: "Payment Issue",
-    details: "Payment gateway not working",
-    uploadImage: "",
-    status: "In Progress",
-    createdAt: new Date().toISOString(),
-  },
+const venueCountries = ["India"];
+
+const venueImages = [
+  "https://images.unsplash.com/photo-1521543387600-c745f8e83d77?w=600",
+  "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=600",
+  "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=600",
+  "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=600",
+  "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600",
+  "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600",
 ];
+
+const venueDistanceTypes = [
+  "Airport",
+  "Railway Station",
+  "Bus Stand",
+  "Metro Station",
+];
+
+const venueStatuses: Venue["status"][] = ["Active", "Inactive"];
+
+const initialVenues: Venue[] = Array.from({ length: VENUE_COUNT }, (_, i) => ({
+  id: String(i + 1),
+
+  venueName: `${venueNames[i % venueNames.length]} ${i + 1}`,
+
+  venueAddress: `${100 + i}, ${
+    venueNames[i % venueNames.length]
+  }, ${venueCities[i % venueCities.length]}`,
+
+  city: venueCities[i % venueCities.length],
+
+  country: venueCountries[0],
+
+  website: `https://venue${i + 1}.example.com`,
+
+  venueImage: venueImages[i % venueImages.length],
+
+  googleMapLink: `https://maps.google.com/?q=${encodeURIComponent(
+    `${venueNames[i % venueNames.length]}, ${
+      venueCities[i % venueCities.length]
+    }`,
+  )}`,
+
+  distanceFrom: [
+    {
+      from: venueDistanceTypes[i % venueDistanceTypes.length],
+      unit: `${5 + (i % 25)} km`,
+    },
+  ],
+
+  status: venueStatuses[i % venueStatuses.length],
+}));
+
+const TICKET_COUNT = 50;
+
+const ticketModules = [
+  "Event Creation",
+  "Payment Issue",
+  "Registration",
+  "User Management",
+  "Team Management",
+  "Venue Management",
+  "Email Notification",
+  "Certificate",
+  "Dashboard",
+  "Reports",
+  "Login",
+  "Profile",
+  "Settings",
+  "Speaker Management",
+  "Sponsor Management",
+];
+
+const ticketDetails = [
+  "Unable to create new event.",
+  "Payment gateway is not working.",
+  "Registration form submission failed.",
+  "Unable to update user profile.",
+  "Venue details are not saving.",
+  "Team member invitation failed.",
+  "Email notifications are delayed.",
+  "Certificate download failed.",
+  "Dashboard is loading slowly.",
+  "Unable to export reports.",
+  "Login failed with valid credentials.",
+  "Image upload is not working.",
+  "Data is not syncing properly.",
+  "Page is showing a blank screen.",
+  "Unexpected server error occurred.",
+];
+
+const ticketStatuses: SupportTicket["status"][] = [
+  "Open",
+  "In Progress",
+  "Closed",
+];
+
+const initialTickets: SupportTicket[] = Array.from(
+  { length: TICKET_COUNT },
+  (_, i) => {
+    const createdDate = new Date();
+    createdDate.setDate(createdDate.getDate() - i);
+
+    return {
+      id: String(i + 1),
+      module: ticketModules[i % ticketModules.length],
+      details: ticketDetails[i % ticketDetails.length],
+      uploadImage: "",
+      status: ticketStatuses[i % ticketStatuses.length],
+      createdAt: createdDate.toISOString(),
+    };
+  },
+);
 
 const initialOrganizer: Organizer = {
   id: "1",

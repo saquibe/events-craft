@@ -59,12 +59,12 @@ export function OrganizerTab({
     <>
       <PageHeader
         title="Organizer Settings"
-        action={
-          <CreateButton
-            onClick={handleEdit}
-            label={organizer ? "Edit Organizer" : "Add Organizer"}
-          />
-        }
+        // action={
+        //   <CreateButton
+        //     onClick={handleEdit}
+        //     label={organizer ? "Edit Organizer" : "Add Organizer"}
+        //   />
+        // }
       />
 
       <p className="text-muted-foreground text-base font-normal mb-6">

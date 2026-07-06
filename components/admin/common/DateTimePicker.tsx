@@ -48,20 +48,23 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
   const ampm = hour24 >= 12 ? "PM" : "AM";
 
   return (
-    <div className="grid grid-cols-10 gap-2 items-end">
+    <div className="grid grid-cols-10 gap-2">
       {/* Date */}
       <div className="col-span-4">
-        {/* <label className="mb-1 block text-xs text-muted-foreground">Date</label> */}
+        <label className="mb-1 block text-xs text-muted-foreground">Date</label>
 
         <Popover>
           <PopoverTrigger asChild>
             <Button
+              type="button"
               variant="outline"
-              className="w-full justify-start text-left font-normal"
+              className="h-10 w-full justify-start rounded-md border border-input bg-background px-3 text-left font-normal shadow-none"
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
+              <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
 
-              {value ? format(currentDate, "dd MMM yyyy") : "Select Date"}
+              <span className="truncate">
+                {value ? format(currentDate, "dd MMM yyyy") : "Select Date"}
+              </span>
             </Button>
           </PopoverTrigger>
 
@@ -98,7 +101,7 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
             updateDateTime(currentDate, newHour, currentDate.getMinutes());
           }}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="h-10 cursor-pointer">
             <SelectValue />
           </SelectTrigger>
 
@@ -124,7 +127,7 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
             updateDateTime(currentDate, currentDate.getHours(), Number(minute))
           }
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="h-10 cursor-pointer">
             <SelectValue />
           </SelectTrigger>
 
@@ -149,18 +152,13 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
           onValueChange={(value) => {
             let hours = currentDate.getHours();
 
-            if (value === "PM" && hours < 12) {
-              hours += 12;
-            }
-
-            if (value === "AM" && hours >= 12) {
-              hours -= 12;
-            }
+            if (value === "PM" && hours < 12) hours += 12;
+            if (value === "AM" && hours >= 12) hours -= 12;
 
             updateDateTime(currentDate, hours, currentDate.getMinutes());
           }}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="h-10 cursor-pointer">
             <SelectValue />
           </SelectTrigger>
 

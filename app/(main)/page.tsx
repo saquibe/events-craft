@@ -29,201 +29,99 @@ import { useState } from "react";
 import clsx from "clsx";
 import { formatDateRange } from "@/lib/date";
 
-// Dummy data directly in the page
-const events = [
-  {
-    id: "1",
-    title:
-      "4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026 4th Mid-Term IAOHNS 2026",
-    description:
-      "Join the biggest medical conference of the year with industry leaders and innovative speakers.",
-    startDate: new Date("2026-05-29"),
-    endDate: new Date("2026-05-30"),
-    location: "Auditorium, AIG Hospitals, Gachibowli",
-    venue: "Auditorium, AIG Hospitals, Gachibowli",
-    attendees: 1200,
-    image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "2",
-    title: "International Conference on Neurology",
-    description:
-      "Experience live presentations from top neurologists around the world.",
-    startDate: new Date("2026-04-15"),
-    endDate: new Date("2026-04-17"),
-    location: "Convention Center, Mumbai",
-    venue: "Convention Center, Mumbai",
-    attendees: 800,
-    image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea",
-    category: "Medical",
-    isPast: true,
-  },
-  {
-    id: "3",
-    title: "Annual Surgery Symposium",
-    description: "Connect with leading surgeons and medical professionals.",
-    startDate: new Date("2026-06-10"),
-    endDate: new Date("2026-06-12"),
-    location: "Medical College, Delhi",
-    venue: "Medical College, Delhi",
-    attendees: 500,
-    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "4",
-    title: "Pediatrics Conference 2026",
-    description: "Latest advancements in child healthcare.",
-    startDate: new Date("2026-03-05"),
-    endDate: new Date("2026-03-07"),
-    location: "Convention Hall, Bangalore",
-    venue: "Convention Hall, Bangalore",
-    attendees: 600,
-    image: "https://images.unsplash.com/photo-1531058020387-3be344556be6",
-    category: "Medical",
-    isPast: true,
-  },
-  {
-    id: "5",
-    title: "Cardiology Summit",
-    description: "International summit on heart health and research.",
-    startDate: new Date("2026-07-20"),
-    endDate: new Date("2026-07-22"),
-    location: "Heart Institute, Chennai",
-    venue: "Heart Institute, Chennai",
-    attendees: 400,
-    image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "6",
-    title: "Radiology Workshop 2026",
-    description: "Hands-on workshop on modern radiology techniques.",
-    startDate: new Date("2026-02-10"),
-    endDate: new Date("2026-02-12"),
-    location: "Medical College, Pune",
-    venue: "Medical College, Pune",
-    attendees: 250,
-    image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea",
-    category: "Medical",
-    isPast: true,
-  },
-  {
-    id: "7",
-    title: "Cardiology Summit 2026",
-    description:
-      "International conference on advancements in cardiology and heart care.",
-    startDate: new Date("2026-03-15"),
-    endDate: new Date("2026-03-17"),
-    location: "AIIMS, New Delhi",
-    venue: "AIIMS Convention Center",
-    attendees: 500,
-    image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "8",
-    title: "Neurology Research Forum 2026",
-    description: "Explore the latest research and innovations in neurology.",
-    startDate: new Date("2026-04-05"),
-    endDate: new Date("2026-04-07"),
-    location: "NIMHANS, Bengaluru",
-    venue: "NIMHANS Auditorium",
-    attendees: 350,
-    image:
-      "https://images.unsplash.com/photo-1561489396-888724a1543d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "9",
-    title: "Pediatric Healthcare Expo 2026",
-    description:
-      "Conference focused on child healthcare and pediatric medicine.",
-    startDate: new Date("2026-05-20"),
-    endDate: new Date("2026-05-22"),
-    location: "Hyderabad International Convention Centre",
-    venue: "HICC, Hyderabad",
-    attendees: 420,
-    image: "https://images.unsplash.com/photo-1584515933487-779824d29309",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "10",
-    title: "Orthopedic Surgery Meet 2026",
-    description:
-      "Advanced discussions and live demonstrations in orthopedic surgery.",
-    startDate: new Date("2026-06-12"),
-    endDate: new Date("2026-06-14"),
-    location: "Apollo Hospitals, Chennai",
-    venue: "Apollo Medical Hall",
-    attendees: 280,
-    image: "https://images.unsplash.com/photo-1516549655169-df83a0774514",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "11",
-    title: "Dermatology Conference 2026",
-    description:
-      "Latest treatments and innovations in dermatology and skincare.",
-    startDate: new Date("2026-07-08"),
-    endDate: new Date("2026-07-10"),
-    location: "Kolkata Medical Center",
-    venue: "KMC Auditorium",
-    attendees: 300,
-    image: "https://images.unsplash.com/photo-1550831107-1553da8c8464",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "12",
-    title: "Emergency Medicine Workshop 2026",
-    description: "Practical emergency medicine and trauma care training.",
-    startDate: new Date("2026-08-18"),
-    endDate: new Date("2026-08-20"),
-    location: "Manipal Hospital, Jaipur",
-    venue: "Emergency Training Center",
-    attendees: 200,
-    image: "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "13",
-    title: "Global Oncology Congress 2026",
-    description:
-      "Comprehensive discussions on cancer treatment and oncology research.",
-    startDate: new Date("2026-09-25"),
-    endDate: new Date("2026-09-27"),
-    location: "Tata Memorial Hospital, Mumbai",
-    venue: "TMH Conference Hall",
-    attendees: 600,
-    image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118",
-    category: "Medical",
-    isPast: false,
-  },
-  {
-    id: "14",
-    title: "Medical AI & Innovation Summit 2026",
-    description:
-      "Exploring artificial intelligence and digital transformation in healthcare.",
-    startDate: new Date("2026-10-14"),
-    endDate: new Date("2026-10-16"),
-    location: "IIT Hyderabad",
-    venue: "Innovation Hub Auditorium",
-    attendees: 450,
-    image: "https://images.unsplash.com/photo-1530497610245-94d3c16cda28",
-    category: "Medical",
-    isPast: false,
-  },
+const EVENT_COUNT = 50;
+
+const titles = [
+  "Medical Conference",
+  "Cardiology Summit",
+  "Neurology Forum",
+  "AI in Healthcare Summit",
+  "Healthcare Expo",
+  "Surgery Symposium",
+  "Pediatrics Conference",
+  "Orthopedic Meet",
+  "Dermatology Congress",
+  "Radiology Workshop",
+  "Emergency Medicine Summit",
+  "Global Oncology Congress",
+  "Medical Innovation Expo",
+  "Clinical Research Conference",
+  "Digital Health Summit",
+  "Nursing Excellence Forum",
+  "Pharma Conference",
+  "Medical Education Summit",
+  "Public Health Congress",
+  "International Healthcare Forum",
 ];
+
+const descriptions = [
+  "Join leading healthcare professionals and industry experts.",
+  "Explore the latest innovations in medical science.",
+  "Learn from world-renowned speakers and researchers.",
+  "Hands-on workshops and networking opportunities.",
+  "Discover cutting-edge technologies in healthcare.",
+];
+
+const venues = [
+  "AIG Hospitals",
+  "HITEX Exhibition Center",
+  "HICC",
+  "AIIMS Convention Center",
+  "Apollo Hospitals",
+  "NIMS Auditorium",
+  "KIMS Hospital",
+  "Medical College Auditorium",
+];
+
+const cities = [
+  "Hyderabad",
+  "Bangalore",
+  "Mumbai",
+  "Delhi",
+  "Chennai",
+  "Pune",
+  "Kolkata",
+  "Ahmedabad",
+];
+
+const images = [
+  "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200",
+  "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=1200",
+  "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200",
+  "https://images.unsplash.com/photo-1531058020387-3be344556be6?w=1200",
+  "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200",
+  "https://images.unsplash.com/photo-1584515933487-779824d29309?w=1200",
+];
+
+const categories = [
+  "Medical",
+  "Technology",
+  "Healthcare",
+  "Business",
+  "Education",
+];
+
+const events = Array.from({ length: EVENT_COUNT }, (_, i) => {
+  const month = (i % 12) + 1;
+  const day = (i % 28) + 1;
+
+  const startDate = new Date(2026, month - 1, day);
+  const endDate = new Date(2026, month - 1, day + 2);
+
+  return {
+    id: String(i + 1),
+    title: `${titles[i % titles.length]} ${2026 + (i % 3)}`,
+    description: descriptions[i % descriptions.length],
+    startDate,
+    endDate,
+    location: `${venues[i % venues.length]}, ${cities[i % cities.length]}`,
+    venue: venues[i % venues.length],
+    attendees: 100 + ((i * 37) % 1900), // 100-1999 attendees
+    image: images[i % images.length],
+    category: categories[i % categories.length],
+    isPast: endDate < new Date(),
+  };
+});
 
 const ITEMS_PER_PAGE = 9;
 

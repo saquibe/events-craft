@@ -86,21 +86,16 @@ export default function AdminHeader() {
       <div className="flex h-16 items-center justify-between px-6">
         {/* Left side - Logo */}
         <div className="flex items-center gap-6">
-          <Link href="/admin/dashboard" className="flex items-center gap-3">
-            {/* Logo Image - Larger size */}
-            <div className="w-40 h-40 relative">
+          <Link href="/admin/dashboard" className="flex items-center">
+            <div className="relative h-12 w-36">
               <Image
                 src={getLogo()}
                 alt="EventsCraft Logo"
-                width={100}
-                height={100}
-                className="w-full h-full object-contain"
+                fill
+                className="object-contain"
                 priority
               />
             </div>
-            {/* <span className="font-semibold text-xl hidden sm:inline-block bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
-              EventsCraft
-            </span> */}
           </Link>
         </div>
 

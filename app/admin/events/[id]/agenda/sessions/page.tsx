@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { SessionTable } from "@/components/admin/agenda/SessionTable";
 import { SessionFormSheet } from "@/components/admin/agenda/SessionFormSheet";
 import { Session, Hall, Track } from "@/lib/types/agenda";
+import { CreateButton } from "@/components/admin/common/CreateButton";
 
 // Mock data
 const mockHalls: Hall[] = [
@@ -92,15 +93,13 @@ export default function SessionsPage() {
             Manage sessions for Event #{eventId}
           </p>
         </div>
-        <Button
+        <CreateButton
+          label="Add Session"
           onClick={() => {
             setEditingSession(null);
             setIsFormOpen(true);
           }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Session
-        </Button>
+        />
       </div>
 
       <SessionTable

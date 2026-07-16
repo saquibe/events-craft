@@ -108,7 +108,12 @@ export function ConvertToSpeakerTable({
             <Edit className="h-4 w-4 mr-1" />
             Edit
           </Button>
-          <Button size="sm" onClick={() => onConvert(attendee.id)}>
+          <Button
+            size="sm"
+            onClick={() => onConvert(attendee.id)}
+            color="primary"
+            className="cursor-pointer"
+          >
             <UserPlus className="h-4 w-4 mr-1" />
             Convert
           </Button>

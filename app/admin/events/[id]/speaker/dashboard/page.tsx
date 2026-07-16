@@ -8,6 +8,7 @@ import type { Speaker } from "@/lib/types/speaker";
 import { SpeakerDashboard } from "@/components/admin/speaker/SpeakerDashboard";
 import { SpeakerTable } from "@/components/admin/speaker/SpeakerTable";
 import { SpeakerFormSheet } from "@/components/admin/speaker/SpeakerFormSheet";
+import { CreateButton } from "@/components/admin";
 
 // Mock data - replace with actual API calls
 const mockSpeakers: Speaker[] = [
@@ -81,23 +82,21 @@ export default function SpeakerDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Speakers</h2>
           <p className="text-muted-foreground">
             Manage speakers for Event #{eventId}
           </p>
         </div>
-        <Button
+        <CreateButton
+          label="Add Speaker"
           onClick={() => {
             setEditingSpeaker(null);
             setIsFormOpen(true);
           }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Speaker
-        </Button>
-      </div>
+        />
+      </div> */}
 
       {/* Dashboard Stats */}
       <SpeakerDashboard speakers={speakers} />

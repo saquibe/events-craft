@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { HallTable } from "@/components/admin/agenda/HallTable";
 import { HallFormSheet } from "@/components/admin/agenda/HallFormSheet";
 import { Hall } from "@/lib/types/agenda";
+import { CreateButton } from "@/components/admin";
 
 // Mock data - replace with actual data
 const mockHalls: Hall[] = [
@@ -75,15 +76,13 @@ export default function HallsPage() {
             Manage halls for Event #{eventId}
           </p>
         </div>
-        <Button
+        <CreateButton
+          label="Add Hall"
           onClick={() => {
             setEditingHall(null);
             setIsFormOpen(true);
           }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Hall
-        </Button>
+        />
       </div>
 
       <HallTable halls={halls} onEdit={handleEdit} onDelete={handleDelete} />

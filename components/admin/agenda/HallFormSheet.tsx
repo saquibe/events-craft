@@ -146,7 +146,12 @@ export function HallFormSheet({
             />
 
             <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                color="primary"
+                className="cursor-pointer text-base"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -157,6 +162,7 @@ export function HallFormSheet({
                 )}
               </Button>
               <Button
+                className="cursor-pointer text-base"
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}

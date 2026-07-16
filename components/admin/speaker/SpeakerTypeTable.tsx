@@ -10,12 +10,14 @@ interface SpeakerTypeTableProps {
   types: SpeakerType[];
   onEdit: (type: SpeakerType) => void;
   onDelete: (id: string) => void;
+  onAddNew: () => void;
 }
 
 export function SpeakerTypeTable({
   types,
   onEdit,
   onDelete,
+  onAddNew,
 }: SpeakerTypeTableProps) {
   const columns = [
     {
@@ -39,7 +41,7 @@ export function SpeakerTypeTable({
     {
       key: "status",
       header: "Status",
-      cell: () => <Badge variant="default">Active</Badge>,
+      cell: () => <Badge color="primary">Active</Badge>,
     },
     {
       key: "actions",
@@ -83,7 +85,9 @@ export function SpeakerTypeTable({
               Manage speaker categories
             </p>
           </div>
-          <Button size="sm">Add New Type</Button>
+          {/* <Button size="sm" onClick={onAddNew}>
+            Add New Type
+          </Button> */}
         </div>
       )}
     />

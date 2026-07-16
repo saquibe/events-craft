@@ -34,7 +34,13 @@ import { Badge } from "@/components/ui/badge";
 
 const formSchema = z.object({
   name: z.string().min(1, "Session name is required"),
-  chairperson: z.array(z.string()).default([]),
+  chairperson: z
+    .array(
+      z.object({
+        name: z.string(),
+      }),
+    )
+    .default([]),
   trackId: z.string().min(1, "Track is required"),
   hallId: z.string().min(1, "Hall is required"),
   sessionDate: z.string().min(1, "Session date is required"),
@@ -87,7 +93,10 @@ export function SessionFormSheet({
     if (session) {
       form.reset({
         name: session.name,
-        chairperson: session.chairperson || [],
+        chairperson:
+          session.chairperson?.map((item) => ({
+            name: item,
+          })) || [],
         trackId: session.trackId,
         hallId: session.hallId,
         sessionDate: session.sessionDate,
@@ -110,14 +119,19 @@ export function SessionFormSheet({
   }, [session, form]);
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    await onSubmit(values);
+    await onSubmit({
+      ...values,
+      chairperson: values.chairperson.map((c) => c.name),
+    });
+
     if (!isSubmitting) {
       onOpenChange(false);
     }
   };
-
   const handleAddChairperson = () => {
-    append("");
+    append({
+      name: "",
+    });
   };
 
   return (
@@ -162,7 +176,9 @@ export function SessionFormSheet({
                       <div key={field.id} className="flex items-center gap-2">
                         <Input
                           placeholder="Enter chairperson name"
-                          {...form.register(`chairperson.${index}`)}
+                          {...form.register(
+                            `chairperson.${index}.name` as const,
+                          )}
                         />
                         <Button
                           type="button"
@@ -319,7 +335,12 @@ export function SessionFormSheet({
             />
 
             <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                color="primary"
+                className="cursor-pointer text-base"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -333,6 +354,7 @@ export function SessionFormSheet({
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                className="cursor-pointer text-base"
               >
                 Cancel
               </Button>

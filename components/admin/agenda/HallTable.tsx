@@ -34,7 +34,7 @@ export function HallTable({ halls, onEdit, onDelete }: HallTableProps) {
     {
       key: "status",
       header: "Status",
-      cell: () => <Badge variant="default">Active</Badge>,
+      cell: () => <Badge color="primary">Active</Badge>,
     },
     {
       key: "actions",

@@ -396,7 +396,12 @@ export function SpeakerFormSheet({
             </div>
 
             <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                color="primary"
+                className="cursor-pointer text-base"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -409,6 +414,7 @@ export function SpeakerFormSheet({
               <Button
                 type="button"
                 variant="outline"
+                className="text-base"
                 onClick={() => onOpenChange(false)}
               >
                 Cancel

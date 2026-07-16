@@ -34,7 +34,7 @@ export function TrackTable({ tracks, onEdit, onDelete }: TrackTableProps) {
     {
       key: "status",
       header: "Status",
-      cell: () => <Badge variant="default">Active</Badge>,
+      cell: () => <Badge color="primary">Active</Badge>,
     },
     {
       key: "actions",

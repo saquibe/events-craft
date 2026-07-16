@@ -300,10 +300,11 @@ export function EventSidebar({ eventId }: EventSidebarProps) {
               w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200
               ${
                 isActiveItem
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "text-muted-foreground hover:bg-primary/8 hover:text-primary"
               }
-              ${depth > 0 ? "pl-8" : ""}
+              ${depth === 1 ? "pl-10" : ""}
+${depth >= 2 ? "pl-14" : ""}
             `}
           >
             {item.icon && <item.icon className="h-4 w-4 flex-shrink-0" />}
@@ -315,7 +316,7 @@ export function EventSidebar({ eventId }: EventSidebarProps) {
             )}
           </button>
           {isOpen && (
-            <div className="ml-2 border-l border-border/50 pl-2">
+            <div className="ml-4 mt-2 space-y-1 border-l-2 border-primary/15 pl-4">
               {item.subItems?.map((subItem) =>
                 renderMenuItem(subItem, depth + 1),
               )}
@@ -333,8 +334,8 @@ export function EventSidebar({ eventId }: EventSidebarProps) {
           flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200
           ${
             isActiveItem
-              ? "bg-primary/10 text-primary font-medium"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              ? "bg-primary/10 text-primary font-semibold"
+              : "text-muted-foreground hover:bg-primary/8 hover:text-primary"
           }
           ${depth > 0 ? "pl-8" : ""}
         `}
@@ -355,7 +356,7 @@ export function EventSidebar({ eventId }: EventSidebarProps) {
           <span className="text-sm font-medium">Event Menu</span>
         </div>
 
-        <nav className="space-y-0.5">
+        <nav className="space-y-1">
           {menuData.map((item) => renderMenuItem(item))}
         </nav>
       </div>

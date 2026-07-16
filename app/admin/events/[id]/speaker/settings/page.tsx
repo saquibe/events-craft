@@ -110,8 +110,12 @@ export default function SpeakerSettingsPage() {
       </Tabs>
 
       <div className="flex gap-3">
-        <Button>Save Settings</Button>
-        <Button variant="outline">Reset to Default</Button>
+        <Button color="primary" className="cursor-pointer text-base">
+          Save Settings
+        </Button>
+        <Button variant="outline" className="cursor-pointer text-base">
+          Reset to Default
+        </Button>
       </div>
     </div>
   );

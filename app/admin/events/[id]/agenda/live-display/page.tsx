@@ -46,13 +46,16 @@ export default function LiveDisplayPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm">
+          <Button variant="outline">
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
           <Button
             onClick={() => setIsLive(!isLive)}
-            className={isLive ? "bg-red-500 hover:bg-red-600" : ""}
+            variant={"outline"}
+            // className={isLive ? "bg-red-500 hover:bg-red-600" : ""}
+            color="primary"
+            className="cursor-pointer text-base"
           >
             {isLive ? (
               <>
@@ -77,7 +80,7 @@ export default function LiveDisplayPage() {
                 <Monitor className="h-5 w-5" />
                 Live Display Preview
                 {isLive && (
-                  <Badge variant="destructive" className="ml-2 animate-pulse">
+                  <Badge color="primary" className="ml-2 animate-pulse">
                     LIVE
                   </Badge>
                 )}
@@ -143,8 +146,8 @@ export default function LiveDisplayPage() {
                         </p>
                       </div>
                       <Badge
-                        variant={
-                          session.status === "ongoing" ? "default" : "secondary"
+                        color={
+                          session.status === "ongoing" ? "primary" : "secondary"
                         }
                       >
                         {session.status}

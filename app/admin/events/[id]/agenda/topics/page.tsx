@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { TopicTable } from "@/components/admin/agenda/TopicTable";
 import { TopicFormSheet } from "@/components/admin/agenda/TopicFormSheet";
 import { Topic, Session } from "@/lib/types/agenda";
+import { CreateButton } from "@/components/admin/common/CreateButton";
 
 // Mock data
 const mockSessions: Session[] = [
@@ -94,15 +95,13 @@ export default function TopicsPage() {
             Manage topics for Event #{eventId}
           </p>
         </div>
-        <Button
+        <CreateButton
+          label="Add Topic"
           onClick={() => {
             setEditingTopic(null);
             setIsFormOpen(true);
           }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Topic
-        </Button>
+        />
       </div>
 
       <TopicTable topics={topics} onEdit={handleEdit} onDelete={handleDelete} />

@@ -1,28 +1,49 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import AdminHeader from "@/components/partials/header/admin-header";
-import Footer from "@/components/partials/footer";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const pathname = usePathname();
-  const isLoginPage = pathname === "/admin/login";
+  const [isAuth, setIsAuth] = useState(false);
 
-  // For login page, don't show header/footer
-  if (isLoginPage) {
+  useEffect(() => {
+    const auth = localStorage.getItem("adminAuth");
+    if (!auth && !pathname?.includes("/admin/login")) {
+      router.push("/admin/login");
+    } else {
+      setIsAuth(true);
+    }
+  }, [router, pathname]);
+
+  // Don't show header on login page
+  if (pathname?.includes("/admin/login")) {
     return <>{children}</>;
   }
 
-  // For other admin pages (dashboard, events, etc.), show admin header and footer
+  if (!isAuth) {
+    return null;
+  }
+
+  // If we're on an event page, don't render the header here
+  // The event layout will render it
+  if (
+    pathname?.includes("/admin/events/") &&
+    !pathname?.includes("/admin/events/[id]")
+  ) {
+    return <>{children}</>;
+  }
+
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="flex flex-col min-h-screen">
       <AdminHeader />
       <main className="flex-1">{children}</main>
-      <Footer />
     </div>
   );
 }

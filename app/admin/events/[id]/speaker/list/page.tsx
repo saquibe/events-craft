@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import type { Speaker } from "@/lib/types/speaker";
 import { SpeakerTable } from "@/components/admin/speaker/SpeakerTable";
 import { SpeakerFormSheet } from "@/components/admin/speaker/SpeakerFormSheet";
+import { CreateButton } from "@/components/admin/common/CreateButton";
 
 // Use the same mock data
 const mockSpeakers: Speaker[] = [
@@ -48,15 +49,13 @@ export default function SpeakerListPage() {
             All speakers for Event #{eventId}
           </p>
         </div>
-        <Button
+        <CreateButton
+          label="Add Speaker"
           onClick={() => {
             setEditingSpeaker(null);
             setIsFormOpen(true);
           }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Speaker
-        </Button>
+        />
       </div>
 
       <SpeakerTable

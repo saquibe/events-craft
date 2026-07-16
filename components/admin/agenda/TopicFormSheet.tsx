@@ -46,11 +46,13 @@ const formSchema = z.object({
   sessionId: z.string().min(1, "Session is required"),
   topicType: z.enum(TOPIC_TYPES),
   topic: z.string().min(1, "Topic is required"),
-  speakers: z.array(z.string()).default([]),
-  moderator: z.array(z.string()).default([]),
-  panellists: z.array(z.string()).default([]),
-  teamMembers: z.array(z.string()).default([]),
-  presenters: z.array(z.string()).default([]),
+
+  speakers: z.array(z.object({ name: z.string() })).default([]),
+  moderator: z.array(z.object({ name: z.string() })).default([]),
+  panellists: z.array(z.object({ name: z.string() })).default([]),
+  teamMembers: z.array(z.object({ name: z.string() })).default([]),
+  presenters: z.array(z.object({ name: z.string() })).default([]),
+
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
   aboutTopic: z.string().optional(),
@@ -121,11 +123,13 @@ export function TopicFormSheet({
         sessionId: topic.sessionId,
         topicType: topic.topicType,
         topic: topic.topic,
-        speakers: topic.speakers || [],
-        moderator: topic.moderator || [],
-        panellists: topic.panellists || [],
-        teamMembers: topic.teamMembers || [],
-        presenters: topic.presenters || [],
+
+        speakers: topic.speakers?.map((name) => ({ name })) ?? [],
+        moderator: topic.moderator?.map((name) => ({ name })) ?? [],
+        panellists: topic.panellists?.map((name) => ({ name })) ?? [],
+        teamMembers: topic.teamMembers?.map((name) => ({ name })) ?? [],
+        presenters: topic.presenters?.map((name) => ({ name })) ?? [],
+
         startTime: topic.startTime,
         endTime: topic.endTime,
         aboutTopic: topic.aboutTopic || "",
@@ -148,7 +152,15 @@ export function TopicFormSheet({
   }, [topic, form]);
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    await onSubmit(values);
+    await onSubmit({
+      ...values,
+      speakers: values.speakers.map((x) => x.name),
+      moderator: values.moderator.map((x) => x.name),
+      panellists: values.panellists.map((x) => x.name),
+      teamMembers: values.teamMembers.map((x) => x.name),
+      presenters: values.presenters.map((x) => x.name),
+    });
+
     if (!isSubmitting) {
       onOpenChange(false);
     }
@@ -156,20 +168,28 @@ export function TopicFormSheet({
 
   const renderMultiSelect = (
     label: string,
-    fields: any,
+    fieldName:
+      | "speakers"
+      | "moderator"
+      | "panellists"
+      | "teamMembers"
+      | "presenters",
+    fields: any[],
     append: any,
     remove: any,
     placeholder: string,
   ) => (
     <FormItem>
       <FormLabel>{label}</FormLabel>
+
       <div className="space-y-2">
-        {fields.map((field: any, index: number) => (
+        {fields.map((field, index) => (
           <div key={field.id} className="flex items-center gap-2">
             <Input
               placeholder={placeholder}
-              {...form.register(`speakers.${index}`)}
+              {...form.register(`${fieldName}.${index}.name` as const)}
             />
+
             <Button
               type="button"
               variant="ghost"
@@ -180,16 +200,18 @@ export function TopicFormSheet({
             </Button>
           </div>
         ))}
+
         <Button
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => append("")}
+          onClick={() => append({ name: "" })}
         >
-          <Plus className="h-4 w-4 mr-1" />
+          <Plus className="mr-1 h-4 w-4" />
           Add {label}
         </Button>
       </div>
+
       <FormMessage />
     </FormItem>
   );
@@ -284,6 +306,7 @@ export function TopicFormSheet({
             {/* Multi-select fields */}
             {renderMultiSelect(
               "Speakers",
+              "speakers",
               speakerFields.fields,
               speakerFields.append,
               speakerFields.remove,
@@ -292,6 +315,7 @@ export function TopicFormSheet({
 
             {renderMultiSelect(
               "Moderator",
+              "moderator",
               moderatorFields.fields,
               moderatorFields.append,
               moderatorFields.remove,
@@ -300,6 +324,7 @@ export function TopicFormSheet({
 
             {renderMultiSelect(
               "Panellists",
+              "panellists",
               panellistFields.fields,
               panellistFields.append,
               panellistFields.remove,
@@ -308,6 +333,7 @@ export function TopicFormSheet({
 
             {renderMultiSelect(
               "Team Members",
+              "teamMembers",
               teamMemberFields.fields,
               teamMemberFields.append,
               teamMemberFields.remove,
@@ -316,6 +342,7 @@ export function TopicFormSheet({
 
             {renderMultiSelect(
               "Presenters",
+              "presenters",
               presenterFields.fields,
               presenterFields.append,
               presenterFields.remove,
@@ -371,7 +398,12 @@ export function TopicFormSheet({
             />
 
             <div className="flex gap-3 pt-4">
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                color="primary"
+                className="cursor-pointer text-base"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -385,6 +417,7 @@ export function TopicFormSheet({
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                className="cursor-pointer text-base"
               >
                 Cancel
               </Button>

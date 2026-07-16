@@ -26,7 +26,7 @@ export function TopicTable({ topics, onEdit, onDelete }: TopicTableProps) {
       key: "topicType",
       header: "Topic Type",
       cell: (topic: Topic) => (
-        <Badge variant="secondary">{topic.topicType}</Badge>
+        <Badge color="secondary">{topic.topicType}</Badge>
       ),
     },
     {

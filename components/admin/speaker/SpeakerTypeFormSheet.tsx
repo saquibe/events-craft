@@ -22,29 +22,29 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Track } from "@/lib/types/agenda";
+import type { SpeakerType } from "@/lib/types/speaker";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Track name is required"),
+  name: z.string().min(1, "Type name is required"),
   description: z.string().optional(),
 });
 
-interface TrackFormSheetProps {
+interface SpeakerTypeFormSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  track?: Track | null;
-  onSubmit: (data: any) => Promise<void>;
+  type?: SpeakerType | null;
+  onSubmit: (data: { name: string; description?: string }) => Promise<void>;
   isSubmitting?: boolean;
 }
 
-export function TrackFormSheet({
+export function SpeakerTypeFormSheet({
   open,
   onOpenChange,
-  track,
+  type,
   onSubmit,
   isSubmitting = false,
-}: TrackFormSheetProps) {
+}: SpeakerTypeFormSheetProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,10 +54,10 @@ export function TrackFormSheet({
   });
 
   useEffect(() => {
-    if (track) {
+    if (type) {
       form.reset({
-        name: track.name,
-        description: track.description || "",
+        name: type.name,
+        description: type.description || "",
       });
     } else {
       form.reset({
@@ -65,23 +65,32 @@ export function TrackFormSheet({
         description: "",
       });
     }
-  }, [track, form]);
+  }, [type, form]);
+
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    await onSubmit(values);
+    if (!isSubmitting) {
+      onOpenChange(false);
+    }
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle>{track ? "Edit Track" : "Add Track"}</SheetTitle>
+          <SheetTitle>
+            {type ? "Edit Speaker Type" : "Add Speaker Type"}
+          </SheetTitle>
           <SheetDescription>
-            {track
-              ? "Update the track information"
-              : "Add a new track for the event"}
+            {type
+              ? "Update the speaker type information"
+              : "Add a new speaker type category"}
           </SheetDescription>
         </SheetHeader>
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-6 py-4"
           >
             <FormField
@@ -89,9 +98,9 @@ export function TrackFormSheet({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Track Name *</FormLabel>
+                  <FormLabel>Type Name *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter track name" {...field} />
+                    <Input placeholder="Enter type name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,17 +135,17 @@ export function TrackFormSheet({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {track ? "Updating..." : "Adding..."}
+                    {type ? "Updating..." : "Adding..."}
                   </>
                 ) : (
-                  <>{track ? "Update Track" : "Add Track"}</>
+                  <>{type ? "Update Type" : "Add Type"}</>
                 )}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onOpenChange(false)}
                 className="cursor-pointer text-base"
+                onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>

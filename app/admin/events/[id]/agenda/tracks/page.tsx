@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { TrackTable } from "@/components/admin/agenda/TrackTable";
 import { TrackFormSheet } from "@/components/admin/agenda/TrackFormSheet";
 import { Track } from "@/lib/types/agenda";
+import { CreateButton } from "@/components/admin/common/CreateButton";
 
 // Mock data
 const mockTracks: Track[] = [
@@ -73,15 +74,13 @@ export default function TracksPage() {
             Manage tracks for Event #{eventId}
           </p>
         </div>
-        <Button
+        <CreateButton
+          label="Add Track"
           onClick={() => {
             setEditingTrack(null);
             setIsFormOpen(true);
           }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Track
-        </Button>
+        />
       </div>
 
       <TrackTable tracks={tracks} onEdit={handleEdit} onDelete={handleDelete} />

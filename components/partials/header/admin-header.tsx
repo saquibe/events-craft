@@ -1,10 +1,9 @@
-//app/components/partials/header/admin-header.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Bell,
   Moon,
@@ -13,6 +12,7 @@ import {
   Settings,
   LogOut,
   HelpCircle,
+  ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,15 +57,46 @@ const notifications = [
   },
 ];
 
-export default function AdminHeader() {
+// Mock function to get event data - replace with actual data fetching
+const getEventData = (eventId: string) => {
+  return {
+    id: eventId,
+    name: "Medical Conference 2026",
+    status: "Published",
+  };
+};
+
+interface AdminHeaderProps {
+  showEventContext?: boolean;
+}
+
+export default function AdminHeader({
+  showEventContext = false,
+}: AdminHeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [eventData, setEventData] = useState<{
+    id: string;
+    name: string;
+    status: string;
+  } | null>(null);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+
+    // Extract event ID from pathname
+    const match = pathname?.match(/\/admin\/events\/([^/]+)/);
+    if (match && showEventContext) {
+      const eventId = match[1];
+      const data = getEventData(eventId);
+      setEventData(data);
+    } else {
+      setEventData(null);
+    }
+  }, [pathname, showEventContext]);
 
   const handleLogout = () => {
     localStorage.removeItem("adminAuth");
@@ -74,19 +105,40 @@ export default function AdminHeader() {
 
   // Determine which logo to show based on theme
   const getLogo = () => {
-    if (!mounted) return "/images/logo/logo-w-2.png"; // Default fallback
-
+    if (!mounted) return "/images/logo/logo-w-2.png";
     if (theme === "dark") {
-      return "/images/logo/logo-w-2.png"; // White logo for dark theme
+      return "/images/logo/logo-w-2.png";
     }
-    return "/images/logo/logo-w-1.png"; // Dark/colored logo for light theme
+    return "/images/logo/logo-w-1.png";
   };
+
+  // Check if we're on an event page
+  const isEventPage =
+    pathname?.includes("/admin/events/") &&
+    !pathname?.includes("/admin/events/[id]");
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center justify-between px-6">
-        {/* Left side - Logo */}
-        <div className="flex items-center gap-6">
+        {/* Left side - Back Button, Logo, and Event Context */}
+        <div className="flex items-center gap-3">
+          {/* Back Button - Show on event pages */}
+          {isEventPage && eventData && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2 text-muted-foreground hover:text-foreground"
+                onClick={() => router.push("/admin/dashboard")}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Back
+              </Button>
+              <div className="h-6 w-px bg-border" />
+            </>
+          )}
+
+          {/* Logo */}
           <Link href="/admin/dashboard" className="flex items-center">
             <div className="relative h-12 w-36">
               <Image
@@ -98,6 +150,32 @@ export default function AdminHeader() {
               />
             </div>
           </Link>
+
+          {/* Event Context - Show when on event pages */}
+          {isEventPage && eventData && (
+            <>
+              <div className="h-6 w-px bg-border" />
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-foreground">
+                  {eventData.name}
+                </span>
+                <Badge
+                  color={
+                    eventData.status === "Published"
+                      ? "success"
+                      : eventData.status === "Draft"
+                        ? "secondary"
+                        : eventData.status === "Completed"
+                          ? "default"
+                          : "destructive"
+                  }
+                  className="text-xs"
+                >
+                  {eventData.status}
+                </Badge>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Right side - Actions */}
@@ -172,9 +250,6 @@ export default function AdminHeader() {
               >
                 <Avatar className="h-10 w-10 cursor-pointer">
                   <AvatarImage src="/images/avatar/default-avatar.png" />
-                  {/* <AvatarFallback className="bg-primary text-white">
-                    AD
-                  </AvatarFallback> */}
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -183,9 +258,6 @@ export default function AdminHeader() {
                 <div className="flex items-center gap-3 p-3 border-b">
                   <Avatar className="h-12 w-12">
                     <AvatarImage src="/images/avatar/default-avatar.png" />
-                    {/* <AvatarFallback className="bg-primary text-white">
-                          AD
-                        </AvatarFallback> */}
                   </Avatar>
                   <div className="flex flex-col">
                     <span className="font-semibold">Admin User</span>

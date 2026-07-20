@@ -252,6 +252,7 @@ export function VenueFormSheet({
             <Label className="text-foreground">Venue Image</Label>
 
             <Input
+              className="cursor-pointer file:cursor-pointer"
               type="file"
               accept="image/*"
               onChange={(e) => {

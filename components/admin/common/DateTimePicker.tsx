@@ -16,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface DateTimePickerProps {
   value: string;
@@ -23,6 +25,7 @@ interface DateTimePickerProps {
 }
 
 export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
+  const [open, setOpen] = useState(false);
   const currentDate = value ? new Date(value) : new Date();
 
   const updateDateTime = (date: Date, hour: number, minute: number) => {
@@ -50,28 +53,40 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
   return (
     <div className="grid grid-cols-10 gap-2">
       {/* Date */}
+      {/* Date */}
       <div className="col-span-4">
         <label className="mb-1 block text-xs text-muted-foreground">Date</label>
 
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               type="button"
               variant="outline"
-              className="h-10 w-full justify-start rounded-md border border-input bg-background px-3 text-left font-normal shadow-none"
+              data-empty={!value}
+              className={cn(
+                "h-10 w-full justify-between text-left font-normal border border-input bg-background shadow-none transition-colors data-[empty=true]:text-muted-foreground",
+                "hover:border-input focus-visible:border-primary focus-visible:ring-0",
+                open && "border-primary ring-primary",
+              )}
             >
-              <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
+              {value ? (
+                format(currentDate, "dd MMM yyyy")
+              ) : (
+                <span>Select Date</span>
+              )}
 
-              <span className="truncate">
-                {value ? format(currentDate, "dd MMM yyyy") : "Select Date"}
-              </span>
+              <CalendarIcon className="h-4 w-4 opacity-60" />
             </Button>
           </PopoverTrigger>
 
-          <PopoverContent className="w-auto p-0">
+          <PopoverContent
+            align="start"
+            className="w-auto rounded-lg border border-primary/20 p-0 shadow-lg"
+          >
             <Calendar
               mode="single"
               selected={value ? currentDate : undefined}
+              defaultMonth={value ? currentDate : undefined}
               onSelect={(date) => {
                 if (!date) return;
 
@@ -80,6 +95,8 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
                   currentDate.getHours(),
                   currentDate.getMinutes(),
                 );
+
+                setOpen(false);
               }}
             />
           </PopoverContent>

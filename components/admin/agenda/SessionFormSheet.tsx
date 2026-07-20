@@ -31,6 +31,8 @@ import {
 import { Session, Hall, Track } from "@/lib/types/agenda";
 import { Loader2, X, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { DatePicker } from "../common/DatePicker";
+import { TimePicker } from "../common/TimePicker";
 
 const formSchema = z.object({
   name: z.string().min(1, "Session name is required"),
@@ -156,7 +158,7 @@ export function SessionFormSheet({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Session Name *</FormLabel>
+                  <FormLabel className="text-default">Session Name *</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter session name" {...field} />
                   </FormControl>
@@ -170,7 +172,7 @@ export function SessionFormSheet({
               name="chairperson"
               render={() => (
                 <FormItem>
-                  <FormLabel>Chairperson</FormLabel>
+                  <FormLabel className="text-default">Chairperson</FormLabel>
                   <div className="space-y-2">
                     {fields.map((field, index) => (
                       <div key={field.id} className="flex items-center gap-2">
@@ -211,7 +213,9 @@ export function SessionFormSheet({
                 name="trackId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Session Track *</FormLabel>
+                    <FormLabel className="text-default">
+                      Session Track *
+                    </FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
@@ -239,7 +243,9 @@ export function SessionFormSheet({
                 name="hallId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Session Hall *</FormLabel>
+                    <FormLabel className="text-default">
+                      Session Hall *
+                    </FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
@@ -268,9 +274,9 @@ export function SessionFormSheet({
               name="sessionDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Session Date *</FormLabel>
+                  <FormLabel className="text-default">Session Date *</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <DatePicker value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -283,9 +289,12 @@ export function SessionFormSheet({
                 name="startTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Start Time *</FormLabel>
+                    <FormLabel className="text-default">Start Time *</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <TimePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -297,9 +306,12 @@ export function SessionFormSheet({
                 name="endTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>End Time *</FormLabel>
+                    <FormLabel className="text-default">End Time *</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <TimePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -312,7 +324,7 @@ export function SessionFormSheet({
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status</FormLabel>
+                  <FormLabel className="text-default">Status</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}

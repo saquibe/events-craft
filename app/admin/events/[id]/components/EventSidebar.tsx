@@ -157,7 +157,46 @@ const menuData: MenuItem[] = [
   {
     label: "Exhibitor",
     icon: Building2,
-    href: "/admin/events/[id]/exhibitor/dashboard",
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/exhibitor/dashboard" },
+      { label: "Exhibitor", href: "/admin/events/[id]/exhibitor/exhibitor" },
+      { label: "Exhibition Hall", href: "/admin/events/[id]/exhibitor/halls" },
+      {
+        label: "Exhibition Stalls",
+        href: "/admin/events/[id]/exhibitor/stalls",
+      },
+      { label: "Category", href: "/admin/events/[id]/exhibitor/category" },
+      {
+        label: "Attendee by Exhibitor",
+        href: "/admin/events/[id]/exhibitor/attendee-by-exhibitor",
+      },
+      {
+        label: "Visitor by Exhibitor",
+        href: "/admin/events/[id]/exhibitor/visitor-by-exhibitor",
+      },
+      // {
+      //   label: "Exhibitor Badges",
+      //   href: "/admin/events/[id]/exhibitor/badges",
+      // },
+      {
+        label: "Registration Quota",
+        subItems: [
+          {
+            label: "Attendee Registration",
+            href: "/admin/events/[id]/exhibitor/registration-quota/attendee",
+          },
+          {
+            label: "Visitor Registration",
+            href: "/admin/events/[id]/exhibitor/registration-quota/visitor",
+          },
+          {
+            label: "Exhibitor Badge",
+            href: "/admin/events/[id]/exhibitor/registration-quota/badges",
+          },
+        ],
+      },
+      { label: "Setting", href: "/admin/events/[id]/exhibitor/setting" },
+    ],
   },
   {
     label: "eManual",

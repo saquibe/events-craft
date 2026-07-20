@@ -24,7 +24,7 @@ export function ConvertToSpeakerTable({
       header: "Name",
       cell: (attendee: ConvertToSpeakerData) => (
         <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12">
+          {/* <Avatar className="h-12 w-12">
             <AvatarImage
               src={`https://ui-avatars.com/api/?name=${attendee.name}`}
             />
@@ -34,7 +34,7 @@ export function ConvertToSpeakerTable({
                 .map((n) => n[0])
                 .join("")}
             </AvatarFallback>
-          </Avatar>
+          </Avatar> */}
           <span className="font-medium text-foreground text-base">
             {attendee.name}
           </span>

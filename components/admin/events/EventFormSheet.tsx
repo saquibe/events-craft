@@ -170,6 +170,7 @@ export function EventFormSheet({
             </Label>
 
             <Input
+              className="cursor-pointer file:cursor-pointer"
               type="file"
               accept="image/*"
               onChange={(e) => {

@@ -104,6 +104,7 @@ export function PaginationControls({
         {/* Previous Button */}
         <Button
           variant="outline"
+          color="primary"
           size="icon"
           className="h-9 w-9"
           onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
@@ -117,6 +118,7 @@ export function PaginationControls({
           <Button
             key={pageNum}
             variant={currentPage === pageNum ? "default" : "outline"}
+            color="primary"
             size="icon"
             className="h-9 w-9"
             onClick={() => onPageChange(pageNum)}
@@ -128,6 +130,7 @@ export function PaginationControls({
         {/* Next Button */}
         <Button
           variant="outline"
+          color="primary"
           size="icon"
           className="h-9 w-9"
           onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}

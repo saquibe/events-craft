@@ -7,10 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
+import { DatePicker } from "@/components/admin/common/DatePicker";
 
 export default function SpeakerSettingsPage() {
   const params = useParams();
   const eventId = (params?.id as string) || "";
+  const [registrationDeadline, setRegistrationDeadline] = useState("");
 
   return (
     <div className="space-y-6">
@@ -36,12 +39,18 @@ export default function SpeakerSettingsPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Maximum Speakers</Label>
+                  <Label className="text-base">Maximum Speakers</Label>
                   <Input type="number" placeholder="100" defaultValue="100" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Speaker Registration Deadline</Label>
-                  <Input type="date" />
+                  <Label className="text-base">
+                    Speaker Registration Deadline
+                  </Label>
+
+                  <DatePicker
+                    value={registrationDeadline}
+                    onChange={setRegistrationDeadline}
+                  />
                 </div>
               </div>
               <div className="flex items-center justify-between">

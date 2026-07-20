@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Topic, Session } from "@/lib/types/agenda";
 import { Loader2, X, Plus } from "lucide-react";
+import { TimePicker } from "../common/TimePicker";
 
 const TOPIC_TYPES = [
   "Presentation",
@@ -180,7 +181,7 @@ export function TopicFormSheet({
     placeholder: string,
   ) => (
     <FormItem>
-      <FormLabel>{label}</FormLabel>
+      <FormLabel className="text-default">{label}</FormLabel>
 
       <div className="space-y-2">
         {fields.map((field, index) => (
@@ -238,7 +239,7 @@ export function TopicFormSheet({
               name="sessionId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Session Name *</FormLabel>
+                  <FormLabel className="text-default">Session Name *</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
@@ -266,7 +267,7 @@ export function TopicFormSheet({
               name="topicType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Topic Type *</FormLabel>
+                  <FormLabel className="text-default">Topic Type *</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
@@ -294,7 +295,7 @@ export function TopicFormSheet({
               name="topic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Topic *</FormLabel>
+                  <FormLabel className="text-default">Topic *</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter topic" {...field} />
                   </FormControl>
@@ -355,9 +356,12 @@ export function TopicFormSheet({
                 name="startTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Start Time *</FormLabel>
+                    <FormLabel className="text-default">Start Time *</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <TimePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -369,9 +373,12 @@ export function TopicFormSheet({
                 name="endTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>End Time *</FormLabel>
+                    <FormLabel className="text-default">End Time *</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <TimePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -384,7 +391,7 @@ export function TopicFormSheet({
               name="aboutTopic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>About Topic</FormLabel>
+                  <FormLabel className="text-default">About Topic</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Enter description about the topic"

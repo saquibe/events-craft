@@ -242,6 +242,7 @@ export function TeamFormSheet({
             <Label className="text-foreground">Profile Photo</Label>
 
             <Input
+              className="cursor-pointer file:cursor-pointer"
               type="file"
               accept="image/*"
               onChange={(e) => {

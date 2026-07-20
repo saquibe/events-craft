@@ -31,8 +31,9 @@ export function SpeakerTable({
           <Avatar className="h-12 w-12">
             <AvatarImage src={speaker.profilePhoto} className="object-cover" />
             <AvatarFallback>
-              {speaker.firstName[0]}
-              {speaker.lastName[0]}
+              {/* {speaker.firstName[0]}
+              {speaker.lastName[0]} */}
+              <img src="/images/users/user7.jpg" alt="" />
             </AvatarFallback>
           </Avatar>
           <div>

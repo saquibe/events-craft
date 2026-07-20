@@ -157,6 +157,7 @@ export function SupportFormSheet({
             <Label className="text-foreground">Upload Image</Label>
 
             <Input
+              className="cursor-pointer file:cursor-pointer"
               type="file"
               accept="image/*"
               onChange={(e) => {

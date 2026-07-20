@@ -156,7 +156,7 @@ export function SpeakerFormSheet({
             {/* Profile Photo */}
             <div className="flex items-center gap-4">
               <Avatar className="h-20 w-20">
-                <AvatarImage src={previewImage || undefined} />
+                <AvatarImage src={previewImage || "/images/users/user7.jpg"} />
                 <AvatarFallback className="text-2xl">
                   {form.watch("firstName")?.[0] || "?"}
                 </AvatarFallback>
@@ -191,7 +191,7 @@ export function SpeakerFormSheet({
                 name="prefix"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Prefix *</FormLabel>
+                    <FormLabel className="text-default">Prefix *</FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
@@ -219,7 +219,7 @@ export function SpeakerFormSheet({
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First Name *</FormLabel>
+                    <FormLabel className="text-default">First Name *</FormLabel>
                     <FormControl>
                       <Input placeholder="First name" {...field} />
                     </FormControl>
@@ -235,7 +235,7 @@ export function SpeakerFormSheet({
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last Name *</FormLabel>
+                    <FormLabel className="text-default">Last Name *</FormLabel>
                     <FormControl>
                       <Input placeholder="Last name" {...field} />
                     </FormControl>
@@ -249,7 +249,7 @@ export function SpeakerFormSheet({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email *</FormLabel>
+                    <FormLabel className="text-default">Email *</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
@@ -268,7 +268,9 @@ export function SpeakerFormSheet({
               name="mobile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mobile (optional)</FormLabel>
+                  <FormLabel className="text-default">
+                    Mobile (optional)
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Mobile number" {...field} />
                   </FormControl>
@@ -283,7 +285,7 @@ export function SpeakerFormSheet({
                 name="designation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Designation</FormLabel>
+                    <FormLabel className="text-default">Designation</FormLabel>
                     <FormControl>
                       <Input placeholder="Designation" {...field} />
                     </FormControl>
@@ -297,7 +299,7 @@ export function SpeakerFormSheet({
                 name="company"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company</FormLabel>
+                    <FormLabel className="text-default">Company</FormLabel>
                     <FormControl>
                       <Input placeholder="Company name" {...field} />
                     </FormControl>
@@ -312,7 +314,7 @@ export function SpeakerFormSheet({
               name="speakerTypeId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Speaker Type *</FormLabel>
+                  <FormLabel className="text-default">Speaker Type *</FormLabel>
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
@@ -341,7 +343,9 @@ export function SpeakerFormSheet({
                 name="speakerAcceptance"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel>Speaker Acceptance</FormLabel>
+                    <FormLabel className="text-default">
+                      Speaker Acceptance
+                    </FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={(value) =>
@@ -370,7 +374,9 @@ export function SpeakerFormSheet({
                 name="speakerEmail"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel>Speaker Invitation Email</FormLabel>
+                    <FormLabel className="text-default">
+                      Speaker Invitation Email
+                    </FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={(value) =>

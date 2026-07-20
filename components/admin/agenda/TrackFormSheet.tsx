@@ -89,7 +89,7 @@ export function TrackFormSheet({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Track Name *</FormLabel>
+                  <FormLabel className="text-default">Track Name *</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter track name" {...field} />
                   </FormControl>
@@ -103,7 +103,9 @@ export function TrackFormSheet({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (optional)</FormLabel>
+                  <FormLabel className="text-default">
+                    Description (optional)
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Enter description"

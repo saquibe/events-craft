@@ -26,6 +26,8 @@ const radioVariants = cva(
           "data-[state=checked]:border-success data-[state=checked]:text-success",
         destructive:
           "data-[state=checked]:border-destructive data-[state=checked]:text-destructive",
+        outline:
+          "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
       },
       size: {
         sm: "h-4 w-4 [&_svg]:h-3 [&_svg]:w-3",

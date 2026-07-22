@@ -241,6 +241,18 @@ const menuData: MenuItem[] = [
         label: "Automated Emails",
         subItems: [
           {
+            label: "User",
+            href: "/admin/events/[id]/communication/automated/user",
+          },
+          {
+            label: "Registration",
+            href: "/admin/events/[id]/communication/automated/registration",
+          },
+          {
+            label: "Abstract",
+            href: "/admin/events/[id]/communication/automated/abstract",
+          },
+          {
             label: "Speaker",
             href: "/admin/events/[id]/communication/automated/speaker",
           },
@@ -251,6 +263,46 @@ const menuData: MenuItem[] = [
           {
             label: "Presentation",
             href: "/admin/events/[id]/communication/automated/presentation",
+          },
+          {
+            label: "Certificate",
+            href: "/admin/events/[id]/communication/automated/certificate",
+          },
+          {
+            label: "Exhibitor",
+            href: "/admin/events/[id]/communication/automated/exhibitor",
+          },
+          {
+            label: "eManual",
+            href: "/admin/events/[id]/communication/automated/emanual",
+          },
+          {
+            label: "Networking",
+            href: "/admin/events/[id]/communication/automated/networking",
+          },
+          {
+            label: "Lead",
+            href: "/admin/events/[id]/communication/automated/lead",
+          },
+          {
+            label: "Accommodation",
+            href: "/admin/events/[id]/communication/automated/accommodation",
+          },
+          {
+            label: "Travel",
+            href: "/admin/events/[id]/communication/automated/travel",
+          },
+          {
+            label: "Event App",
+            href: "/admin/events/[id]/communication/automated/eventapp",
+          },
+          {
+            label: "Onsite Check-in",
+            href: "/admin/events/[id]/communication/automated/onsite",
+          },
+          {
+            label: "Accounting",
+            href: "/admin/events/[id]/communication/automated/accounting",
           },
         ],
       },

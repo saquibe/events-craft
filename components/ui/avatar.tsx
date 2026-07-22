@@ -33,6 +33,8 @@ const avatarVariant = cva(
         info: "bg-info text-info-foreground hover:bg-info/90 hover:ring-info",
         success:
           "bg-success text-success-foreground hover:bg-success/90 hover:ring-success",
+        outline:
+          "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
       },
       variant: {
         default: "",
@@ -185,7 +187,7 @@ const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
       <AvatarPrimitive.Root
         ref={ref}
         className={cn(
-          avatarVariant({ size, shape, color, variant, rounded }),
+          avatarVariant({ size, shape, variant, rounded }),
           className,
         )}
         {...props}

@@ -19,6 +19,8 @@ const switchVariants = cva(
         success: "data-[state=checked]:bg-success ",
         destructive: "data-[state=checked]:bg-destructive ",
         dark: "data-[state=checked]:bg-foreground ",
+        outline:
+          "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
       },
       size: {
         sm: "h-4 w-[30px]  [&_.content-box]:text-[7px] [&_.content-box>svg]:h-2.5  [&_.content-box>svg]:w-2.5 ",

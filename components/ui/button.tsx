@@ -29,6 +29,8 @@ const buttonVariants = cva(
 
         success:
           "bg-success text-success-foreground hover:bg-success/80 border border-transparent",
+        outline:
+          "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
       },
 
       variant: {

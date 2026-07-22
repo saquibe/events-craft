@@ -19,6 +19,8 @@ const tooltipVariants = cva(
         warning: "bg-warning text-warning-foreground",
         info: "bg-info text-info-foreground",
         success: "bg-success text-success-foreground",
+        outline:
+          "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
       },
     },
     defaultVariants: {

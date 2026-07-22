@@ -17,19 +17,21 @@ const progressVariants = cva(
         warning: "[&>div]:bg-warning",
         info: "[&>div]:bg-info",
         success: "[&>div]:bg-success",
+        outline:
+          "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
       },
       size: {
         sm: "h-2",
         default: "h-3",
         md: "h-3.5",
         lg: "h-4",
-      }
+      },
     },
     defaultVariants: {
       color: "default",
       size: "default",
     },
-  }
+  },
 );
 
 interface ProgressProps extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {

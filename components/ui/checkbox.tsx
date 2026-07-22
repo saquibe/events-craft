@@ -25,6 +25,8 @@ const checkboxVariants = cva(
         info: "data-[state=checked]:border-info data-[state=checked]:bg-info data-[state=checked]:ring-info [&_svg]:stroke-info-foreground",
         success:
           "data-[state=checked]:border-success data-[state=checked]:bg-success data-[state=checked]:ring-success [&_svg]:stroke-success-foreground",
+        outline:
+          "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
       },
     },
     defaultVariants: {

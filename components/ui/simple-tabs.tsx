@@ -30,16 +30,18 @@ const SimpleTabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap px-3 md:px-4 py-2 text-sm md:text-base font-medium transition-all cursor-pointer shrink-0",
-      "hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md md:rounded-none",
+      "inline-flex items-center justify-center shrink-0 whitespace-nowrap",
+      "px-3 md:px-4 py-2",
+      "text-sm md:text-base font-semibold",
+      "cursor-pointer",
+      "text-muted-foreground",
+      "border-b-2 md:border-b-[3px] border-transparent",
+      "transition-colors duration-200",
+      "hover:text-foreground",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       "disabled:pointer-events-none disabled:opacity-50",
-      "data-[state=active]:text-black dark:data-[state=active]:text-white",
-      "data-[state=active]:font-semibold md:data-[state=active]:font-bold",
-      "data-[state=active]:border-b-2 md:data-[state=active]:border-b-[3px] data-[state=active]:border-primary",
-      "data-[state=active]:bg-transparent",
-      "data-[state=active]:hover:bg-transparent",
-      "bg-transparent shadow-none rounded-none",
+      "data-[state=active]:text-foreground",
+      "data-[state=active]:border-primary",
       className,
     )}
     {...props}

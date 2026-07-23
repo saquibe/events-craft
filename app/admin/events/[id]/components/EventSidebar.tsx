@@ -206,17 +206,40 @@ const menuData: MenuItem[] = [
   {
     label: "Networking",
     icon: Users2,
-    href: "/admin/events/[id]/networking/dashboard",
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/networking/dashboard" },
+      { label: "Meetings", href: "/admin/events/[id]/networking/meetings" },
+      {
+        label: "Location / Table",
+        href: "/admin/events/[id]/networking/locations",
+      },
+      { label: "Time Slot", href: "/admin/events/[id]/networking/time-slots" },
+      { label: "Settings", href: "/admin/events/[id]/networking/settings" },
+    ],
   },
   {
     label: "Lead",
     icon: TrendingUp,
-    href: "/admin/events/[id]/lead/dashboard",
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/lead/dashboard" },
+      { label: "Lead Form", href: "/admin/events/[id]/lead/lead-form" },
+    ],
   },
   {
     label: "Accommodation",
     icon: Hotel,
-    href: "/admin/events/[id]/accommodation/dashboard",
+    subItems: [
+      {
+        label: "Dashboard",
+        href: "/admin/events/[id]/accommodation/dashboard",
+      },
+      { label: "Hotel", href: "/admin/events/[id]/accommodation/hotels" },
+      {
+        label: "Room Type",
+        href: "/admin/events/[id]/accommodation/room-types",
+      },
+      { label: "Booking", href: "/admin/events/[id]/accommodation/bookings" },
+    ],
   },
   {
     label: "Travel",

@@ -18,7 +18,7 @@ import {
   Reply,
 } from "lucide-react";
 
-interface ActionItem {
+export interface ActionItem {
   label: string;
   icon?: React.ReactNode;
   onClick: () => void;

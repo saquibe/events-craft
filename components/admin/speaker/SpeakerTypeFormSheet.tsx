@@ -112,9 +112,7 @@ export function SpeakerTypeFormSheet({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-default">
-                    Description (optional)
-                  </FormLabel>
+                  <FormLabel className="text-default">Description</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Enter description"

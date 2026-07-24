@@ -9,6 +9,12 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { DatePicker } from "@/components/admin/common/DatePicker";
+import {
+  SimpleTabs,
+  SimpleTabsContent,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+} from "@/components/ui/simple-tabs";
 
 export default function SpeakerSettingsPage() {
   const params = useParams();
@@ -24,14 +30,18 @@ export default function SpeakerSettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="invitation">Invitations</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        </TabsList>
+      <SimpleTabs defaultValue="general">
+        <SimpleTabsList>
+          <SimpleTabsTrigger value="general">General</SimpleTabsTrigger>
 
-        <TabsContent value="general" className="space-y-4">
+          <SimpleTabsTrigger value="invitation">Invitations</SimpleTabsTrigger>
+
+          <SimpleTabsTrigger value="notifications">
+            Notifications
+          </SimpleTabsTrigger>
+        </SimpleTabsList>
+
+        <SimpleTabsContent value="general" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>General Settings</CardTitle>
@@ -64,9 +74,9 @@ export default function SpeakerSettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </SimpleTabsContent>
 
-        <TabsContent value="invitation" className="space-y-4">
+        <SimpleTabsContent value="invitation" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Invitation Settings</CardTitle>
@@ -87,9 +97,9 @@ export default function SpeakerSettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </SimpleTabsContent>
 
-        <TabsContent value="notifications" className="space-y-4">
+        <SimpleTabsContent value="notifications" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Notification Settings</CardTitle>
@@ -115,8 +125,8 @@ export default function SpeakerSettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </SimpleTabsContent>
+      </SimpleTabs>
 
       <div className="flex gap-3">
         <Button color="primary" className="cursor-pointer text-base">

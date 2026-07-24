@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Save, Mail, Image, Type, AlignLeft } from "lucide-react";
+import Image from "next/image";
+import { Save, Type, AlignLeft } from "lucide-react";
 import {
   SimpleTabs,
   SimpleTabsContent,
@@ -17,11 +17,55 @@ import {
   SimpleTabsTrigger,
 } from "@/components/ui/simple-tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import ReactCrop, { Crop } from "react-image-crop";
 
 export default function EmailHeaderFooterPage() {
   const params = useParams();
   const eventId = (params?.id as string) || "";
   const [activeTab, setActiveTab] = useState("header");
+  const [selectedImage, setSelectedImage] = useState("");
+  const [croppedImage, setCroppedImage] = useState("");
+  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
+
+  const [crop, setCrop] = useState<Crop>({
+    unit: "%",
+    width: 100,
+    height: 100,
+    x: 0,
+    y: 0,
+  });
+
+  const handleCropSave = () => {
+    if (!imageRef || !crop.width || !crop.height) return;
+
+    const canvas = document.createElement("canvas");
+
+    const scaleX = imageRef.naturalWidth / imageRef.width;
+    const scaleY = imageRef.naturalHeight / imageRef.height;
+
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      imageRef,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height,
+    );
+
+    const base64Image = canvas.toDataURL("image/jpeg");
+
+    setCroppedImage(base64Image);
+  };
 
   return (
     <div className="space-y-6">
@@ -109,11 +153,62 @@ export default function EmailHeaderFooterPage() {
 
               <div className="space-y-2">
                 <Label className="text-default">Header Logo (Optional)</Label>
-                <div className="flex items-center gap-4">
-                  <Input type="file" accept="image/*" />
-                  <Button variant="outline" size="sm" className="p-4">
-                    Upload
-                  </Button>
+
+                <div className="space-y-3">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    className="cursor-pointer file:cursor-pointer"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+
+                      if (!file) return;
+
+                      const imageUrl = URL.createObjectURL(file);
+                      setSelectedImage(imageUrl);
+                    }}
+                  />
+
+                  {selectedImage && (
+                    <div className="space-y-3">
+                      <div className="overflow-hidden rounded-xl border border-border">
+                        <ReactCrop
+                          crop={crop}
+                          onChange={(c) => setCrop(c)}
+                          aspect={3}
+                        >
+                          <img
+                            ref={setImageRef}
+                            src={selectedImage}
+                            alt="Header Logo"
+                            className="max-h-[300px] w-full object-contain"
+                          />
+                        </ReactCrop>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <Button
+                          type="button"
+                          color="primary"
+                          className="cursor-pointer"
+                          onClick={handleCropSave}
+                        >
+                          Save Crop
+                        </Button>
+                      </div>
+
+                      <div className="flex justify-center">
+                        <div className="relative h-24 w-60 overflow-hidden rounded-xl border border-border bg-muted">
+                          <Image
+                            src={croppedImage || selectedImage}
+                            alt="Header Preview"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

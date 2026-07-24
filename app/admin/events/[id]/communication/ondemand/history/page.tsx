@@ -76,7 +76,7 @@ export default function EmailHistoryPage() {
       key: "subject",
       header: "Subject",
       cell: (item: any) => (
-        <span className="font-medium text-foreground text-sm">
+        <span className="font-medium text-foreground text-base">
           {item.subject}
         </span>
       ),
@@ -86,8 +86,8 @@ export default function EmailHistoryPage() {
       header: "Recipient",
       cell: (item: any) => (
         <div>
-          <p className="text-sm font-medium">{item.recipientName}</p>
-          <p className="text-xs text-muted-foreground">{item.recipient}</p>
+          <p className="text-base font-medium">{item.recipientName}</p>
+          <p className="text-sm text-muted-foreground">{item.recipient}</p>
         </div>
       ),
     },
@@ -95,7 +95,7 @@ export default function EmailHistoryPage() {
       key: "sentAt",
       header: "Sent At",
       cell: (item: any) => (
-        <span className="text-muted-foreground text-sm">
+        <span className="text-muted-foreground text-base">
           {new Date(item.sentAt).toLocaleString()}
         </span>
       ),
@@ -109,14 +109,14 @@ export default function EmailHistoryPage() {
       key: "opens",
       header: "Opens",
       cell: (item: any) => (
-        <span className="text-muted-foreground text-sm">{item.opens}</span>
+        <span className="text-muted-foreground text-base">{item.opens}</span>
       ),
     },
     {
       key: "clicks",
       header: "Clicks",
       cell: (item: any) => (
-        <span className="text-muted-foreground text-sm">{item.clicks}</span>
+        <span className="text-muted-foreground text-base">{item.clicks}</span>
       ),
     },
     {

@@ -33,6 +33,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { speakerTypes } from "@/lib/data/speaker-types";
 import type { Speaker, SpeakerFormData } from "@/lib/types/speaker";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
+import ReactCrop, { Crop } from "react-image-crop";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -63,7 +65,17 @@ export function SpeakerFormSheet({
   onSubmit,
   isSubmitting = false,
 }: SpeakerFormSheetProps) {
+  const [selectedImage, setSelectedImage] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
+
+  const [crop, setCrop] = useState<Crop>({
+    unit: "%",
+    width: 80,
+    height: 80,
+    x: 10,
+    y: 10,
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -125,15 +137,45 @@ export function SpeakerFormSheet({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setPreviewImage(result);
-        form.setValue("profilePhoto", result);
-      };
-      reader.readAsDataURL(file);
-    }
+
+    if (!file) return;
+
+    const imageUrl = URL.createObjectURL(file);
+
+    setSelectedImage(imageUrl);
+  };
+
+  const handleCropSave = () => {
+    if (!imageRef || !crop.width || !crop.height) return;
+
+    const canvas = document.createElement("canvas");
+
+    const scaleX = imageRef.naturalWidth / imageRef.width;
+    const scaleY = imageRef.naturalHeight / imageRef.height;
+
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      imageRef,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height,
+    );
+
+    const base64 = canvas.toDataURL("image/jpeg");
+
+    setPreviewImage(base64);
+    form.setValue("profilePhoto", base64);
   };
 
   return (
@@ -154,35 +196,84 @@ export function SpeakerFormSheet({
             className="space-y-6 py-4"
           >
             {/* Profile Photo */}
-            <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={previewImage || "/images/users/user7.jpg"} />
-                <AvatarFallback className="text-2xl">
-                  {form.watch("firstName")?.[0] || "?"}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    document.getElementById("photo-upload")?.click()
-                  }
-                >
-                  Upload Photo
-                </Button>
-                <Input
-                  id="photo-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  JPG, PNG or GIF. Max 2MB
-                </p>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage
+                    src={previewImage || "/images/users/user7.jpg"}
+                  />
+                  <AvatarFallback className="text-2xl">
+                    {form.watch("firstName")?.[0] || "?"}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      document.getElementById("photo-upload")?.click()
+                    }
+                  >
+                    Upload Photo
+                  </Button>
+
+                  <Input
+                    id="photo-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    JPG, PNG or GIF. Max 2MB
+                  </p>
+                </div>
               </div>
+
+              {selectedImage && (
+                <div className="space-y-4">
+                  <div className="overflow-hidden rounded-xl border border-border">
+                    <ReactCrop
+                      crop={crop}
+                      onChange={(c) => setCrop(c)}
+                      aspect={1}
+                      circularCrop
+                    >
+                      <img
+                        ref={setImageRef}
+                        src={selectedImage}
+                        alt="Profile"
+                        className="max-h-[300px] w-full object-contain"
+                      />
+                    </ReactCrop>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      color="primary"
+                      className="cursor-pointer"
+                      onClick={handleCropSave}
+                    >
+                      Save Crop
+                    </Button>
+                  </div>
+
+                  <div className="flex justify-center">
+                    <div className="relative h-24 w-24 overflow-hidden rounded-full border border-border bg-muted">
+                      <Image
+                        src={previewImage || selectedImage}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -193,21 +284,7 @@ export function SpeakerFormSheet({
                   <FormItem>
                     <FormLabel className="text-default">Prefix *</FormLabel>
                     <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select prefix" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Dr.">Dr.</SelectItem>
-                          <SelectItem value="Prof.">Prof.</SelectItem>
-                          <SelectItem value="Mr.">Mr.</SelectItem>
-                          <SelectItem value="Ms.">Ms.</SelectItem>
-                          <SelectItem value="Mrs.">Mrs.</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Input placeholder="Prefix" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -268,9 +345,7 @@ export function SpeakerFormSheet({
               name="mobile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-default">
-                    Mobile (optional)
-                  </FormLabel>
+                  <FormLabel className="text-default">Mobile</FormLabel>
                   <FormControl>
                     <Input placeholder="Mobile number" {...field} />
                   </FormControl>

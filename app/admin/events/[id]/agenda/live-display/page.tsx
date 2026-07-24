@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Play, Pause, Monitor, RefreshCw } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  SimpleTabs,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+} from "@/components/ui/simple-tabs";
 
 // Mock data - replace with actual data
 const mockSessions = [
@@ -116,19 +121,19 @@ export default function LiveDisplayPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Display Mode</label>
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="w-full">
-                    <TabsTrigger value="current" className="flex-1">
+                <SimpleTabs value={activeTab} onValueChange={setActiveTab}>
+                  <SimpleTabsList>
+                    <SimpleTabsTrigger value="current">
                       Current
-                    </TabsTrigger>
-                    <TabsTrigger value="upcoming" className="flex-1">
+                    </SimpleTabsTrigger>
+
+                    <SimpleTabsTrigger value="upcoming">
                       Upcoming
-                    </TabsTrigger>
-                    <TabsTrigger value="all" className="flex-1">
-                      All
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                    </SimpleTabsTrigger>
+
+                    <SimpleTabsTrigger value="all">All</SimpleTabsTrigger>
+                  </SimpleTabsList>
+                </SimpleTabs>
               </div>
 
               <div className="space-y-2">

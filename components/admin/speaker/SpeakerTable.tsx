@@ -40,7 +40,7 @@ export function SpeakerTable({
             <span className="font-medium text-foreground text-base">
               {speaker.prefix} {speaker.firstName} {speaker.lastName}
             </span>
-            <p className="text-xs text-muted-foreground">{speaker.email}</p>
+            <p className="text-sm text-muted-foreground">{speaker.email}</p>
           </div>
         </div>
       ),

@@ -114,9 +114,7 @@ export function HallFormSheet({
               name="capacity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-default">
-                    Capacity (optional)
-                  </FormLabel>
+                  <FormLabel className="text-default">Capacity</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -134,9 +132,7 @@ export function HallFormSheet({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-default">
-                    Description (optional)
-                  </FormLabel>
+                  <FormLabel className="text-default">Description</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Enter description"

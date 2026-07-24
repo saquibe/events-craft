@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Plus, Mail, CheckCircle, X, Edit, Trash2, Star } from "lucide-react";
 import { CreateButton } from "@/components/admin";
+import { SenderEmailTable } from "@/components/admin/communication/SenderEmailTable";
 
 // Mock sender emails
 const mockSenders = [
@@ -79,6 +80,17 @@ export default function SenderEmailsPage() {
     setSenders(senders.filter((s) => s.id !== id));
   };
 
+  function handleEdit(sender: {
+    id: string;
+    email: string;
+    name: string;
+    isDefault: boolean;
+    verified: boolean;
+  }): void {
+    setNewSender({ email: sender.email, name: sender.name });
+    setIsAdding(true);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -139,80 +151,15 @@ export default function SenderEmailsPage() {
               </div>
             </div>
           )}
-
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Sender Name</TableHead>
-                <TableHead>Email Address</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Default</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {senders.map((sender) => (
-                <TableRow key={sender.id}>
-                  <TableCell className="font-medium">{sender.name}</TableCell>
-                  <TableCell>{sender.email}</TableCell>
-                  <TableCell>
-                    {sender.verified ? (
-                      <Badge
-                        color="success"
-                        className="flex items-center gap-1 w-fit"
-                      >
-                        <CheckCircle className="h-3 w-3" />
-                        Verified
-                      </Badge>
-                    ) : (
-                      <Badge
-                        color="warning"
-                        className="flex items-center gap-1 w-fit"
-                      >
-                        <Mail className="h-3 w-3" />
-                        Pending
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {sender.isDefault ? (
-                      <Badge
-                        color="outline"
-                        className="flex items-center gap-1 w-fit"
-                      >
-                        <Star className="h-3 w-3" />
-                        Default
-                      </Badge>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        color="primary"
-                        size="sm"
-                        onClick={() => handleSetDefault(sender.id)}
-                      >
-                        Set as Default
-                      </Button>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(sender.id)}
-                        disabled={sender.isDefault}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <SenderEmailTable
+            senders={senders}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onSetDefault={handleSetDefault}
+          />
+          {/* <Card>
+            <CardContent className="pt-6"></CardContent>
+          </Card> */}
         </CardContent>
       </Card>
 

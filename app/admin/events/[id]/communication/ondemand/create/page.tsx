@@ -156,7 +156,11 @@ export default function CreateEmailPage() {
             <Save className="mr-2 h-4 w-4" />
             Save Draft
           </Button>
-          <Button className="text-base cursor-pointer" onClick={handleSend}>
+          <Button
+            className="text-base cursor-pointer"
+            color="primary"
+            onClick={handleSend}
+          >
             <Send className="mr-2 h-4 w-4" />
             Send Now
           </Button>

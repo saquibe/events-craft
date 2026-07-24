@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -32,6 +32,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Exhibitor, Category, Hall, Stall } from "@/lib/types/exhibitor";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
+import ReactCrop, { Crop } from "react-image-crop";
 
 const formSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
@@ -84,6 +86,17 @@ export function ExhibitorFormSheet({
   onSubmit,
   isSubmitting = false,
 }: ExhibitorFormSheetProps) {
+  const [selectedImage, setSelectedImage] = useState("");
+  const [croppedImage, setCroppedImage] = useState("");
+  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
+
+  const [crop, setCrop] = useState<Crop>({
+    unit: "%",
+    width: 100,
+    height: 100,
+    x: 0,
+    y: 0,
+  });
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -181,6 +194,41 @@ export function ExhibitorFormSheet({
     }
   };
 
+  const handleCropSave = async () => {
+    if (!imageRef || !crop.width || !crop.height) return;
+
+    const canvas = document.createElement("canvas");
+
+    const scaleX = imageRef.naturalWidth / imageRef.width;
+    const scaleY = imageRef.naturalHeight / imageRef.height;
+
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      imageRef,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height,
+    );
+
+    const base64Image = canvas.toDataURL("image/jpeg");
+
+    setCroppedImage(base64Image);
+
+    form.setValue("logo", base64Image);
+    setCroppedImage(base64Image);
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
@@ -255,12 +303,67 @@ export function ExhibitorFormSheet({
                 name="logo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-default">
-                      Upload Logo (Optional)
-                    </FormLabel>
+                    <FormLabel className="text-default">Upload Logo</FormLabel>
+
                     <FormControl>
-                      <Input type="file" accept="image/*" />
+                      <div className="space-y-3">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          className="cursor-pointer file:cursor-pointer"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+
+                            if (!file) return;
+
+                            const imageUrl = URL.createObjectURL(file);
+                            setSelectedImage(imageUrl);
+                          }}
+                        />
+
+                        {selectedImage && (
+                          <div className="space-y-3">
+                            <div className="overflow-hidden rounded-xl border border-border">
+                              <ReactCrop
+                                crop={crop}
+                                onChange={(c) => setCrop(c)}
+                                aspect={1}
+                              >
+                                <img
+                                  ref={setImageRef}
+                                  src={selectedImage}
+                                  alt="Logo"
+                                  className="max-h-[300px] w-full object-contain"
+                                />
+                              </ReactCrop>
+                            </div>
+
+                            <div className="flex justify-end">
+                              <Button
+                                type="button"
+                                color="primary"
+                                className="cursor-pointer"
+                                onClick={handleCropSave}
+                              >
+                                Save Crop
+                              </Button>
+                            </div>
+
+                            <div className="flex justify-center">
+                              <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-border bg-muted">
+                                <Image
+                                  src={croppedImage || selectedImage}
+                                  alt="Preview"
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -285,9 +388,7 @@ export function ExhibitorFormSheet({
                 name="taxId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-default">
-                      Tax ID (Optional)
-                    </FormLabel>
+                    <FormLabel className="text-default">Tax ID</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter tax ID" {...field} />
                     </FormControl>
@@ -433,7 +534,7 @@ export function ExhibitorFormSheet({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-default">
-                        Contact Mobile (Optional)
+                        Contact Mobile
                       </FormLabel>
                       <FormControl>
                         <Input placeholder="Enter mobile number" {...field} />
@@ -636,7 +737,7 @@ export function ExhibitorFormSheet({
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-default">Status</FormLabel>
+                    <FormLabel className="text-default">Status *</FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}

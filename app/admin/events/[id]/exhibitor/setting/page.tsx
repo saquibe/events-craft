@@ -9,6 +9,12 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DatePicker } from "@/components/admin/common/DatePicker";
 import { useState } from "react";
+import {
+  SimpleTabs,
+  SimpleTabsContent,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+} from "@/components/ui/simple-tabs";
 
 export default function ExhibitorSettingsPage() {
   const params = useParams();
@@ -26,14 +32,18 @@ export default function ExhibitorSettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="registration">Registration</TabsTrigger>
-          <TabsTrigger value="badges">Badges</TabsTrigger>
-        </TabsList>
+      <SimpleTabs defaultValue="general">
+        <SimpleTabsList>
+          <SimpleTabsTrigger value="general">General</SimpleTabsTrigger>
 
-        <TabsContent value="general" className="space-y-4">
+          <SimpleTabsTrigger value="registration">
+            Registration
+          </SimpleTabsTrigger>
+
+          <SimpleTabsTrigger value="badges">Badges</SimpleTabsTrigger>
+        </SimpleTabsList>
+
+        <SimpleTabsContent value="general" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>General Settings</CardTitle>
@@ -63,9 +73,9 @@ export default function ExhibitorSettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </SimpleTabsContent>
 
-        <TabsContent value="registration" className="space-y-4">
+        <SimpleTabsContent value="registration">
           <Card>
             <CardHeader>
               <CardTitle>Registration Settings</CardTitle>
@@ -91,9 +101,9 @@ export default function ExhibitorSettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </SimpleTabsContent>
 
-        <TabsContent value="badges" className="space-y-4">
+        <SimpleTabsContent value="badges">
           <Card>
             <CardHeader>
               <CardTitle>Badge Settings</CardTitle>
@@ -114,8 +124,8 @@ export default function ExhibitorSettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </SimpleTabsContent>
+      </SimpleTabs>
 
       <div className="flex gap-3">
         <Button className="text-base cursor-pointer" color="primary">

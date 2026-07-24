@@ -25,10 +25,10 @@ export function MeetingsTable({
       header: "Sender",
       cell: (meeting: Meeting) => (
         <div>
-          <p className="font-medium text-foreground text-sm">
+          <p className="font-medium text-foreground text-base">
             {meeting.senderName}
           </p>
-          <p className="text-xs text-muted-foreground">{meeting.senderEmail}</p>
+          <p className="text-sm text-muted-foreground">{meeting.senderEmail}</p>
           <p className="text-xs text-muted-foreground">{meeting.senderType}</p>
         </div>
       ),
@@ -38,10 +38,10 @@ export function MeetingsTable({
       header: "Receiver",
       cell: (meeting: Meeting) => (
         <div>
-          <p className="font-medium text-foreground text-sm">
+          <p className="font-medium text-foreground text-base">
             {meeting.receiverName}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {meeting.receiverEmail}
           </p>
           <p className="text-xs text-muted-foreground">
@@ -64,7 +64,7 @@ export function MeetingsTable({
       header: "Time Slot",
       cell: (meeting: Meeting) => (
         <div>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-base">
             {meeting.timeSlot ? (
               <>
                 {format(new Date(meeting.timeSlot.startDateTime), "HH:mm")} -{" "}
@@ -74,7 +74,7 @@ export function MeetingsTable({
               "-"
             )}
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {meeting.timeSlot
               ? format(new Date(meeting.timeSlot.startDateTime), "MMM dd, yyyy")
               : ""}

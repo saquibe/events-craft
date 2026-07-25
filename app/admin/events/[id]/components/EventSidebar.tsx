@@ -96,39 +96,11 @@ const menuData: MenuItem[] = [
     subItems: [
       { label: "Dashboard", href: "/admin/events/[id]/presentation/dashboard" },
       {
-        label: "Submitted",
-        subItems: [
-          {
-            label: "Talk Submitted",
-            href: "/admin/events/[id]/presentation/submitted/talk",
-          },
-          {
-            label: "ePoster Submitted",
-            href: "/admin/events/[id]/presentation/submitted/eposter",
-          },
-          {
-            label: "Paper Submitted",
-            href: "/admin/events/[id]/presentation/submitted/paper",
-          },
-        ],
+        label: "Invited Talk",
+        href: "/admin/events/[id]/presentation/invited-talk",
       },
-      {
-        label: "Submission Forms",
-        subItems: [
-          {
-            label: "Talk Form",
-            href: "/admin/events/[id]/presentation/forms/talk",
-          },
-          {
-            label: "ePoster Form",
-            href: "/admin/events/[id]/presentation/forms/eposter",
-          },
-          {
-            label: "Paper Form",
-            href: "/admin/events/[id]/presentation/forms/paper",
-          },
-        ],
-      },
+      { label: "Paper", href: "/admin/events/[id]/presentation/paper" },
+      { label: "ePoster", href: "/admin/events/[id]/presentation/eposter" },
       {
         label: "Submission Guidelines",
         subItems: [
@@ -137,12 +109,12 @@ const menuData: MenuItem[] = [
             href: "/admin/events/[id]/presentation/guidelines/talk",
           },
           {
-            label: "ePoster Guidelines",
-            href: "/admin/events/[id]/presentation/guidelines/eposter",
-          },
-          {
             label: "Paper Guidelines",
             href: "/admin/events/[id]/presentation/guidelines/paper",
+          },
+          {
+            label: "ePoster Guidelines",
+            href: "/admin/events/[id]/presentation/guidelines/eposter",
           },
         ],
       },

@@ -226,7 +226,22 @@ const menuData: MenuItem[] = [
   {
     label: "Onsite Check-in",
     icon: ClipboardCheck,
-    href: "/admin/events/[id]/check-in/dashboard",
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/check-in/dashboard" },
+      {
+        label: "Attendee Profile",
+        href: "/admin/events/[id]/check-in/attendee-profile",
+      },
+      { label: "Data Import", href: "/admin/events/[id]/check-in/data-import" },
+      {
+        label: "Spot Registration",
+        href: "/admin/events/[id]/check-in/spot-registration",
+      },
+      { label: "Send QR Code", href: "/admin/events/[id]/check-in/send-qr" },
+      { label: "Scan Point", href: "/admin/events/[id]/check-in/scan-point" },
+      { label: "Privileges", href: "/admin/events/[id]/check-in/privileges" },
+      { label: "Onsite Key", href: "/admin/events/[id]/check-in/onsite-key" },
+    ],
   },
   {
     label: "Communication",

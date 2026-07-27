@@ -1,6 +1,7 @@
+// app/admin/events/[id]/components/EventSidebar.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -25,7 +26,13 @@ import {
   Calculator,
   BarChart3,
   Settings,
+  X,
+  Search,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface MenuItem {
   label: string;
@@ -146,10 +153,6 @@ const menuData: MenuItem[] = [
         label: "Visitor by Exhibitor",
         href: "/admin/events/[id]/exhibitor/visitor-by-exhibitor",
       },
-      // {
-      //   label: "Exhibitor Badges",
-      //   href: "/admin/events/[id]/exhibitor/badges",
-      // },
       {
         label: "Registration Quota",
         subItems: [
@@ -358,11 +361,85 @@ const menuData: MenuItem[] = [
 
 interface EventSidebarProps {
   eventId: string;
+  onClose?: () => void;
+  isMobile?: boolean;
 }
 
-export function EventSidebar({ eventId }: EventSidebarProps) {
+export function EventSidebar({
+  eventId,
+  onClose,
+  isMobile = false,
+}: EventSidebarProps) {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Close sidebar on route change for mobile
+  useEffect(() => {
+    if (isMobile && onClose) {
+      onClose();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  // Filter menu items based on search query
+  const filterMenuItems = (items: MenuItem[], query: string): MenuItem[] => {
+    if (!query.trim()) return items;
+
+    const lowerQuery = query.toLowerCase().trim();
+    const filtered: MenuItem[] = [];
+
+    items.forEach((item) => {
+      const labelMatch = item.label.toLowerCase().includes(lowerQuery);
+      let filteredSubItems: MenuItem[] | undefined;
+
+      if (item.subItems) {
+        filteredSubItems = filterMenuItems(item.subItems, query);
+      }
+
+      // Include item if label matches or has matching subitems
+      if (labelMatch || (filteredSubItems && filteredSubItems.length > 0)) {
+        filtered.push({
+          ...item,
+          subItems: labelMatch ? item.subItems : filteredSubItems,
+        });
+      }
+    });
+
+    return filtered;
+  };
+
+  const filteredMenuData = useMemo(() => {
+    return filterMenuItems(menuData, searchQuery);
+  }, [searchQuery]);
+
+  // Auto-expand menus when searching
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const expandedMenus: Record<string, boolean> = {};
+      const expandItems = (items: MenuItem[]) => {
+        items.forEach((item) => {
+          if (item.subItems && item.subItems.length > 0) {
+            // Check if any subitem matches the search
+            const hasMatchingSubItem = item.subItems.some((sub) =>
+              sub.label
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase().trim()),
+            );
+            if (hasMatchingSubItem) {
+              expandedMenus[item.label] = true;
+            }
+            expandItems(item.subItems);
+          }
+        });
+      };
+      expandItems(menuData);
+      setOpenMenus(expandedMenus);
+    } else {
+      // Don't close all menus, just keep the ones that were manually opened
+      // We'll keep the existing state
+    }
+  }, [searchQuery]);
 
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) => ({
@@ -398,26 +475,28 @@ export function EventSidebar({ eventId }: EventSidebarProps) {
           <button
             onClick={() => toggleMenu(item.label)}
             className={`
-              w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200
+              w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm transition-all duration-200
               ${
                 isActiveItem
                   ? "bg-primary/10 text-primary font-semibold"
                   : "text-muted-foreground hover:bg-primary/8 hover:text-primary"
               }
-              ${depth === 1 ? "pl-10" : ""}
-${depth >= 2 ? "pl-14" : ""}
+              ${depth === 1 ? "pl-6 sm:pl-8" : ""}
+              ${depth >= 2 ? "pl-8 sm:pl-12" : ""}
             `}
           >
-            {item.icon && <item.icon className="h-4 w-4 flex-shrink-0" />}
-            <span className="flex-1 text-left">{item.label}</span>
+            {item.icon && (
+              <item.icon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+            )}
+            <span className="flex-1 text-left truncate">{item.label}</span>
             {isOpen ? (
-              <ChevronDown className="h-4 w-4 flex-shrink-0 transition-transform" />
+              <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 transition-transform" />
             ) : (
-              <ChevronRight className="h-4 w-4 flex-shrink-0 transition-transform" />
+              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 transition-transform" />
             )}
           </button>
           {isOpen && (
-            <div className="ml-4 mt-2 space-y-1 border-l-2 border-primary/15 pl-4">
+            <div className="ml-2 sm:ml-4 mt-1 sm:mt-2 space-y-1 border-l-2 border-primary/15 pl-2 sm:pl-4">
               {item.subItems?.map((subItem) =>
                 renderMenuItem(subItem, depth + 1),
               )}
@@ -432,35 +511,112 @@ ${depth >= 2 ? "pl-14" : ""}
         key={item.label}
         href={resolvedHref}
         className={`
-          flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200
+          flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm transition-all duration-200
           ${
             isActiveItem
               ? "bg-primary/10 text-primary font-semibold"
               : "text-muted-foreground hover:bg-primary/8 hover:text-primary"
           }
-          ${depth > 0 ? "pl-8" : ""}
+          ${depth > 0 ? "pl-6 sm:pl-8" : ""}
         `}
       >
-        {item.icon && <item.icon className="h-4 w-4 flex-shrink-0" />}
-        <span>{item.label}</span>
+        {item.icon && (
+          <item.icon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+        )}
+        <span className="truncate">{item.label}</span>
       </Link>
     );
   };
 
-  return (
-    <aside className="w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0 overflow-y-auto">
-      <div className="p-4">
-        <div className="flex items-center gap-2 px-3 py-2 mb-4">
-          <div className="p-1.5 bg-primary/10 rounded-lg">
-            <LayoutDashboard className="h-4 w-4 text-primary" />
-          </div>
-          <span className="text-sm font-medium">Event Menu</span>
-        </div>
+  // Clear search
+  const clearSearch = () => {
+    setSearchQuery("");
+  };
 
-        <nav className="space-y-1">
-          {menuData.map((item) => renderMenuItem(item))}
-        </nav>
+  return (
+    <aside className="h-full w-full bg-background border-r flex flex-col">
+      {/* Mobile header with close button */}
+      {isMobile && (
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b lg:hidden">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-primary/10 rounded-lg">
+              <LayoutDashboard className="h-4 w-4 text-primary" />
+            </div>
+            <span className="text-sm font-medium">Event Menu</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={onClose}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Desktop header */}
+      {!isMobile && (
+        <div className="p-3 sm:p-4 border-b hidden lg:block">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-1.5 bg-primary/10 rounded-lg">
+              <LayoutDashboard className="h-4 w-4 text-primary" />
+            </div>
+            <span className="text-sm font-medium">Event Menu</span>
+          </div>
+        </div>
+      )}
+
+      {/* Search Bar */}
+      <div className="px-2 sm:px-3 pt-2 sm:pt-3 pb-1 sm:pb-2 border-b">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search menu..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={cn(
+              "pl-8 sm:pl-9 pr-8 h-8 sm:h-9 text-xs sm:text-sm",
+              "bg-muted/50 border-muted focus:bg-background",
+            )}
+          />
+          {searchQuery && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-0.5 top-0.5 h-7 w-7 sm:h-8 sm:w-8"
+              onClick={clearSearch}
+            >
+              <X className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            </Button>
+          )}
+        </div>
+        {searchQuery && filteredMenuData.length === 0 && (
+          <p className="text-xs text-muted-foreground text-center py-2">
+            No menu items found
+          </p>
+        )}
+        {searchQuery && filteredMenuData.length > 0 && (
+          <p className="text-[10px] sm:text-xs text-muted-foreground text-center py-1">
+            Found {filteredMenuData.length} result(s)
+          </p>
+        )}
       </div>
+
+      <ScrollArea className="flex-1">
+        <div className="p-2 sm:p-3 space-y-1">
+          {filteredMenuData.length > 0 ? (
+            filteredMenuData.map((item) => renderMenuItem(item))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+              <Search className="h-8 w-8 mb-2 opacity-50" />
+              <p className="text-sm">No results found</p>
+              <p className="text-xs">Try adjusting your search</p>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
     </aside>
   );
 }

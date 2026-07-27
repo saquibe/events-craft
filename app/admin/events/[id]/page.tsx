@@ -1,3 +1,4 @@
+// app/admin/events/[id]/overview/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,6 +11,8 @@ import {
   Eye,
   TrendingUp,
   Activity,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -49,16 +52,16 @@ export default function EventOverviewPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center min-h-[40vh] sm:min-h-[60vh]">
+        <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (!event) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <h2 className="text-2xl font-bold">Event not found</h2>
+      <div className="flex flex-col items-center justify-center min-h-[40vh] sm:min-h-[60vh] gap-3 sm:gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold">Event not found</h2>
         <Button onClick={() => router.push("/admin/dashboard")}>
           Back to Dashboard
         </Button>
@@ -66,136 +69,174 @@ export default function EventOverviewPage() {
     );
   }
 
+  const stats = [
+    {
+      title: "Total Registrations",
+      value: "1,284",
+      change: "+12%",
+      trend: "up",
+      icon: Users,
+      color: "text-blue-500",
+    },
+    {
+      title: "Tickets Sold",
+      value: "856",
+      change: "66% capacity",
+      trend: "neutral",
+      icon: Ticket,
+      color: "text-green-500",
+    },
+    {
+      title: "Page Views",
+      value: "3,842",
+      change: "+8%",
+      trend: "up",
+      icon: Eye,
+      color: "text-purple-500",
+    },
+    {
+      title: "Conversion Rate",
+      value: "22.3%",
+      change: "+2.1%",
+      trend: "up",
+      icon: TrendingUp,
+      color: "text-orange-500",
+    },
+  ];
+
+  const recentActivities = [
+    {
+      id: 1,
+      title: "New registration",
+      description: "John Doe registered for the event",
+      time: "2 min ago",
+    },
+    {
+      id: 2,
+      title: "Speaker added",
+      description: "Dr. Sarah Johnson added as speaker",
+      time: "1 hour ago",
+    },
+    {
+      id: 3,
+      title: "Agenda updated",
+      description: "Day 2 schedule has been updated",
+      time: "3 hours ago",
+    },
+    {
+      id: 4,
+      title: "Payment received",
+      description: "Payment of $250 from TechCorp",
+      time: "5 hours ago",
+    },
+  ];
+
+  const quickActions = [
+    { label: "Manage Speakers", icon: "👤" },
+    { label: "Edit Agenda", icon: "📅" },
+    { label: "View Registrations", icon: "📋" },
+    { label: "Send Emails", icon: "✉️" },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Overview</h2>
-        <p className="text-muted-foreground">
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
+          Overview
+        </h2>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Key metrics and statistics for your event.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Registrations
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1,284</div>
-            <p className="text-xs text-muted-foreground">+12% from last week</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tickets Sold</CardTitle>
-            <Ticket className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">856</div>
-            <p className="text-xs text-muted-foreground">66% of capacity</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Page Views</CardTitle>
-            <Eye className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3,842</div>
-            <p className="text-xs text-muted-foreground">+8% from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Conversion Rate
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">22.3%</div>
-            <p className="text-xs text-muted-foreground">
-              +2.1% from last month
-            </p>
-          </CardContent>
-        </Card>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {stats.map((stat) => (
+          <Card key={stat.title} className="overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+                {stat.title}
+              </CardTitle>
+              <stat.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${stat.color}`} />
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{stat.value}</div>
+              <div className="flex items-center gap-1 text-xs sm:text-sm">
+                {stat.trend === "up" && (
+                  <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+                )}
+                {stat.trend === "down" && (
+                  <ArrowDownRight className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
+                )}
+                <span
+                  className={
+                    stat.trend === "up"
+                      ? "text-green-500"
+                      : stat.trend === "down"
+                        ? "text-red-500"
+                        : "text-muted-foreground"
+                  }
+                >
+                  {stat.change}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+      {/* Bottom Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg">
+              Recent Activity
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Activity className="h-4 w-4 text-primary" />
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="space-y-3 sm:space-y-4">
+              {recentActivities.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="flex items-start gap-3 sm:gap-4"
+                >
+                  <div className="p-1.5 sm:p-2 bg-primary/10 rounded-full flex-shrink-0 mt-0.5">
+                    <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium truncate">
+                      {activity.title}
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                      {activity.description}
+                    </p>
+                  </div>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground flex-shrink-0">
+                    {activity.time}
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">New registration</p>
-                  <p className="text-xs text-muted-foreground">
-                    John Doe registered for the event
-                  </p>
-                </div>
-                <span className="text-xs text-muted-foreground">2 min ago</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Activity className="h-4 w-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Speaker added</p>
-                  <p className="text-xs text-muted-foreground">
-                    Dr. Sarah Johnson added as speaker
-                  </p>
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  1 hour ago
-                </span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <Activity className="h-4 w-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Agenda updated</p>
-                  <p className="text-xs text-muted-foreground">
-                    Day 2 schedule has been updated
-                  </p>
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  3 hours ago
-                </span>
-              </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg">
+              Quick Actions
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "Manage Speakers", icon: "👤" },
-                { label: "Edit Agenda", icon: "📅" },
-                { label: "View Registrations", icon: "📋" },
-                { label: "Send Emails", icon: "✉️" },
-              ].map((action) => (
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              {quickActions.map((action) => (
                 <button
                   key={action.label}
-                  className="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-muted transition-colors text-sm"
+                  className="flex items-center gap-2 p-2 sm:p-3 rounded-lg border border-border hover:bg-muted transition-colors text-xs sm:text-sm"
                 >
-                  <span>{action.icon}</span>
-                  <span>{action.label}</span>
+                  <span className="text-base sm:text-lg">{action.icon}</span>
+                  <span className="truncate">{action.label}</span>
                 </button>
               ))}
             </div>

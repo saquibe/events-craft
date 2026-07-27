@@ -6,6 +6,12 @@ import { StatusBadge } from "../common/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Download, Link2, Mail, Clock } from "lucide-react";
 import { format } from "date-fns";
+import {
+  SimpleTabs,
+  SimpleTabsContent,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+} from "@/components/ui/simple-tabs";
 
 interface PresentationTableProps {
   presentations: Presentation[];
@@ -24,6 +30,8 @@ export function PresentationTable({
 }: PresentationTableProps) {
   // Filter by type
   const filtered = presentations.filter((p) => p.type === type);
+  const submitted = filtered.filter((p) => p.status === "Submitted");
+  const pending = filtered.filter((p) => p.status === "Pending");
 
   const columns = [
     {
@@ -134,31 +142,56 @@ export function PresentationTable({
   ];
 
   return (
-    <PaginatedTable
-      data={filtered}
-      columns={columns}
-      searchFields={["presenterName", "presenterEmail", "abstractId", "topic"]}
-      searchPlaceholder={`Search ${type}s...`}
-      emptyMessage={`No ${type}s found`}
-      renderHeader={() => (
-        <div className="flex items-center justify-between w-full">
-          <div>
-            <h3 className="text-lg font-semibold">
-              {type}s ({filtered.length})
-            </h3>
-            <div className="flex items-center gap-4 mt-1">
-              <span className="text-sm text-muted-foreground">
-                <span className="text-green-600">●</span> Submitted:{" "}
-                {filtered.filter((p) => p.status === "Submitted").length}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                <span className="text-yellow-600">●</span> Pending:{" "}
-                {filtered.filter((p) => p.status === "Pending").length}
-              </span>
+    <SimpleTabs defaultValue="submitted" className="w-full">
+      <SimpleTabsList>
+        <SimpleTabsTrigger value="submitted">
+          Submitted ({submitted.length})
+        </SimpleTabsTrigger>
+
+        <SimpleTabsTrigger value="pending">
+          Pending ({pending.length})
+        </SimpleTabsTrigger>
+      </SimpleTabsList>
+
+      <SimpleTabsContent value="submitted">
+        <PaginatedTable
+          data={submitted}
+          columns={columns}
+          searchFields={[
+            "presenterName",
+            "presenterEmail",
+            "abstractId",
+            "topic",
+          ]}
+          searchPlaceholder={`Search Submitted ${type}s...`}
+          emptyMessage={`No Submitted ${type}s found`}
+          renderHeader={() => (
+            <div>
+              <h3 className="text-lg font-semibold">Submitted {type}s</h3>
             </div>
-          </div>
-        </div>
-      )}
-    />
+          )}
+        />
+      </SimpleTabsContent>
+
+      <SimpleTabsContent value="pending">
+        <PaginatedTable
+          data={pending}
+          columns={columns}
+          searchFields={[
+            "presenterName",
+            "presenterEmail",
+            "abstractId",
+            "topic",
+          ]}
+          searchPlaceholder={`Search Pending ${type}s...`}
+          emptyMessage={`No Pending ${type}s found`}
+          renderHeader={() => (
+            <div>
+              <h3 className="text-lg font-semibold">Pending {type}s</h3>
+            </div>
+          )}
+        />
+      </SimpleTabsContent>
+    </SimpleTabs>
   );
 }

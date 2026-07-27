@@ -69,6 +69,10 @@ export default function AttendeeProfilePage() {
     setProfiles([...profiles, newProfile]);
   };
 
+  const handleDelete = (profile: AttendeeProfile) => {
+    setProfiles((prev) => prev.filter((p) => p.id !== profile.id));
+  };
+
   const handleEditProfile = async (data: any) => {
     if (editingProfile) {
       setProfiles(
@@ -106,7 +110,11 @@ export default function AttendeeProfilePage() {
         />
       </div>
 
-      <AttendeeProfileTable profiles={profiles} onEdit={handleEdit} />
+      <AttendeeProfileTable
+        profiles={profiles}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
       <AttendeeProfileFormSheet
         open={isFormOpen}

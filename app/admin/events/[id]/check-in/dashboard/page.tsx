@@ -135,6 +135,9 @@ export default function OnsiteCheckinDashboardPage() {
     setEditingProfile(profile);
     setIsFormOpen(true);
   };
+  const handleDelete = (profile: AttendeeProfile) => {
+    setProfiles((prev) => prev.filter((p) => p.id !== profile.id));
+  };
 
   return (
     <div className="space-y-6">
@@ -187,7 +190,11 @@ export default function OnsiteCheckinDashboardPage() {
         </SimpleTabsList>
 
         <SimpleTabsContent value="attendee-profiles">
-          <AttendeeProfileTable profiles={profiles} onEdit={handleEdit} />
+          <AttendeeProfileTable
+            profiles={profiles}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
 
           <AttendeeProfileFormSheet
             open={isFormOpen}

@@ -8,11 +8,13 @@ import { StatusBadge } from "../common/StatusBadge";
 interface AttendeeProfileTableProps {
   profiles: AttendeeProfile[];
   onEdit: (profile: AttendeeProfile) => void;
+  onDelete: (profile: AttendeeProfile) => void;
 }
 
 export function AttendeeProfileTable({
   profiles,
   onEdit,
+  onDelete,
 }: AttendeeProfileTableProps) {
   const columns = [
     {
@@ -51,12 +53,12 @@ export function AttendeeProfileTable({
               icon: ActionIcons.edit,
               onClick: () => onEdit(profile),
             },
-            ...(!profile.canDelete && !profile.isDefault
+            ...(profile.canDelete
               ? [
                   {
                     label: "Delete",
                     icon: ActionIcons.delete,
-                    onClick: () => {},
+                    onClick: () => onDelete(profile),
                     variant: "destructive" as const,
                   },
                 ]

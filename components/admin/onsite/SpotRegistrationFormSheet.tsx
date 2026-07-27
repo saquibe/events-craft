@@ -49,6 +49,8 @@ import {
   SimpleTabsList,
   SimpleTabsTrigger,
 } from "@/components/ui/simple-tabs";
+import Image from "next/image";
+import ReactCrop, { Crop } from "react-image-crop";
 
 // Base schema with default fields
 const baseFormSchema = z.object({
@@ -104,6 +106,16 @@ export function SpotRegistrationFormSheet({
   onFormSave,
 }: SpotRegistrationFormSheetProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
+
+  const [crop, setCrop] = useState<Crop>({
+    unit: "%",
+    width: 80,
+    height: 80,
+    x: 10,
+    y: 10,
+  });
   const [activeTab, setActiveTab] = useState("form");
   const [dynamicFields, setDynamicFields] = useState<Record<string, any>>({});
   const [showBuilder, setShowBuilder] = useState(false);
@@ -182,14 +194,44 @@ export function SpotRegistrationFormSheet({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setPreviewImage(result);
-        form.setValue("profilePhoto", result);
-      };
-      reader.readAsDataURL(file);
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
+      // clear preview until user saves crop
+      setPreviewImage(null);
     }
+  };
+
+  const handleCropSave = () => {
+    if (!imageRef || !crop.width || !crop.height) return;
+
+    const canvas = document.createElement("canvas");
+
+    const scaleX = imageRef.naturalWidth / imageRef.width;
+    const scaleY = imageRef.naturalHeight / imageRef.height;
+
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return;
+
+    ctx.drawImage(
+      imageRef,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height,
+    );
+
+    const base64 = canvas.toDataURL("image/jpeg");
+
+    setPreviewImage(base64);
+    form.setValue("profilePhoto", base64);
   };
 
   const handleDynamicFieldChange = (fieldId: string, value: any) => {
@@ -439,35 +481,84 @@ export function SpotRegistrationFormSheet({
                 className="space-y-6 py-4"
               >
                 {/* Profile Photo */}
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src={previewImage || undefined} />
-                    <AvatarFallback className="text-2xl">
-                      {form.watch("firstName")?.[0] || "?"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        document.getElementById("photo-upload")?.click()
-                      }
-                    >
-                      Upload Photo
-                    </Button>
-                    <Input
-                      id="photo-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageChange}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      JPG, PNG or GIF. Max 2MB
-                    </p>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage
+                        src={previewImage || "/images/users/user7.jpg"}
+                      />
+                      <AvatarFallback className="text-2xl">
+                        {form.watch("firstName")?.[0] || "?"}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          document.getElementById("photo-upload")?.click()
+                        }
+                      >
+                        Upload Photo
+                      </Button>
+
+                      <Input
+                        id="photo-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange}
+                      />
+
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        JPG, PNG or GIF. Max 2MB
+                      </p>
+                    </div>
                   </div>
+
+                  {selectedImage && (
+                    <div className="space-y-4">
+                      <div className="overflow-hidden rounded-xl border border-border">
+                        <ReactCrop
+                          crop={crop}
+                          onChange={(c) => setCrop(c)}
+                          aspect={1}
+                          circularCrop
+                        >
+                          <img
+                            ref={setImageRef}
+                            src={selectedImage}
+                            alt="Profile"
+                            className="max-h-[300px] w-full object-contain"
+                          />
+                        </ReactCrop>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <Button
+                          type="button"
+                          color="primary"
+                          className="cursor-pointer"
+                          onClick={handleCropSave}
+                        >
+                          Save Crop
+                        </Button>
+                      </div>
+
+                      <div className="flex justify-center">
+                        <div className="relative h-24 w-24 overflow-hidden rounded-full border border-border bg-muted">
+                          <Image
+                            src={previewImage || selectedImage}
+                            alt="Preview"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Default Fields */}

@@ -6,6 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PresentationDashboard } from "@/components/admin/presentation/PresentationDashboard";
 import { PresentationTable } from "@/components/admin/presentation/PresentationTable";
 import { Presentation } from "@/lib/types/presentation";
+import {
+  SimpleTabs,
+  SimpleTabsContent,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+} from "@/components/ui/simple-tabs";
 
 // Mock stats
 const mockStats = {
@@ -114,14 +120,16 @@ export default function PresentationDashboardPage() {
       <PresentationDashboard stats={mockStats} />
 
       <div className="mt-8">
-        <Tabs defaultValue="talk" className="w-full">
-          <TabsList>
-            <TabsTrigger value="talk">Invited Talk</TabsTrigger>
-            <TabsTrigger value="paper">Paper</TabsTrigger>
-            <TabsTrigger value="eposter">ePoster</TabsTrigger>
-          </TabsList>
+        <SimpleTabs defaultValue="talk" className="w-full">
+          <SimpleTabsList>
+            <SimpleTabsTrigger value="talk">Invited Talk</SimpleTabsTrigger>
 
-          <TabsContent value="talk" className="mt-6">
+            <SimpleTabsTrigger value="paper">Paper</SimpleTabsTrigger>
+
+            <SimpleTabsTrigger value="eposter">ePoster</SimpleTabsTrigger>
+          </SimpleTabsList>
+
+          <SimpleTabsContent value="talk">
             <PresentationTable
               presentations={presentations}
               type="Talk"
@@ -129,9 +137,9 @@ export default function PresentationDashboardPage() {
               onDownload={handleDownload}
               onCopyLink={handleCopyLink}
             />
-          </TabsContent>
+          </SimpleTabsContent>
 
-          <TabsContent value="paper" className="mt-6">
+          <SimpleTabsContent value="paper">
             <PresentationTable
               presentations={presentations}
               type="Paper"
@@ -139,9 +147,9 @@ export default function PresentationDashboardPage() {
               onDownload={handleDownload}
               onCopyLink={handleCopyLink}
             />
-          </TabsContent>
+          </SimpleTabsContent>
 
-          <TabsContent value="eposter" className="mt-6">
+          <SimpleTabsContent value="eposter">
             <PresentationTable
               presentations={presentations}
               type="ePoster"
@@ -149,8 +157,8 @@ export default function PresentationDashboardPage() {
               onDownload={handleDownload}
               onCopyLink={handleCopyLink}
             />
-          </TabsContent>
-        </Tabs>
+          </SimpleTabsContent>
+        </SimpleTabs>
       </div>
     </div>
   );

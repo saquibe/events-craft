@@ -111,7 +111,7 @@ export function AttendeeProfileFormSheet({
                     <Input
                       placeholder="Enter profile name"
                       {...field}
-                      disabled={isDefault}
+                      disabled={false}
                     />
                   </FormControl>
                   <FormMessage />

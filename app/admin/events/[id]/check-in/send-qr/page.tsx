@@ -25,6 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PaginatedTable } from "@/components/paginated-table";
 
 // Mock attendees
 const mockAttendees = [
@@ -103,6 +104,41 @@ export default function SendQRCodePage() {
     alert("Downloading QR codes...");
   };
 
+  const columns = [
+    {
+      key: "name",
+      header: "Name",
+      cell: (attendee: (typeof attendees)[0]) => (
+        <span className="font-medium">{attendee.name}</span>
+      ),
+    },
+    {
+      key: "email",
+      header: "Email",
+      cell: (attendee: (typeof attendees)[0]) => attendee.email,
+    },
+    {
+      key: "regNo",
+      header: "Reg No",
+      cell: (attendee: (typeof attendees)[0]) => (
+        <span className="font-mono">{attendee.regNo}</span>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      cell: (attendee: (typeof attendees)[0]) => (
+        <span
+          className={`text-sm font-medium ${
+            attendee.qrSent ? "text-green-600" : "text-yellow-600"
+          }`}
+        >
+          {attendee.qrSent ? "✓ Sent" : "Pending"}
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -174,7 +210,9 @@ export default function SendQRCodePage() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium">Attendees</CardTitle>
+              <CardTitle className="text-default font-medium">
+                Attendees
+              </CardTitle>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -198,54 +236,30 @@ export default function SendQRCodePage() {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10">
-                    <Checkbox
-                      checked={selectedAll}
-                      onCheckedChange={handleSelectAll}
-                    />
-                  </TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Reg No</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {attendees.map((attendee) => (
-                  <TableRow key={attendee.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedAttendees.includes(attendee.id)}
-                        onCheckedChange={(checked) =>
-                          handleSelectAttendee(attendee.id, checked as boolean)
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {attendee.name}
-                    </TableCell>
-                    <TableCell>{attendee.email}</TableCell>
-                    <TableCell className="font-mono">
-                      {attendee.regNo}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`text-xs ${attendee.qrSent ? "text-green-600" : "text-yellow-600"}`}
-                      >
-                        {attendee.qrSent ? "✓ Sent" : "Pending"}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className="mt-4 text-sm text-muted-foreground">
+            <PaginatedTable
+              data={attendees}
+              columns={columns}
+              searchFields={["name", "email", "regNo"]}
+              searchPlaceholder="Search attendees..."
+              emptyMessage="No attendees found"
+              renderHeader={() => (
+                <div className="flex items-center justify-between w-full">
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      Attendees ({attendees.length})
+                    </h3>
+
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {attendees.filter((a) => a.qrSent).length} QR codes sent
+                    </p>
+                  </div>
+                </div>
+              )}
+            />
+            {/* <div className="mt-4 text-sm text-muted-foreground">
               {attendees.length} attendees •{" "}
               {attendees.filter((a) => a.qrSent).length} QR codes sent
-            </div>
+            </div> */}
           </CardContent>
         </Card>
       </div>

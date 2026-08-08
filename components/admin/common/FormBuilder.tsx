@@ -482,7 +482,7 @@ export function FormBuilder({
         </div>
         <div className="flex gap-2">
           <Button
-            variant={previewMode ? "default" : "outline"}
+            variant={previewMode ? "outline" : "outline"}
             size="sm"
             onClick={() => setPreviewMode(!previewMode)}
           >

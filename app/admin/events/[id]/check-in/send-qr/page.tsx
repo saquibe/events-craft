@@ -148,73 +148,16 @@ export default function SendQRCodePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Email Template */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Email Template
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Subject</Label>
-              <Input
-                value={emailSubject}
-                onChange={(e) => setEmailSubject(e.target.value)}
-                placeholder="Email subject"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Message</Label>
-              <Textarea
-                value={emailTemplate}
-                onChange={(e) => setEmailTemplate(e.target.value)}
-                placeholder="Enter your email message here..."
-                className="min-h-[200px]"
-              />
-              <p className="text-xs text-muted-foreground">
-                Use {"{name}"} for attendee name, {"{regNo}"} for registration
-                number
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>QR Code Format</Label>
-              <Select defaultValue="png">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select format" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="png">PNG</SelectItem>
-                  <SelectItem value="svg">SVG</SelectItem>
-                  <SelectItem value="pdf">PDF</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Include QR in email body</Label>
-                <p className="text-xs text-muted-foreground">
-                  Show QR code directly in email
-                </p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-          </CardContent>
-        </Card>
-
+      <div className="space-y-6">
         {/* Attendee List */}
-        <Card className="lg:col-span-2">
+        <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-default font-medium">
                 Attendees
               </CardTitle>
               <div className="flex gap-2">
-                <Button
+                {/* <Button
                   variant="outline"
                   size="sm"
                   onClick={handleDownloadQR}
@@ -222,7 +165,7 @@ export default function SendQRCodePage() {
                 >
                   <Download className="h-4 w-4 mr-1" />
                   Download QR
-                </Button>
+                </Button> */}
                 <Button
                   size="sm"
                   onClick={handleSendBulkQR}

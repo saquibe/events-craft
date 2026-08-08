@@ -69,7 +69,45 @@ const menuData: MenuItem[] = [
   {
     label: "Abstract",
     icon: FileText,
-    href: "/admin/events/[id]/abstract/dashboard",
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/abstract/dashboard" },
+      { label: "Abstracts", href: "/admin/events/[id]/abstract/my-abstracts" },
+      { label: "Categories", href: "/admin/events/[id]/abstract/categories" },
+      {
+        label: "Abstract Reviewer",
+        href: "/admin/events/[id]/abstract/reviewers",
+      },
+      {
+        label: "Abstract Approver",
+        href: "/admin/events/[id]/abstract/approvers",
+      },
+      {
+        label: "Presentation Judge",
+        href: "/admin/events/[id]/abstract/judges",
+      },
+      {
+        label: "Forms",
+        subItems: [
+          {
+            label: "Abstract Submission Form",
+            href: "/admin/events/[id]/abstract/forms/submission",
+          },
+          {
+            label: "Talk Judging Form",
+            href: "/admin/events/[id]/abstract/forms/talk-judging",
+          },
+          {
+            label: "Paper Judging Form",
+            href: "/admin/events/[id]/abstract/forms/paper-judging",
+          },
+          {
+            label: "Poster Judging Form",
+            href: "/admin/events/[id]/abstract/forms/poster-judging",
+          },
+        ],
+      },
+      { label: "Settings", href: "/admin/events/[id]/abstract/settings" },
+    ],
   },
   {
     label: "Speaker",

@@ -1,0 +1,113 @@
+"use client";
+
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { CategoryTable } from "@/components/admin/abstract/CategoryTable";
+import { CategoryFormSheet } from "@/components/admin/abstract/CategoryFormSheet";
+import { Category } from "@/lib/types/abstract";
+import { CreateButton } from "@/components/admin/common/CreateButton";
+
+const mockCategories: Category[] = [
+  {
+    id: "1",
+    name: "Medical Research",
+    options: ["ePoster", "Paper", "Talk"],
+    status: "Active",
+    createdAt: "",
+    updatedAt: "",
+  },
+  {
+    id: "2",
+    name: "Technology",
+    options: ["Poster", "Paper"],
+    status: "Active",
+    createdAt: "",
+    updatedAt: "",
+  },
+  {
+    id: "3",
+    name: "Healthcare",
+    options: ["ePoster", "Talk"],
+    status: "Active",
+    createdAt: "",
+    updatedAt: "",
+  },
+];
+
+export default function CategoriesPage() {
+  const params = useParams();
+  const eventId = (params?.id as string) || "";
+  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
+  const handleSubmit = async (data: any) => {
+    if (editingCategory) {
+      setCategories(
+        categories.map((c) =>
+          c.id === editingCategory.id
+            ? { ...c, ...data, updatedAt: new Date().toISOString() }
+            : c,
+        ),
+      );
+    } else {
+      const newCategory: Category = {
+        id: String(categories.length + 1),
+        ...data,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setCategories([...categories, newCategory]);
+    }
+    setIsFormOpen(false);
+    setEditingCategory(null);
+  };
+
+  const handleEdit = (category: Category) => {
+    setEditingCategory(category);
+    setIsFormOpen(true);
+  };
+
+  const handleStatusChange = (id: string, status: Category["status"]) => {
+    setCategories(
+      categories.map((c) =>
+        c.id === id ? { ...c, status, updatedAt: new Date().toISOString() } : c,
+      ),
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Categories</h2>
+          <p className="text-muted-foreground">
+            Manage abstract categories for Event #{eventId}
+          </p>
+        </div>
+        <CreateButton
+          label="Add Category"
+          onClick={() => {
+            setEditingCategory(null);
+            setIsFormOpen(true);
+          }}
+        />
+      </div>
+
+      <CategoryTable
+        categories={categories}
+        onEdit={handleEdit}
+        onStatusChange={handleStatusChange}
+      />
+
+      <CategoryFormSheet
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        category={editingCategory}
+        onSubmit={handleSubmit}
+      />
+    </div>
+  );
+}

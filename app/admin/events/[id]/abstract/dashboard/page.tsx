@@ -32,6 +32,13 @@ import {
   Abstract as AbstractType,
   AbstractStats,
 } from "@/lib/types/abstract";
+import { CreateButton } from "@/components/admin/common/CreateButton";
+import {
+  SimpleTabs,
+  SimpleTabsContent,
+  SimpleTabsList,
+  SimpleTabsTrigger,
+} from "@/components/ui/simple-tabs";
 
 // Mock data
 const mockStats: AbstractStats = {
@@ -269,17 +276,32 @@ export default function AbstractDashboardPage() {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList>
-          <TabsTrigger value="abstracts">Abstracts</TabsTrigger>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="reviewers">Abstract Reviewers</TabsTrigger>
-          <TabsTrigger value="approvers">Abstract Approvers</TabsTrigger>
-          <TabsTrigger value="judges">Presentation Judges</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
+      <SimpleTabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <SimpleTabsList>
+          <SimpleTabsTrigger value="abstracts">Abstracts</SimpleTabsTrigger>
 
-        <TabsContent value="abstracts" className="mt-6">
+          <SimpleTabsTrigger value="categories">Categories</SimpleTabsTrigger>
+
+          <SimpleTabsTrigger value="reviewers">
+            Abstract Reviewers
+          </SimpleTabsTrigger>
+
+          <SimpleTabsTrigger value="approvers">
+            Abstract Approvers
+          </SimpleTabsTrigger>
+
+          <SimpleTabsTrigger value="judges">
+            Presentation Judges
+          </SimpleTabsTrigger>
+
+          <SimpleTabsTrigger value="settings">Settings</SimpleTabsTrigger>
+        </SimpleTabsList>
+
+        <SimpleTabsContent value="abstracts" className="mt-6">
           <AbstractTable
             abstracts={abstracts}
             onSendEmail={(id) => alert(`Email sent for abstract ${id}`)}
@@ -287,14 +309,14 @@ export default function AbstractDashboardPage() {
             onExport={() => alert("Exporting abstracts...")}
             onSendUpdateEmail={() => alert("Update email sent to all authors")}
           />
-        </TabsContent>
+        </SimpleTabsContent>
 
-        <TabsContent value="categories" className="mt-6">
+        <SimpleTabsContent value="categories" className="mt-6">
           <div className="flex justify-end mb-4">
-            <Button onClick={() => handleOpenForm("category")}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Category
-            </Button>
+            <CreateButton
+              label="Add Category"
+              onClick={() => handleOpenForm("category")}
+            />
           </div>
           <CategoryTable
             categories={categories}
@@ -305,14 +327,14 @@ export default function AbstractDashboardPage() {
               );
             }}
           />
-        </TabsContent>
+        </SimpleTabsContent>
 
-        <TabsContent value="reviewers" className="mt-6">
+        <SimpleTabsContent value="reviewers" className="mt-6">
           <div className="flex justify-end mb-4">
-            <Button onClick={() => handleOpenForm("reviewer")}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Reviewer
-            </Button>
+            <CreateButton
+              label="Add Reviewer"
+              onClick={() => handleOpenForm("reviewer")}
+            />
           </div>
           <AbstractReviewerTable
             reviewers={reviewers}
@@ -326,14 +348,14 @@ export default function AbstractDashboardPage() {
               );
             }}
           />
-        </TabsContent>
+        </SimpleTabsContent>
 
-        <TabsContent value="approvers" className="mt-6">
+        <SimpleTabsContent value="approvers" className="mt-6">
           <div className="flex justify-end mb-4">
-            <Button onClick={() => handleOpenForm("approver")}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Approver
-            </Button>
+            <CreateButton
+              label="Add Approver"
+              onClick={() => handleOpenForm("approver")}
+            />
           </div>
           <AbstractApproverTable
             approvers={approvers}
@@ -347,14 +369,14 @@ export default function AbstractDashboardPage() {
               );
             }}
           />
-        </TabsContent>
+        </SimpleTabsContent>
 
         <TabsContent value="judges" className="mt-6">
           <div className="flex justify-end mb-4">
-            <Button onClick={() => handleOpenForm("judge")}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Judge
-            </Button>
+            <CreateButton
+              label="Add Judge"
+              onClick={() => handleOpenForm("judge")}
+            />
           </div>
           <PresentationJudgeTable
             judges={judges}
@@ -371,7 +393,7 @@ export default function AbstractDashboardPage() {
         <TabsContent value="settings" className="mt-6">
           <AbstractSettings settings={settings} onSave={setSettings} />
         </TabsContent>
-      </Tabs>
+      </SimpleTabs>
 
       {/* Form Sheet */}
       {formType === "category" && (

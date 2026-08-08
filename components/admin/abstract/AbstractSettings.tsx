@@ -32,7 +32,11 @@ export function AbstractSettings({ settings, onSave }: AbstractSettingsProps) {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>Abstract Settings</span>
-          <Button onClick={() => onSave(formData)}>
+          <Button
+            onClick={() => onSave(formData)}
+            className="cursor-pointer text-base"
+            color="primary"
+          >
             <Save className="h-4 w-4 mr-2" />
             Save Settings
           </Button>

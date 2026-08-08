@@ -42,7 +42,7 @@ const mockAbstracts: Abstract[] = [
     submittedBy: "m@n.com",
     presenterName: "Mintu Nath",
     coAuthors: ["Dr. Sarah Johnson", "Prof. Michael Chen"],
-    abstractTitle: "dsjkdfo dsjfklsdjf. dsjfklsdf dsjfklsdf dsjfklsdf",
+    abstractTitle: "Innovations in Medical Research",
     abstractDetails:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     wordCount: 250,

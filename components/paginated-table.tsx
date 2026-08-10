@@ -162,7 +162,9 @@ export function PaginatedTable<T extends Record<string, any>>({
                       key={col.key}
                       className={`text-muted-foreground text-base ${col.className || ""}`}
                     >
-                      {col.cell ? col.cell(item, startIndex + index) : item[col.key]}
+                      {col.cell
+                        ? col.cell(item, startIndex + index)
+                        : item[col.key]}
                     </TableCell>
                   ))}
                 </TableRow>

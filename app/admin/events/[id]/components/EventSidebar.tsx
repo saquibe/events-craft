@@ -214,7 +214,28 @@ const menuData: MenuItem[] = [
   {
     label: "eManual",
     icon: BookOpen,
-    href: "/admin/events/[id]/emanual/dashboard",
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/emanual/dashboard" },
+      {
+        label: "eManual Builder",
+        subItems: [
+          { label: "Menu", href: "/admin/events/[id]/emanual/menus" },
+          {
+            label: "Information",
+            href: "/admin/events/[id]/emanual/information",
+          },
+          { label: "Forms", href: "/admin/events/[id]/emanual/forms" },
+        ],
+      },
+      {
+        label: "Official Contractor",
+        href: "/admin/events/[id]/emanual/contractors",
+      },
+      { label: "Additional Items", href: "/admin/events/[id]/emanual/items" },
+      { label: "Item Category", href: "/admin/events/[id]/emanual/categories" },
+      { label: "Orders", href: "/admin/events/[id]/emanual/orders" },
+      { label: "Setting", href: "/admin/events/[id]/emanual/settings" },
+    ],
   },
   {
     label: "Networking",

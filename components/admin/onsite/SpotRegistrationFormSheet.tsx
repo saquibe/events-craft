@@ -29,7 +29,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AttendeeProfile } from "@/lib/types/onsite";
 import { Loader2, Settings2, FormInput, Plus, X } from "lucide-react";
 import {

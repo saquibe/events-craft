@@ -16,6 +16,7 @@ import {
   Archive,
   Mail,
   Reply,
+  FileText,
 } from "lucide-react";
 
 export interface ActionItem {
@@ -60,6 +61,7 @@ export function ActionDropdown({ actions }: ActionDropdownProps) {
 // Pre-defined action icons for convenience
 export const ActionIcons = {
   edit: <Edit className="h-4 w-4 mr-2" />,
+  editContent: <FileText className="h-4 w-4 mr-2" />,
   delete: <Trash2 className="h-4 w-4 mr-2" />,
   publish: <CheckCircle className="h-4 w-4 mr-2" />,
   draft: <Clock className="h-4 w-4 mr-2" />,

@@ -1,0 +1,15 @@
+export const contractorCategories = [
+  "Stand Contractor",
+  "Electrical Contractor",
+  "Internet / IT Contractor",
+  "Cleaning Contractor",
+  "Freight & Logistics Contractor",
+  "AV (Audio Visual) Contractor",
+  "Furniture Contractor",
+  "Floral & Decoration Contractor",
+  "Rigging Contractor",
+  "Security Contractor",
+  "Catering Contractor",
+  "Registration / Badging Contractor",
+  "Media / Photography Contractor",
+];

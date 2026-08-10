@@ -16,7 +16,7 @@ import { PaginationControls } from "./pagination-controls";
 interface Column<T> {
   key: string;
   header: string;
-  cell?: (item: T) => ReactNode;
+  cell?: (item: T, index?: number) => ReactNode;
   className?: string;
   headerClassName?: string;
 }
@@ -162,7 +162,7 @@ export function PaginatedTable<T extends Record<string, any>>({
                       key={col.key}
                       className={`text-muted-foreground text-base ${col.className || ""}`}
                     >
-                      {col.cell ? col.cell(item) : item[col.key]}
+                      {col.cell ? col.cell(item, startIndex + index) : item[col.key]}
                     </TableCell>
                   ))}
                 </TableRow>

@@ -409,7 +409,41 @@ const menuData: MenuItem[] = [
   {
     label: "Accounting",
     icon: Calculator,
-    href: "/admin/events/[id]/accounting/dashboard",
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/accounting/dashboard" },
+      {
+        label: "Expenses",
+        subItems: [
+          { label: "Expenses", href: "/admin/events/[id]/accounting/expenses" },
+          {
+            label: "Expense Category",
+            href: "/admin/events/[id]/accounting/expense-category",
+          },
+          {
+            label: "Expense Head",
+            href: "/admin/events/[id]/accounting/expense-head",
+          },
+        ],
+      },
+      {
+        label: "Sponsor Income",
+        subItems: [
+          { label: "Invoices", href: "/admin/events/[id]/accounting/invoices" },
+          {
+            label: "Invoice Items",
+            href: "/admin/events/[id]/accounting/invoice-items",
+          },
+          {
+            label: "Record Income",
+            href: "/admin/events/[id]/accounting/record-income",
+          },
+        ],
+      },
+      {
+        label: "Registration Income",
+        href: "/admin/events/[id]/accounting/registration-income",
+      },
+    ],
   },
   {
     label: "Analytics",

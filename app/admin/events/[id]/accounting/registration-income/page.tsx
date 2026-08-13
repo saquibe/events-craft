@@ -92,13 +92,13 @@ export default function RegistrationIncomePage() {
             Manage registration income for Event #{eventId}
           </p>
         </div>
-        <CreateButton
+        {/* <CreateButton
           label="Add Registration Income"
           onClick={() => {
             setEditingIncome(null);
             setIsFormOpen(true);
           }}
-        />
+        /> */}
       </div>
 
       <RegistrationIncomeTable

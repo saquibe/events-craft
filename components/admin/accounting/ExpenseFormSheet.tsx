@@ -37,7 +37,7 @@ const formSchema = z.object({
   expenseHeadId: z.string().min(1, "Expense head is required"),
   totalUnit: z.string().min(1, "Total unit is required"),
   unitType: z.string().min(1, "Unit type is required"),
-  gstPercentage: z.string().min(1, "GST percentage is required"),
+  taxPercentage: z.string().min(1, "Tax percentage is required"),
   date: z.string().min(1, "Date is required"),
   narration: z.string().min(1, "Narration is required"),
   status: z.enum(["Active", "Inactive"]).default("Active"),
@@ -66,7 +66,7 @@ export function ExpenseFormSheet({
       expenseHeadId: "",
       totalUnit: "",
       unitType: "",
-      gstPercentage: "",
+      taxPercentage: "",
       date: "",
       narration: "",
       status: "Active",
@@ -79,7 +79,7 @@ export function ExpenseFormSheet({
         expenseHeadId: expense.expenseHeadId,
         totalUnit: expense.totalUnit.toString(),
         unitType: expense.unitType,
-        gstPercentage: expense.gstPercentage.toString(),
+        taxPercentage: expense.taxPercentage.toString(),
         date: expense.date,
         narration: expense.narration,
         status: expense.status,
@@ -89,7 +89,7 @@ export function ExpenseFormSheet({
         expenseHeadId: "",
         totalUnit: "",
         unitType: "",
-        gstPercentage: "",
+        taxPercentage: "",
         date: "",
         narration: "",
         status: "Active",
@@ -183,14 +183,14 @@ export function ExpenseFormSheet({
 
             <FormField
               control={form.control}
-              name="gstPercentage"
+              name="taxPercentage"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-default">
-                    GST Percentage *
+                    Tax Percentage *
                   </FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Enter GST %" {...field} />
+                    <Input type="number" placeholder="Enter tax %" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

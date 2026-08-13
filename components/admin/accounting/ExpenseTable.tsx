@@ -57,11 +57,11 @@ export function ExpenseTable({
       ),
     },
     {
-      key: "gstPercentage",
-      header: "GST %",
+      key: "taxPercentage",
+      header: "Tax %",
       cell: (expense: Expense) => (
         <span className="text-muted-foreground text-base">
-          {expense.gstPercentage}%
+          {expense.taxPercentage}%
         </span>
       ),
     },
@@ -75,11 +75,11 @@ export function ExpenseTable({
       ),
     },
     {
-      key: "gstAmount",
-      header: "GST Amount",
+      key: "taxAmount",
+      header: "Tax Amount",
       cell: (expense: Expense) => (
         <span className="text-muted-foreground text-base">
-          ${expense.gstAmount}
+          ${expense.taxAmount}
         </span>
       ),
     },

@@ -1,28 +1,94 @@
+// app/admin/events/[id]/accounting/invoice-items/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { InvoiceItemsTable } from "@/components/admin/accounting/InvoiceItemsTable";
 import { InvoiceItemsFormSheet } from "@/components/admin/accounting/InvoiceItemsFormSheet";
 import { InvoiceItem } from "@/lib/types/accounting";
 import { CreateButton } from "@/components/admin/common/CreateButton";
 
-const mockItems: InvoiceItem[] = [];
+// Initial mock data
+const initialMockItems: InvoiceItem[] = [
+  {
+    id: "1",
+    itemName: "Sponsorship Package",
+    description: "Gold Sponsorship",
+    taxCode: "SPONSOR-GOLD",
+    unitPrice: 5000,
+    taxPercentage: 10,
+    status: "Active",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "2",
+    itemName: "Banner Display",
+    description: "Main Hall Banner",
+    taxCode: "BANNER-01",
+    unitPrice: 500,
+    taxPercentage: 10,
+    status: "Active",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "3",
+    itemName: "Exhibition Booth",
+    description: "Standard Booth",
+    taxCode: "BOOTH-STD",
+    unitPrice: 3000,
+    taxPercentage: 10,
+    status: "Active",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "4",
+    itemName: "Speaking Slot",
+    description: "Keynote Session",
+    taxCode: "SPEAK-KEY",
+    unitPrice: 2000,
+    taxPercentage: 10,
+    status: "Active",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
 
 export default function InvoiceItemsPage() {
   const params = useParams();
   const eventId = (params?.id as string) || "";
-  const [items, setItems] = useState<InvoiceItem[]>(mockItems);
+  const [items, setItems] = useState<InvoiceItem[]>(initialMockItems);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<InvoiceItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Store items in localStorage to persist across sessions
+  useEffect(() => {
+    const storedItems = localStorage.getItem("invoiceItems");
+    if (storedItems) {
+      try {
+        const parsed = JSON.parse(storedItems);
+        if (parsed.length > 0) {
+          setItems(parsed);
+        }
+      } catch (e) {
+        console.error("Error loading items from storage:", e);
+      }
+    }
+  }, []);
+
+  // Save items to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("invoiceItems", JSON.stringify(items));
+  }, [items]);
 
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
+
       if (editingItem) {
         setItems(
           items.map((i) =>
@@ -39,7 +105,7 @@ export default function InvoiceItemsPage() {
         );
       } else {
         const newItem: InvoiceItem = {
-          id: String(items.length + 1),
+          id: String(Date.now()),
           ...data,
           unitPrice: parseFloat(data.unitPrice),
           taxPercentage: parseFloat(data.taxPercentage),

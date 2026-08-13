@@ -14,7 +14,7 @@ export interface ExpenseHead {
   amountPerUnit: number;
   unitQuantity: number;
   unitType: string;
-  gstPercentage: number;
+  taxPercentage: number;
   status: "Active" | "Inactive";
   createdAt: string;
   updatedAt: string;
@@ -26,11 +26,11 @@ export interface Expense {
   expenseHead?: ExpenseHead;
   totalUnit: number;
   unitType: string;
-  gstPercentage: number;
+  taxPercentage: number;
   date: string;
   narration: string;
   amount: number;
-  gstAmount: number;
+  taxAmount: number;
   totalAmount: number;
   status: "Active" | "Inactive";
   createdAt: string;
@@ -54,7 +54,7 @@ export interface RecordIncome {
   sponsorName: string;
   amountReceived: number;
   urnNumber: string;
-  dateTime: string;
+  date: string;
   status: "Active" | "Inactive";
   createdAt: string;
   updatedAt: string;
@@ -81,6 +81,7 @@ export interface Invoice extends InvoiceFormData {
   totalTax: number;
   total: number;
   status: "Draft" | "Sent" | "Paid" | "Overdue";
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }

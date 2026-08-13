@@ -21,8 +21,8 @@ export function RegistrationIncomeTable({
 }: RegistrationIncomeTableProps) {
   const columns = [
     {
-      key: "sponsorName",
-      header: "Sponsor Name",
+      key: "Invoice Number",
+      header: "Invoice Number",
       cell: (income: RegistrationIncome) => (
         <span className="font-medium text-foreground text-base">
           {income.sponsorName}
@@ -49,7 +49,7 @@ export function RegistrationIncomeTable({
     },
     {
       key: "dateTime",
-      header: "Date & Time",
+      header: "Date",
       cell: (income: RegistrationIncome) => (
         <span className="text-muted-foreground text-base">
           {format(new Date(income.dateTime), "MMM dd, yyyy HH:mm")}

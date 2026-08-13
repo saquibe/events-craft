@@ -51,7 +51,7 @@ export default function ExpenseHeadPage() {
           ...data,
           amountPerUnit: parseFloat(data.amountPerUnit),
           unitQuantity: parseFloat(data.unitQuantity),
-          gstPercentage: parseFloat(data.gstPercentage),
+          taxPercentage: parseFloat(data.taxPercentage),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };

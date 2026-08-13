@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -29,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Plus, Trash2, Calculator } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -38,18 +37,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { InvoiceItem } from "@/lib/types/accounting";
 import { DatePicker } from "../common/DatePicker";
 
+// Mock invoice items for dropdown
+const MOCK_INVOICE_ITEMS = [
+  {
+    id: "1",
+    name: "Sponsorship Package",
+    description: "Gold Sponsorship",
+    unitPrice: 5000,
+  },
+  {
+    id: "2",
+    name: "Banner Display",
+    description: "Main Hall Banner",
+    unitPrice: 500,
+  },
+  {
+    id: "3",
+    name: "Exhibition Booth",
+    description: "Standard Booth",
+    unitPrice: 3000,
+  },
+  {
+    id: "4",
+    name: "Speaking Slot",
+    description: "Keynote Session",
+    unitPrice: 2000,
+  },
+];
+
 const formSchema = z.object({
-  eventName: z.string().min(1, "Event name is required"),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
-  venue: z.string().min(1, "Venue is required"),
-  taxNo: z.string().min(1, "Tax number is required"),
+  date: z.string().min(1, "Date is required"),
   items: z
     .array(
       z.object({
+        id: z.string().optional(),
         name: z.string().min(1, "Item name is required"),
         description: z.string().min(1, "Description is required"),
         unit: z.string().min(1, "Unit is required"),
@@ -81,11 +104,7 @@ export function InvoiceFormSheet({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      eventName: "",
-      startDate: "",
-      endDate: "",
-      venue: "",
-      taxNo: "",
+      date: "",
       items: [{ name: "", description: "", unit: "1", amount: "" }],
     },
   });
@@ -98,12 +117,9 @@ export function InvoiceFormSheet({
   useEffect(() => {
     if (invoice) {
       form.reset({
-        eventName: invoice.eventName,
-        startDate: invoice.startDate,
-        endDate: invoice.endDate,
-        venue: invoice.venue,
-        taxNo: invoice.taxNo,
+        date: invoice.date || invoice.startDate || "",
         items: invoice.items.map((item: any) => ({
+          id: item.id,
           name: item.name,
           description: item.description,
           unit: item.unit.toString(),
@@ -113,11 +129,7 @@ export function InvoiceFormSheet({
       calculateTotals(invoice.items);
     } else {
       form.reset({
-        eventName: "",
-        startDate: "",
-        endDate: "",
-        venue: "",
-        taxNo: "",
+        date: "",
         items: [{ name: "", description: "", unit: "1", amount: "" }],
       });
       setSubTotal(0);
@@ -133,7 +145,7 @@ export function InvoiceFormSheet({
       const unit = parseFloat(item.unit) || 0;
       const amount = parseFloat(item.amount) || 0;
       subTotal += unit * amount;
-      tax += unit * amount * 0.1; // Assuming 10% tax
+      tax += unit * amount * 0.1;
     });
     setSubTotal(subTotal);
     setTotalTax(tax);
@@ -145,8 +157,19 @@ export function InvoiceFormSheet({
     calculateTotals(items);
   };
 
+  const handleSelectItem = (index: number, itemId: string) => {
+    const selectedItem = MOCK_INVOICE_ITEMS.find((item) => item.id === itemId);
+    if (selectedItem) {
+      form.setValue(`items.${index}.name`, selectedItem.name);
+      form.setValue(`items.${index}.description`, selectedItem.description);
+      form.setValue(`items.${index}.amount`, selectedItem.unitPrice.toString());
+      handleItemChange();
+    }
+  };
+
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     const items = values.items.map((item) => ({
+      id: item.id,
       name: item.name,
       description: item.description,
       unit: parseFloat(item.unit),
@@ -161,7 +184,7 @@ export function InvoiceFormSheet({
     const total = subTotal + tax;
 
     await onSubmit({
-      ...values,
+      date: values.date,
       items,
       subTotal,
       totalTax: tax,
@@ -174,7 +197,7 @@ export function InvoiceFormSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-4xl overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{invoice ? "Edit Invoice" : "Create Invoice"}</SheetTitle>
           <SheetDescription>
@@ -189,80 +212,14 @@ export function InvoiceFormSheet({
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-6 py-4"
           >
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="eventName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-default">Event Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter event name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="taxNo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-default">Tax No. *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter tax number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-default">Start Date *</FormLabel>
-                    <FormControl>
-                      <DatePicker
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="endDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-default">End Date *</FormLabel>
-                    <FormControl>
-                      <DatePicker
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
             <FormField
               control={form.control}
-              name="venue"
+              name="date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-default">Venue *</FormLabel>
+                  <FormLabel className="text-default">Date *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter venue" {...field} />
+                    <DatePicker value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -272,7 +229,7 @@ export function InvoiceFormSheet({
             {/* Invoice Items */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-default">Invoice Items</h4>
+                <h4 className="text-default font-semibold">Invoice Items</h4>
                 <Button
                   type="button"
                   variant="outline"
@@ -286,12 +243,14 @@ export function InvoiceFormSheet({
                 </Button>
               </div>
 
-              <div className="border rounded-lg overflow-hidden">
+              <div className="border rounded-lg overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Item Name</TableHead>
-                      <TableHead>Description</TableHead>
+                      <TableHead className="min-w-[180px]">Item Name</TableHead>
+                      <TableHead className="min-w-[150px]">
+                        Description
+                      </TableHead>
                       <TableHead className="w-20">Unit</TableHead>
                       <TableHead className="w-24">Amount</TableHead>
                       <TableHead className="w-24">Total</TableHead>
@@ -313,34 +272,55 @@ export function InvoiceFormSheet({
                       return (
                         <TableRow key={field.id}>
                           <TableCell>
-                            <FormField
-                              control={form.control}
-                              name={`items.${index}.name`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input
-                                      placeholder="Item name"
-                                      {...field}
-                                      onChange={(e) => {
-                                        field.onChange(e);
-                                        handleItemChange();
-                                      }}
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
+                            <div className="flex flex-col gap-1">
+                              <FormField
+                                control={form.control}
+                                name={`items.${index}.name`}
+                                render={({ field }) => (
+                                  <FormItem className="space-y-0">
+                                    <FormControl>
+                                      <Input
+                                        placeholder="Item name"
+                                        className="h-8"
+                                        {...field}
+                                        onChange={(e) => {
+                                          field.onChange(e);
+                                          handleItemChange();
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <Select
+                                onValueChange={(value) =>
+                                  handleSelectItem(index, value)
+                                }
+                              >
+                                <SelectTrigger className="h-7 text-xs">
+                                  <SelectValue placeholder="Quick select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {MOCK_INVOICE_ITEMS.map((item) => (
+                                    <SelectItem key={item.id} value={item.id}>
+                                      {item.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </TableCell>
                           <TableCell>
                             <FormField
                               control={form.control}
                               name={`items.${index}.description`}
                               render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="space-y-0">
                                   <FormControl>
                                     <Input
                                       placeholder="Description"
+                                      className="h-8"
                                       {...field}
                                       onChange={(e) => {
                                         field.onChange(e);
@@ -348,6 +328,7 @@ export function InvoiceFormSheet({
                                       }}
                                     />
                                   </FormControl>
+                                  <FormMessage />
                                 </FormItem>
                               )}
                             />
@@ -357,11 +338,12 @@ export function InvoiceFormSheet({
                               control={form.control}
                               name={`items.${index}.unit`}
                               render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="space-y-0">
                                   <FormControl>
                                     <Input
                                       type="number"
                                       placeholder="0"
+                                      className="h-8"
                                       {...field}
                                       onChange={(e) => {
                                         field.onChange(e);
@@ -369,6 +351,7 @@ export function InvoiceFormSheet({
                                       }}
                                     />
                                   </FormControl>
+                                  <FormMessage />
                                 </FormItem>
                               )}
                             />
@@ -378,11 +361,12 @@ export function InvoiceFormSheet({
                               control={form.control}
                               name={`items.${index}.amount`}
                               render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="space-y-0">
                                   <FormControl>
                                     <Input
                                       type="number"
                                       placeholder="0"
+                                      className="h-8"
                                       {...field}
                                       onChange={(e) => {
                                         field.onChange(e);
@@ -390,6 +374,7 @@ export function InvoiceFormSheet({
                                       }}
                                     />
                                   </FormControl>
+                                  <FormMessage />
                                 </FormItem>
                               )}
                             />
@@ -402,6 +387,7 @@ export function InvoiceFormSheet({
                               type="button"
                               variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0"
                               onClick={() => remove(index)}
                               disabled={fields.length === 1}
                             >
@@ -439,7 +425,6 @@ export function InvoiceFormSheet({
                 type="submit"
                 disabled={isSubmitting}
                 className="cursor-pointer text-base"
-                color="primary"
               >
                 {isSubmitting ? (
                   <>

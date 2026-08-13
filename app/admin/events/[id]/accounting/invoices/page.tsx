@@ -1,18 +1,18 @@
+// app/admin/events/[id]/accounting/invoices/page.tsx
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { InvoiceTable } from "@/components/admin/accounting/InvoiceTable";
-import { InvoiceFormSheet } from "@/components/admin/accounting/InvoiceFormSheet";
 import { InvoiceDetails } from "@/components/admin/accounting/InvoiceDetails";
 import { Invoice } from "@/lib/types/accounting";
 import { CreateButton } from "@/components/admin/common/CreateButton";
+import { Plus } from "lucide-react";
 
-const mockInvoices: Invoice[] = [
+// Initial mock data
+const initialMockInvoices: Invoice[] = [
   {
-    id: "1",
+    id: "INV-2026-001",
     eventName: "Medical Conference 2026",
     startDate: "2026-01-15",
     endDate: "2026-01-17",
@@ -32,15 +32,15 @@ const mockInvoices: Invoice[] = [
         amount: 500,
       },
     ],
-    subTotal: 5500,
-    totalTax: 550,
-    total: 6050,
+    subTotal: 6000,
+    totalTax: 600,
+    total: 6600,
     status: "Draft",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
   {
-    id: "2",
+    id: "INV-2026-002",
     eventName: "Tech Summit 2026",
     startDate: "2026-02-10",
     endDate: "2026-02-12",
@@ -53,10 +53,16 @@ const mockInvoices: Invoice[] = [
         unit: 1,
         amount: 3000,
       },
+      {
+        name: "Speaking Slot",
+        description: "Keynote Session",
+        unit: 1,
+        amount: 2000,
+      },
     ],
-    subTotal: 3000,
-    totalTax: 300,
-    total: 3300,
+    subTotal: 5000,
+    totalTax: 500,
+    total: 5500,
     status: "Sent",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -65,67 +71,45 @@ const mockInvoices: Invoice[] = [
 
 export default function InvoicesPage() {
   const params = useParams();
+  const router = useRouter();
   const eventId = (params?.id as string) || "";
-  const [invoices, setInvoices] = useState<Invoice[]>(mockInvoices);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>(initialMockInvoices);
   const [viewingInvoice, setViewingInvoice] = useState<Invoice | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (data: any) => {
-    setIsSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      if (editingInvoice) {
-        setInvoices(
-          invoices.map((i) =>
-            i.id === editingInvoice.id
-              ? {
-                  ...i,
-                  ...data,
-                  status: "Draft",
-                  updatedAt: new Date().toISOString(),
-                }
-              : i,
-          ),
-        );
-      } else {
-        const newInvoice: Invoice = {
-          id: String(invoices.length + 1),
-          ...data,
-          status: "Draft",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        setInvoices([...invoices, newInvoice]);
+  // Load invoices from localStorage on mount
+  useEffect(() => {
+    const storedInvoices = localStorage.getItem("invoices");
+    if (storedInvoices) {
+      try {
+        const parsed = JSON.parse(storedInvoices);
+        if (parsed.length > 0) {
+          setInvoices(parsed);
+        }
+      } catch (e) {
+        console.error("Error loading invoices from storage:", e);
       }
-    } catch (error) {
-      console.error("Error saving invoice:", error);
-    } finally {
-      setIsSubmitting(false);
-      setIsFormOpen(false);
-      setEditingInvoice(null);
     }
-  };
+  }, []);
+
+  // Save invoices to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("invoices", JSON.stringify(invoices));
+  }, [invoices]);
 
   const handleView = (id: string) => {
-    const invoice = invoices.find((i) => i.id === id);
-    if (invoice) {
-      setViewingInvoice(invoice);
-    }
+    router.push(`/admin/events/${eventId}/accounting/invoices/${id}`);
   };
 
   const handleEdit = (id: string) => {
-    const invoice = invoices.find((i) => i.id === id);
-    if (invoice) {
-      setEditingInvoice(invoice);
-      setIsFormOpen(true);
-    }
+    router.push(`/admin/events/${eventId}/accounting/invoices/${id}/edit`);
+  };
+
+  const handleCreate = () => {
+    router.push(`/admin/events/${eventId}/accounting/invoices/create`);
   };
 
   const handlePrint = (id: string) => {
-    alert(`Printing invoice ${id}`);
+    window.print();
   };
 
   const handleDownload = (id: string) => {
@@ -133,21 +117,34 @@ export default function InvoicesPage() {
   };
 
   const handleSend = (id: string) => {
-    const invoice = invoices.find((i) => i.id === id);
-    if (invoice) {
-      setInvoices(
-        invoices.map((i) =>
-          i.id === id
-            ? { ...i, status: "Sent", updatedAt: new Date().toISOString() }
-            : i,
-        ),
-      );
-      alert(`Invoice ${id} sent successfully!`);
-    }
+    setInvoices(
+      invoices.map((i) =>
+        i.id === id
+          ? { ...i, status: "Sent", updatedAt: new Date().toISOString() }
+          : i,
+      ),
+    );
+    alert(`Invoice ${id} sent successfully!`);
+  };
+
+  const handleMarkAsPaid = (id: string) => {
+    setInvoices(
+      invoices.map((i) =>
+        i.id === id
+          ? { ...i, status: "Paid", updatedAt: new Date().toISOString() }
+          : i,
+      ),
+    );
+    alert(`Invoice ${id} marked as paid!`);
   };
 
   const handleBack = () => {
     setViewingInvoice(null);
+  };
+
+  // Function to add a new invoice (called from the form)
+  const addInvoice = (newInvoice: Invoice) => {
+    setInvoices([...invoices, newInvoice]);
   };
 
   if (viewingInvoice) {
@@ -174,10 +171,8 @@ export default function InvoicesPage() {
         </div>
         <CreateButton
           label="Create Invoice"
-          onClick={() => {
-            setEditingInvoice(null);
-            setIsFormOpen(true);
-          }}
+          onClick={handleCreate}
+          // icon={<Plus className="h-4 w-4" />}
         />
       </div>
 
@@ -188,14 +183,7 @@ export default function InvoicesPage() {
         onDownload={handleDownload}
         onSend={handleSend}
         onEdit={handleEdit}
-      />
-
-      <InvoiceFormSheet
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        invoice={editingInvoice}
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
+        onMarkAsPaid={handleMarkAsPaid}
       />
     </div>
   );

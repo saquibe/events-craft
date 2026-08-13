@@ -37,7 +37,7 @@ export function ExpenseHeadTable({
     },
     {
       key: "amountPerUnit",
-      header: "Amount Per Unit (Without GST)",
+      header: "Amount Per Unit (Without Tax)",
       cell: (expenseHead: ExpenseHead) => (
         <span className="text-muted-foreground text-base">
           ${expenseHead.amountPerUnit}
@@ -54,23 +54,23 @@ export function ExpenseHeadTable({
       ),
     },
     {
-      key: "gstPercentage",
-      header: "GST %",
+      key: "taxPercentage",
+      header: "Tax %",
       cell: (expenseHead: ExpenseHead) => (
         <span className="text-muted-foreground text-base">
-          {expenseHead.gstPercentage}%
+          {expenseHead.taxPercentage}%
         </span>
       ),
     },
     {
-      key: "gstAmount",
-      header: "GST Amount",
+      key: "taxAmount",
+      header: "Tax Amount",
       cell: (expenseHead: ExpenseHead) => {
-        const gstAmount =
-          (expenseHead.amountPerUnit * expenseHead.gstPercentage) / 100;
+        const taxAmount =
+          (expenseHead.amountPerUnit * expenseHead.taxPercentage) / 100;
         return (
           <span className="text-muted-foreground text-base">
-            ${gstAmount.toFixed(2)}
+            ${taxAmount.toFixed(2)}
           </span>
         );
       },
@@ -81,7 +81,7 @@ export function ExpenseHeadTable({
       cell: (expenseHead: ExpenseHead) => {
         const total =
           expenseHead.amountPerUnit +
-          (expenseHead.amountPerUnit * expenseHead.gstPercentage) / 100;
+          (expenseHead.amountPerUnit * expenseHead.taxPercentage) / 100;
         return (
           <span className="font-medium text-base">${total.toFixed(2)}</span>
         );

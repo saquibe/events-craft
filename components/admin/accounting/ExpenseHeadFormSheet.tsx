@@ -37,7 +37,7 @@ const formSchema = z.object({
   amountPerUnit: z.string().min(1, "Amount per unit is required"),
   unitQuantity: z.string().min(1, "Unit quantity is required"),
   unitType: z.string().min(1, "Unit type is required"),
-  gstPercentage: z.string().min(1, "GST percentage is required"),
+  taxPercentage: z.string().min(1, "Tax percentage is required"),
   status: z.enum(["Active", "Inactive"]).default("Active"),
 });
 
@@ -66,7 +66,7 @@ export function ExpenseHeadFormSheet({
       amountPerUnit: "",
       unitQuantity: "",
       unitType: "",
-      gstPercentage: "",
+      taxPercentage: "",
       status: "Active",
     },
   });
@@ -79,7 +79,7 @@ export function ExpenseHeadFormSheet({
         amountPerUnit: expenseHead.amountPerUnit.toString(),
         unitQuantity: expenseHead.unitQuantity.toString(),
         unitType: expenseHead.unitType,
-        gstPercentage: expenseHead.gstPercentage.toString(),
+        taxPercentage: expenseHead.taxPercentage.toString(),
         status: expenseHead.status,
       });
     } else {
@@ -89,7 +89,7 @@ export function ExpenseHeadFormSheet({
         amountPerUnit: "",
         unitQuantity: "",
         unitType: "",
-        gstPercentage: "",
+        taxPercentage: "",
         status: "Active",
       });
     }
@@ -174,7 +174,7 @@ export function ExpenseHeadFormSheet({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-default">
-                      Amount per unit (without GST) *
+                      Amount per unit (without Tax) *
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -226,16 +226,16 @@ export function ExpenseHeadFormSheet({
 
               <FormField
                 control={form.control}
-                name="gstPercentage"
+                name="taxPercentage"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-default">
-                      GST Percentage *
+                      Tax Percentage *
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="Enter GST %"
+                        placeholder="Enter tax %"
                         {...field}
                       />
                     </FormControl>

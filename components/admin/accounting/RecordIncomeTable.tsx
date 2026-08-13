@@ -48,11 +48,11 @@ export function RecordIncomeTable({
       ),
     },
     {
-      key: "dateTime",
-      header: "Date & Time",
+      key: "date",
+      header: "Date",
       cell: (record: RecordIncome) => (
         <span className="text-muted-foreground text-base">
-          {format(new Date(record.dateTime), "MMM dd, yyyy HH:mm")}
+          {format(new Date(record.date), "MMM dd, yyyy")}
         </span>
       ),
     },

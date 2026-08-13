@@ -29,13 +29,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import { DateTimePicker } from "../common/DateTimePicker";
+import { DatePicker } from "../common/DatePicker";
 
 const formSchema = z.object({
   sponsorName: z.string().min(1, "Sponsor name is required"),
   amountReceived: z.string().min(1, "Amount received is required"),
   urnNumber: z.string().min(1, "URN number is required"),
-  dateTime: z.string().min(1, "Date and time is required"),
+  date: z.string().min(1, "Date is required"),
   status: z.enum(["Active", "Inactive"]).default("Active"),
 });
 
@@ -46,6 +46,17 @@ interface RecordIncomeFormSheetProps {
   onSubmit: (data: any) => Promise<void>;
   isSubmitting?: boolean;
 }
+
+const MOCK_SPONSORS = [
+  { id: "1", name: "Pfizer" },
+  { id: "2", name: "Johnson & Johnson" },
+  { id: "3", name: "Roche" },
+  { id: "4", name: "Novartis" },
+  { id: "5", name: "Abbott" },
+  { id: "6", name: "Medtronic" },
+  { id: "7", name: "Siemens Healthineers" },
+  { id: "8", name: "Philips Healthcare" },
+];
 
 export function RecordIncomeFormSheet({
   open,
@@ -60,7 +71,7 @@ export function RecordIncomeFormSheet({
       sponsorName: "",
       amountReceived: "",
       urnNumber: "",
-      dateTime: "",
+      date: "",
       status: "Active",
     },
   });
@@ -71,7 +82,7 @@ export function RecordIncomeFormSheet({
         sponsorName: income.sponsorName,
         amountReceived: income.amountReceived.toString(),
         urnNumber: income.urnNumber,
-        dateTime: income.dateTime,
+        date: income.date,
         status: income.status,
       });
     } else {
@@ -79,7 +90,7 @@ export function RecordIncomeFormSheet({
         sponsorName: "",
         amountReceived: "",
         urnNumber: "",
-        dateTime: "",
+        date: "",
         status: "Active",
       });
     }
@@ -117,9 +128,20 @@ export function RecordIncomeFormSheet({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-default">Sponsor Name *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter sponsor name" {...field} />
-                  </FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a sponsor" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {MOCK_SPONSORS.map((sponsor) => (
+                        <SelectItem key={sponsor.id} value={sponsor.name}>
+                          {sponsor.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -161,17 +183,12 @@ export function RecordIncomeFormSheet({
 
             <FormField
               control={form.control}
-              name="dateTime"
+              name="date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-default">
-                    Date and Time *
-                  </FormLabel>
+                  <FormLabel className="text-default">Date</FormLabel>
                   <FormControl>
-                    <DateTimePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
+                    <DatePicker value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

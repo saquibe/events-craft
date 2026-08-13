@@ -17,7 +17,7 @@ const mockExpenseHeads: ExpenseHead[] = [
     amountPerUnit: 100,
     unitQuantity: 5,
     unitType: "nights",
-    gstPercentage: 18,
+    taxPercentage: 18,
     status: "Active",
     createdAt: "",
     updatedAt: "",
@@ -45,8 +45,8 @@ export default function ExpensesPage() {
       const amount = expenseHead
         ? expenseHead.amountPerUnit * parseFloat(data.totalUnit)
         : 0;
-      const gstAmount = (amount * parseFloat(data.gstPercentage)) / 100;
-      const totalAmount = amount + gstAmount;
+      const taxAmount = (amount * parseFloat(data.taxPercentage)) / 100;
+      const totalAmount = amount + taxAmount;
 
       if (editingExpense) {
         setExpenses(
@@ -56,7 +56,7 @@ export default function ExpensesPage() {
                   ...e,
                   ...data,
                   amount,
-                  gstAmount,
+                  taxAmount,
                   totalAmount,
                   updatedAt: new Date().toISOString(),
                 }
@@ -68,9 +68,9 @@ export default function ExpensesPage() {
           id: String(expenses.length + 1),
           ...data,
           totalUnit: parseFloat(data.totalUnit),
-          gstPercentage: parseFloat(data.gstPercentage),
+          taxPercentage: parseFloat(data.taxPercentage),
           amount,
-          gstAmount,
+          taxAmount,
           totalAmount,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

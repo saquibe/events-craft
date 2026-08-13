@@ -441,6 +441,10 @@ const menuData: MenuItem[] = [
             label: "Record Income",
             href: "/admin/events/[id]/accounting/record-income",
           },
+          {
+            label: "Invoice Notes",
+            href: "/admin/events/[id]/accounting/invoice-notes",
+          },
         ],
       },
       {

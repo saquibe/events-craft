@@ -1,10 +1,13 @@
 // app/admin/events/[id]/accounting/invoices/create/page.tsx
+
 import { InvoiceFormPage } from "@/components/admin/accounting/InvoiceFormPage";
 
-export default function CreateInvoicePage({
+export default async function CreateInvoicePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <InvoiceFormPage eventId={params.id} invoice={null} />;
+  const { id } = await params;
+
+  return <InvoiceFormPage eventId={id} invoice={null} />;
 }

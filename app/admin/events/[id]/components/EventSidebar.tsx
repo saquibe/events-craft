@@ -291,6 +291,10 @@ const menuData: MenuItem[] = [
     subItems: [
       { label: "Dashboard", href: "/admin/events/[id]/check-in/dashboard" },
       {
+        label: "Badge Design",
+        href: "/admin/events/[id]/check-in/badge-design",
+      },
+      {
         label: "Attendee Profile",
         href: "/admin/events/[id]/check-in/attendee-profile",
       },

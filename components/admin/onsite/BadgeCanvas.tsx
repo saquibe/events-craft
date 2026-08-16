@@ -66,6 +66,16 @@ export function BadgeCanvas({
 
     const isSelected = selectedFieldId === field.id;
 
+    // Calculate font size based on field dimensions
+    const getResponsiveFontSize = () => {
+      const baseSize = field.fontSize || 14;
+      // Scale font size based on field width and height
+      const widthScale = field.width / 65; // 65 is default width
+      const heightScale = field.height / 20; // 20 is default height
+      const scale = Math.min(widthScale, heightScale, 1.5);
+      return Math.max(8, Math.min(48, Math.round(baseSize * scale)));
+    };
+
     const baseStyle: React.CSSProperties = {
       position: "absolute",
       left: `${leftPercent}%`,
@@ -84,22 +94,22 @@ export function BadgeCanvas({
           : field.alignment === "right"
             ? "flex-end"
             : "flex-start",
-      padding: "2px 4px",
+      padding: "4px 6px",
       overflow: "hidden",
       wordBreak: "break-word",
       userSelect: "none",
       backgroundColor: isSelected ? "rgba(59, 130, 246, 0.05)" : "transparent",
       zIndex: isSelected ? 10 : 1,
+      // Responsive font sizing
+      fontSize: `${getResponsiveFontSize()}px`,
+      fontFamily: field.fontFamily || "Arial",
+      fontWeight: field.fontWeight || "normal",
+      color: field.color || "#1a1a2e",
+      lineHeight: "1.2",
     };
 
     if (field.type === "text") {
-      return {
-        ...baseStyle,
-        fontSize: `${Math.max(8, (field.fontSize || 14) * 0.7)}px`,
-        fontFamily: field.fontFamily || "Arial",
-        fontWeight: field.fontWeight || "normal",
-        color: field.color || "#1a1a2e",
-      };
+      return baseStyle;
     }
 
     if (field.type === "qr") {
@@ -111,6 +121,8 @@ export function BadgeCanvas({
         padding: "4px",
         border: isSelected ? "2px solid #3b82f6" : "1px solid #e5e7eb",
         borderRadius: "4px",
+        fontSize: "10px",
+        color: "#666",
       };
     }
 
@@ -122,6 +134,7 @@ export function BadgeCanvas({
         alignItems: "center",
         border: isSelected ? "2px solid #3b82f6" : "1px dashed transparent",
         overflow: "hidden",
+        padding: "2px",
       };
     }
 
@@ -343,27 +356,38 @@ export function BadgeCanvas({
         let newY = fieldStartPos.y;
 
         if (resizeHandle.includes("right")) {
-          newWidth = Math.max(10, fieldStartSize.width + dx);
+          newWidth = Math.max(15, fieldStartSize.width + dx);
         }
         if (resizeHandle.includes("left")) {
           const delta = Math.max(0, fieldStartSize.width - dx);
-          newWidth = Math.max(10, delta);
+          newWidth = Math.max(15, delta);
           newX = fieldStartPos.x + (fieldStartSize.width - newWidth);
         }
         if (resizeHandle.includes("bottom")) {
-          newHeight = Math.max(10, fieldStartSize.height + dy);
+          newHeight = Math.max(15, fieldStartSize.height + dy);
         }
         if (resizeHandle.includes("top")) {
           const delta = Math.max(0, fieldStartSize.height - dy);
-          newHeight = Math.max(10, delta);
+          newHeight = Math.max(15, delta);
           newY = fieldStartPos.y + (fieldStartSize.height - newHeight);
         }
+
+        // Auto-adjust font size based on new dimensions
+        const scale = Math.min(
+          newWidth / fieldStartSize.width,
+          newHeight / fieldStartSize.height,
+        );
+        const currentField = fields.find((f) => f.id === dragFieldId);
+        const newFontSize = currentField?.fontSize
+          ? Math.max(8, Math.min(48, Math.round(currentField.fontSize * scale)))
+          : 14;
 
         onFieldUpdate(dragFieldId, {
           width: Math.round(newWidth),
           height: Math.round(newHeight),
           x: Math.round(Math.max(0, newX)),
           y: Math.round(Math.max(0, newY)),
+          fontSize: newFontSize,
         });
 
         setShowSizeInfo({
@@ -594,7 +618,7 @@ export function BadgeCanvas({
       {showSizeInfo && selectedFieldId && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-1 rounded-full pointer-events-none z-30">
           {Math.round(showSizeInfo.width)} × {Math.round(showSizeInfo.height)}{" "}
-          px
+          {template.size.unit}
         </div>
       )}
 

@@ -1,4 +1,4 @@
-// components/admin/onsite/badge-design/BadgeDesignEditor.tsx
+// components/admin/onsite/badge-design/BadgeDesignEditor.tsx - Updated with field presets sidebar
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -39,6 +39,7 @@ import { BadgeToolbar } from "./BadgeToolbar";
 import { BadgeCanvas } from "./BadgeCanvas";
 import { BadgeProperties } from "./BadgeProperties";
 import { BadgeLayers } from "./BadgeLayers";
+import { BadgeFieldPresets } from "./BadgeFieldPresets";
 import { cn } from "@/lib/utils";
 import {
   AlertDialog,
@@ -203,6 +204,14 @@ export function BadgeDesignEditor({
     }
     setDeleteDialogOpen(false);
     setFieldToDelete(null);
+  };
+
+  const handleToggleVisibility = (fieldId: string) => {
+    const side = activeSide;
+    const fields = side === "front" ? template.frontSide : template.backSide;
+    const field = fields.find((f) => f.id === fieldId);
+    if (!field) return;
+    handleFieldUpdate(fieldId, { isVisible: !field.isVisible });
   };
 
   const handleDeleteWithConfirmation = (fieldId: string) => {
@@ -379,9 +388,14 @@ export function BadgeDesignEditor({
         </div>
       </div>
 
-      {/* Main Editor */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        {/* Left Side - Canvas */}
+      {/* Main Editor - 5 columns layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        {/* Left Sidebar - Field Presets */}
+        <div className="lg:col-span-1 space-y-4">
+          <BadgeFieldPresets onAddField={handleAddField} />
+        </div>
+
+        {/* Center - Canvas */}
         <div className="lg:col-span-2 space-y-4">
           <BadgeToolbar onAddField={handleAddField} />
 
@@ -434,6 +448,7 @@ export function BadgeDesignEditor({
             selectedFieldId={selectedFieldId}
             onFieldSelect={handleFieldSelect}
             onFieldDelete={handleDeleteWithConfirmation}
+            onToggleVisibility={handleToggleVisibility}
           />
         </div>
       </div>

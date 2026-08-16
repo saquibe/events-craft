@@ -11,6 +11,7 @@ interface BadgeLayersProps {
   selectedFieldId: string | null;
   onFieldSelect: (fieldId: string) => void;
   onFieldDelete: (fieldId: string) => void;
+  onToggleVisibility?: (fieldId: string) => void;
 }
 
 export function BadgeLayers({
@@ -18,6 +19,7 @@ export function BadgeLayers({
   selectedFieldId,
   onFieldSelect,
   onFieldDelete,
+  onToggleVisibility,
 }: BadgeLayersProps) {
   return (
     <div className="p-4 bg-muted/20 rounded-lg border">
@@ -69,7 +71,7 @@ export function BadgeLayers({
                   className="h-6 w-6 p-0"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Toggle visibility
+                    onToggleVisibility?.(field.id);
                   }}
                 >
                   {field.isVisible ? (

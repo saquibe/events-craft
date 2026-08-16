@@ -147,7 +147,18 @@ const GRAPHIC_FIELDS = [
   { id: "logo", label: "Logo", type: "image" },
 ];
 
-const STATIC_FIELDS = [
+type StaticFieldPreset = {
+  id: string;
+  label: string;
+  type: string;
+  content?: string;
+  width?: number;
+  height?: number;
+  fontSize?: number;
+  fontWeight?: string;
+};
+
+const STATIC_FIELDS: StaticFieldPreset[] = [
   { id: "text", label: "Text", type: "text" },
   { id: "image", label: "Image", type: "image" },
   { id: "rectangle", label: "Rectangle", type: "rectangle" },
@@ -322,13 +333,20 @@ export function BadgeFieldPresets({ onAddField }: BadgeFieldPresetsProps) {
                   onClick={() => {
                     const fieldData: Partial<BadgeField> = {
                       label: field.label,
-                      content: field.type === "text" ? "Static Text" : "",
+                      content:
+                        field.content ||
+                        (field.type === "text" ? "Double click to edit" : ""),
+                      width: field.width || 60,
+                      height: field.height || 24,
                     };
                     if (field.type === "rectangle") {
-                      fieldData.width = 40;
-                      fieldData.height = 30;
                       fieldData.backgroundColor = "#e5e7eb";
                       fieldData.color = "#6b7280";
+                    }
+                    if (field.type === "text") {
+                      fieldData.fontSize = field.fontSize || 16;
+                      fieldData.fontWeight = field.fontWeight || "400";
+                      fieldData.alignment = "center";
                     }
                     onAddField(field.type, fieldData);
                   }}

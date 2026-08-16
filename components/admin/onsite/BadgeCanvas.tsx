@@ -13,6 +13,7 @@ interface BadgeCanvasProps {
   onFieldUpdate: (fieldId: string, updates: Partial<BadgeField>) => void;
   showPunchingArea: boolean;
   zoomLevel: number;
+  onFieldDoubleClick?: (fieldId: string) => void;
 }
 
 export function BadgeCanvas({
@@ -23,6 +24,7 @@ export function BadgeCanvas({
   onFieldUpdate,
   showPunchingArea,
   zoomLevel,
+  onFieldDoubleClick,
 }: BadgeCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -66,14 +68,14 @@ export function BadgeCanvas({
 
     const isSelected = selectedFieldId === field.id;
 
-    // Calculate font size based on field dimensions
-    const getResponsiveFontSize = () => {
-      const baseSize = field.fontSize || 14;
-      // Scale font size based on field width and height
-      const widthScale = field.width / 65; // 65 is default width
-      const heightScale = field.height / 20; // 20 is default height
-      const scale = Math.min(widthScale, heightScale, 1.5);
-      return Math.max(8, Math.min(48, Math.round(baseSize * scale)));
+    // Calculate font size based on field dimensions - scales with box
+    const getFitFontSize = () => {
+      const baseSize = field.fontSize || 16;
+      // Scale based on area relative to default (65 * 25 = 1625)
+      const area = field.width * field.height;
+      const scale = Math.sqrt(area / 1625);
+      const newSize = Math.round(baseSize * scale);
+      return Math.max(8, Math.min(72, newSize));
     };
 
     const baseStyle: React.CSSProperties = {
@@ -85,7 +87,7 @@ export function BadgeCanvas({
       cursor: isSelected ? "move" : "pointer",
       border: isSelected ? "2px solid #3b82f6" : "1px solid transparent",
       borderRadius: "4px",
-      transition: isDragging || isResizing ? "none" : "all 0.2s",
+      transition: isDragging || isResizing ? "none" : "all 0.15s",
       display: field.isVisible ? "flex" : "none",
       alignItems: "center",
       justifyContent:
@@ -94,18 +96,20 @@ export function BadgeCanvas({
           : field.alignment === "right"
             ? "flex-end"
             : "flex-start",
-      padding: "4px 6px",
+      padding: "6px 8px",
       overflow: "hidden",
       wordBreak: "break-word",
       userSelect: "none",
-      backgroundColor: isSelected ? "rgba(59, 130, 246, 0.05)" : "transparent",
+      backgroundColor: isSelected ? "rgba(59, 130, 246, 0.06)" : "transparent",
       zIndex: isSelected ? 10 : 1,
-      // Responsive font sizing
-      fontSize: `${getResponsiveFontSize()}px`,
-      fontFamily: field.fontFamily || "Arial",
-      fontWeight: field.fontWeight || "normal",
+      fontSize: `${getFitFontSize()}px`,
+      fontFamily: field.fontFamily || "Inter, sans-serif",
+      fontWeight: field.fontWeight || "400",
       color: field.color || "#1a1a2e",
-      lineHeight: "1.2",
+      lineHeight: "1.3",
+      maxWidth: "100%",
+      maxHeight: "100%",
+      boxSizing: "border-box",
     };
 
     if (field.type === "text") {
@@ -239,7 +243,19 @@ export function BadgeCanvas({
 
   const getFieldContent = (field: BadgeField) => {
     if (field.type === "text") {
-      return field.content || "Text Field";
+      // Check if content has HTML (rich text)
+      if (
+        field.content &&
+        (field.content.includes("<") || field.content.includes(">"))
+      ) {
+        return (
+          <div
+            className="w-full h-full flex items-center justify-center"
+            dangerouslySetInnerHTML={{ __html: field.content }}
+          />
+        );
+      }
+      return field.content || "Double click to edit";
     }
     if (field.type === "qr") {
       return (
@@ -295,19 +311,25 @@ export function BadgeCanvas({
     const field = fields.find((f) => f.id === fieldId);
     if (!field) return;
 
-    // Store mouse down info for click detection
     setIsMouseDown(true);
     setMouseDownFieldId(fieldId);
     setMouseDownTime(Date.now());
     setMouseDownPos({ x: e.clientX, y: e.clientY });
 
-    // Start dragging
     setIsDragging(true);
     setDragFieldId(fieldId);
     setDragStart({ x: e.clientX, y: e.clientY });
     setFieldStartPos({ x: field.x, y: field.y });
+  };
 
-    // DO NOT call onFieldSelect here - only on click (not drag)
+  const handleDoubleClick = (e: React.MouseEvent, fieldId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Select the field and trigger edit
+    onFieldSelect(fieldId);
+    if (onFieldDoubleClick) {
+      onFieldDoubleClick(fieldId);
+    }
   };
 
   const handleResizeMouseDown = (
@@ -333,8 +355,6 @@ export function BadgeCanvas({
     setIsResizing(true);
     setIsDragging(true);
     setShowSizeInfo({ width: field.width, height: field.height });
-
-    // DO NOT call onFieldSelect here - only on click (not resize)
   };
 
   const handleMouseMove = useCallback(
@@ -349,18 +369,17 @@ export function BadgeCanvas({
         ((e.clientY - dragStart.y) / rect.height) * template.size.height;
 
       if (resizeHandle && fieldStartSize) {
-        // Resize logic
         let newWidth = fieldStartSize.width;
         let newHeight = fieldStartSize.height;
         let newX = fieldStartPos.x;
         let newY = fieldStartPos.y;
 
         if (resizeHandle.includes("right")) {
-          newWidth = Math.max(15, fieldStartSize.width + dx);
+          newWidth = Math.max(20, fieldStartSize.width + dx);
         }
         if (resizeHandle.includes("left")) {
           const delta = Math.max(0, fieldStartSize.width - dx);
-          newWidth = Math.max(15, delta);
+          newWidth = Math.max(20, delta);
           newX = fieldStartPos.x + (fieldStartSize.width - newWidth);
         }
         if (resizeHandle.includes("bottom")) {
@@ -372,15 +391,16 @@ export function BadgeCanvas({
           newY = fieldStartPos.y + (fieldStartSize.height - newHeight);
         }
 
-        // Auto-adjust font size based on new dimensions
-        const scale = Math.min(
-          newWidth / fieldStartSize.width,
-          newHeight / fieldStartSize.height,
-        );
+        // Calculate new font size based on area
         const currentField = fields.find((f) => f.id === dragFieldId);
-        const newFontSize = currentField?.fontSize
-          ? Math.max(8, Math.min(48, Math.round(currentField.fontSize * scale)))
-          : 14;
+        const baseFontSize = currentField?.fontSize || 16;
+        const oldArea = fieldStartSize.width * fieldStartSize.height;
+        const newArea = newWidth * newHeight;
+        const scale = Math.sqrt(Math.max(0.1, newArea / oldArea));
+        const newFontSize = Math.max(
+          8,
+          Math.min(72, Math.round(baseFontSize * scale)),
+        );
 
         onFieldUpdate(dragFieldId, {
           width: Math.round(newWidth),
@@ -395,7 +415,6 @@ export function BadgeCanvas({
           height: Math.round(newHeight),
         });
       } else {
-        // Drag logic
         const field = fields.find((f) => f.id === dragFieldId);
         if (!field) return;
 
@@ -432,7 +451,6 @@ export function BadgeCanvas({
 
   const handleMouseUp = useCallback(
     (e: MouseEvent) => {
-      // Check if this was a click (not a drag or resize)
       if (isMouseDown && mouseDownFieldId && mouseDownPos) {
         const distance = Math.sqrt(
           Math.pow(e.clientX - mouseDownPos.x, 2) +
@@ -440,13 +458,11 @@ export function BadgeCanvas({
         );
         const timeElapsed = Date.now() - mouseDownTime;
 
-        // Only select if it was a click (small distance, short time, and not resizing)
         if (distance < 5 && timeElapsed < 300 && !resizeHandle) {
           onFieldSelect(mouseDownFieldId);
         }
       }
 
-      // Reset all states
       setIsDragging(false);
       setIsResizing(false);
       setDragFieldId(null);
@@ -459,7 +475,6 @@ export function BadgeCanvas({
       setMouseDownFieldId(null);
       setMouseDownPos(null);
 
-      // Hide size info after delay
       setTimeout(() => setShowSizeInfo(null), 1500);
     },
     [
@@ -544,8 +559,9 @@ export function BadgeCanvas({
           key={field.id}
           style={getFieldStyle(field)}
           onMouseDown={(e) => handleMouseDown(e, field.id)}
+          onDoubleClick={(e) => handleDoubleClick(e, field.id)}
           className={cn(
-            "transition-all duration-200",
+            "transition-all duration-200 group",
             selectedFieldId === field.id && "ring-2 ring-primary ring-offset-1",
             !field.isVisible && "opacity-40",
             selectedFieldId !== field.id &&
@@ -557,55 +573,53 @@ export function BadgeCanvas({
           {/* Resize handles - show when selected */}
           {selectedFieldId === field.id && (
             <>
-              {/* Corner handles */}
               <div
-                className="absolute top-0 left-0 w-4 h-4 cursor-nwse-resize bg-primary rounded-full -translate-x-2 -translate-y-2 border-2 border-white shadow-md hover:scale-125 transition-transform z-20"
+                className="absolute top-0 left-0 w-5 h-5 cursor-nwse-resize bg-primary rounded-full -translate-x-2.5 -translate-y-2.5 border-2 border-white shadow-lg hover:scale-125 transition-transform z-30"
                 onMouseDown={(e) =>
                   handleResizeMouseDown(e, field.id, "top-left")
                 }
                 title="Drag to resize"
               />
               <div
-                className="absolute top-0 right-0 w-4 h-4 cursor-nesw-resize bg-primary rounded-full translate-x-2 -translate-y-2 border-2 border-white shadow-md hover:scale-125 transition-transform z-20"
+                className="absolute top-0 right-0 w-5 h-5 cursor-nesw-resize bg-primary rounded-full translate-x-2.5 -translate-y-2.5 border-2 border-white shadow-lg hover:scale-125 transition-transform z-30"
                 onMouseDown={(e) =>
                   handleResizeMouseDown(e, field.id, "top-right")
                 }
                 title="Drag to resize"
               />
               <div
-                className="absolute bottom-0 left-0 w-4 h-4 cursor-nesw-resize bg-primary rounded-full -translate-x-2 translate-y-2 border-2 border-white shadow-md hover:scale-125 transition-transform z-20"
+                className="absolute bottom-0 left-0 w-5 h-5 cursor-nesw-resize bg-primary rounded-full -translate-x-2.5 translate-y-2.5 border-2 border-white shadow-lg hover:scale-125 transition-transform z-30"
                 onMouseDown={(e) =>
                   handleResizeMouseDown(e, field.id, "bottom-left")
                 }
                 title="Drag to resize"
               />
               <div
-                className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize bg-primary rounded-full translate-x-2 translate-y-2 border-2 border-white shadow-md hover:scale-125 transition-transform z-20"
+                className="absolute bottom-0 right-0 w-5 h-5 cursor-nwse-resize bg-primary rounded-full translate-x-2.5 translate-y-2.5 border-2 border-white shadow-lg hover:scale-125 transition-transform z-30"
                 onMouseDown={(e) =>
                   handleResizeMouseDown(e, field.id, "bottom-right")
                 }
                 title="Drag to resize"
               />
-              {/* Edge handles */}
               <div
-                className="absolute top-1/2 right-0 w-4 h-2 cursor-ew-resize bg-primary rounded-full translate-x-2 -translate-y-1/2 border-2 border-white shadow-md hover:scale-125 transition-transform z-20"
+                className="absolute top-1/2 right-0 w-5 h-2.5 cursor-ew-resize bg-primary rounded-full translate-x-2.5 -translate-y-1/2 border-2 border-white shadow-lg hover:scale-125 transition-transform z-30"
                 onMouseDown={(e) => handleResizeMouseDown(e, field.id, "right")}
                 title="Drag to resize width"
               />
               <div
-                className="absolute top-1/2 left-0 w-4 h-2 cursor-ew-resize bg-primary rounded-full -translate-x-2 -translate-y-1/2 border-2 border-white shadow-md hover:scale-125 transition-transform z-20"
+                className="absolute top-1/2 left-0 w-5 h-2.5 cursor-ew-resize bg-primary rounded-full -translate-x-2.5 -translate-y-1/2 border-2 border-white shadow-lg hover:scale-125 transition-transform z-30"
                 onMouseDown={(e) => handleResizeMouseDown(e, field.id, "left")}
                 title="Drag to resize width"
               />
               <div
-                className="absolute bottom-0 left-1/2 w-2 h-4 cursor-ns-resize bg-primary rounded-full -translate-x-1/2 translate-y-2 border-2 border-white shadow-md hover:scale-125 transition-transform z-20"
+                className="absolute bottom-0 left-1/2 w-2.5 h-5 cursor-ns-resize bg-primary rounded-full -translate-x-1/2 translate-y-2.5 border-2 border-white shadow-lg hover:scale-125 transition-transform z-30"
                 onMouseDown={(e) =>
                   handleResizeMouseDown(e, field.id, "bottom")
                 }
                 title="Drag to resize height"
               />
               <div
-                className="absolute top-0 left-1/2 w-2 h-4 cursor-ns-resize bg-primary rounded-full -translate-x-1/2 -translate-y-2 border-2 border-white shadow-md hover:scale-125 transition-transform z-20"
+                className="absolute top-0 left-1/2 w-2.5 h-5 cursor-ns-resize bg-primary rounded-full -translate-x-1/2 -translate-y-2.5 border-2 border-white shadow-lg hover:scale-125 transition-transform z-30"
                 onMouseDown={(e) => handleResizeMouseDown(e, field.id, "top")}
                 title="Drag to resize height"
               />
@@ -614,11 +628,11 @@ export function BadgeCanvas({
         </div>
       ))}
 
-      {/* Size info tooltip - shows during resize */}
+      {/* Size info tooltip */}
       {showSizeInfo && selectedFieldId && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-1 rounded-full pointer-events-none z-30">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-1 rounded-full pointer-events-none z-40">
           {Math.round(showSizeInfo.width)} × {Math.round(showSizeInfo.height)}{" "}
-          {template.size.unit}
+          px
         </div>
       )}
 
@@ -627,10 +641,10 @@ export function BadgeCanvas({
         {side === "front" ? "Front" : "Back"}
       </div>
 
-      {/* Resize hint - only when field is selected */}
+      {/* Resize hint */}
       {selectedFieldId && (
-        <div className="absolute top-2 left-2 text-[8px] text-gray-400 bg-white/80 px-2 py-0.5 rounded pointer-events-none">
-          Drag handles to resize
+        <div className="absolute top-2 left-2 text-[8px] text-gray-400 bg-white/80 px-2 py-0.5 rounded pointer-events-none z-5">
+          Drag handles to resize • Double click to edit text
         </div>
       )}
     </div>

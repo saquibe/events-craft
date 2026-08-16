@@ -23,6 +23,7 @@ import {
   Square,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { RichTextEditor } from "@/components/rich-text-editor";
 
 interface BadgePropertiesProps {
   template: BadgeTemplate;
@@ -214,115 +215,13 @@ export function BadgeProperties({
           <>
             <div>
               <Label className="text-xs">Content</Label>
-              <Input
-                value={selectedField.content}
-                onChange={(e) => handleChange("content", e.target.value)}
-                className="h-8 text-xs"
+              <RichTextEditor
+                value={selectedField.content || ""}
+                onChange={(value) => handleChange("content", value)}
+                placeholder="Type your text here..."
+                minHeight="120px"
+                className="mt-1"
               />
-            </div>
-
-            <div>
-              <Label className="text-xs">Font Size</Label>
-              <div className="flex items-center gap-2">
-                <Slider
-                  value={[selectedField.fontSize || 14]}
-                  onValueChange={([value]) => handleChange("fontSize", value)}
-                  min={8}
-                  max={72}
-                  step={1}
-                  className="flex-1"
-                />
-                <Select
-                  value={String(selectedField.fontSize || 14)}
-                  onValueChange={(value) =>
-                    handleChange("fontSize", parseInt(value))
-                  }
-                >
-                  <SelectTrigger className="w-20 h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {FONT_SIZES.map((size) => (
-                      <SelectItem key={size} value={String(size)}>
-                        {size}px
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-xs">Font Family</Label>
-              <Select
-                value={selectedField.fontFamily || "Arial"}
-                onValueChange={(value) => handleChange("fontFamily", value)}
-              >
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FONT_FAMILIES.map((font) => (
-                    <SelectItem
-                      key={font}
-                      value={font}
-                      style={{ fontFamily: font }}
-                    >
-                      {font}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="text-xs">Font Weight</Label>
-              <Select
-                value={selectedField.fontWeight || "normal"}
-                onValueChange={(value) => handleChange("fontWeight", value)}
-              >
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FONT_WEIGHTS.map((weight) => (
-                    <SelectItem key={weight} value={weight}>
-                      {weight}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="flex-1">
-                <Label className="text-xs">Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    type="color"
-                    value={selectedField.color || "#1a1a2e"}
-                    onChange={(e) => handleChange("color", e.target.value)}
-                    className="w-12 h-8 p-0"
-                  />
-                  <Input
-                    type="text"
-                    value={selectedField.color || "#1a1a2e"}
-                    onChange={(e) => handleChange("color", e.target.value)}
-                    className="flex-1 h-8 text-xs"
-                  />
-                </div>
-              </div>
-              <div className="flex-1">
-                <Label className="text-xs">Background</Label>
-                <Input
-                  type="color"
-                  value={selectedField.backgroundColor || "#ffffff"}
-                  onChange={(e) =>
-                    handleChange("backgroundColor", e.target.value)
-                  }
-                  className="w-12 h-8 p-0"
-                />
-              </div>
             </div>
 
             <div>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
   Menu,
@@ -14,15 +13,14 @@ import {
   ShoppingBag,
   Plus,
   Layers,
+  Settings2,
 } from "lucide-react";
 import { MenuTable } from "@/components/admin/emanual/MenuTable";
 import { InformationTable } from "@/components/admin/emanual/InformationTable";
-import { FormTable } from "@/components/admin/emanual/FormTable";
 import { OfficialContractorTable } from "@/components/admin/emanual/OfficialContractorTable";
 import { ItemCategoryTable } from "@/components/admin/emanual/ItemCategoryTable";
 import { MenuFormSheet } from "@/components/admin/emanual/MenuFormSheet";
 import { InformationFormSheet } from "@/components/admin/emanual/InformationFormSheet";
-import { FormFormSheet } from "@/components/admin/emanual/FormFormSheet";
 import { OfficialContractorFormSheet } from "@/components/admin/emanual/OfficialContractorFormSheet";
 import { ItemCategoryFormSheet } from "@/components/admin/emanual/ItemCategoryFormSheet";
 import {
@@ -40,6 +38,16 @@ import {
   SimpleTabsTrigger,
 } from "@/components/ui/simple-tabs";
 import { CreateButton } from "@/components/admin/common/CreateButton";
+import {
+  FormBuilder,
+  FormConfig,
+  DynamicFormRenderer,
+} from "@/components/admin/common";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Save } from "lucide-react";
 
 // Mock stats
 const mockStats: EManualStats = {
@@ -83,7 +91,6 @@ const mockMenus: MenuType[] = [
 ];
 
 const mockInformations: Information[] = [];
-const mockForms: Form[] = [];
 const mockContractors: OfficialContractor[] = [];
 const mockCategories: ItemCategory[] = [];
 
@@ -94,15 +101,31 @@ export default function EManualDashboardPage() {
   const [menus, setMenus] = useState<MenuType[]>(mockMenus);
   const [informations, setInformations] =
     useState<Information[]>(mockInformations);
-  const [forms, setForms] = useState<Form[]>(mockForms);
   const [contractors, setContractors] =
     useState<OfficialContractor[]>(mockContractors);
   const [categories, setCategories] = useState<ItemCategory[]>(mockCategories);
 
+  // Form state
+  const [formConfig, setFormConfig] = useState<FormConfig>({
+    id: "emanual-form",
+    title: "Additional Fields",
+    fields: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+  const [formData, setFormData] = useState({
+    menuId: "",
+    lastDateOfSubmission: "",
+    payment: false,
+    status: "Active" as const,
+  });
+  const [dynamicValues, setDynamicValues] = useState<Record<string, any>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formType, setFormType] = useState<
-    "menu" | "information" | "form" | "contractor" | "category"
+    "menu" | "information" | "contractor" | "category"
   >("menu");
 
   const statItems = [
@@ -192,26 +215,6 @@ export default function EManualDashboardPage() {
           },
         ]);
       }
-    } else if (formType === "form") {
-      if (editingItem) {
-        setForms(
-          forms.map((f) =>
-            f.id === editingItem.id
-              ? { ...f, ...data, updatedAt: new Date().toISOString() }
-              : f,
-          ),
-        );
-      } else {
-        setForms([
-          ...forms,
-          {
-            id: String(forms.length + 1),
-            ...data,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ]);
-      }
     } else if (formType === "contractor") {
       if (editingItem) {
         setContractors(
@@ -264,8 +267,6 @@ export default function EManualDashboardPage() {
       setInformations(
         informations.map((i) => (i.id === id ? { ...i, status } : i)),
       );
-    } else if (formType === "form") {
-      setForms(forms.map((f) => (f.id === id ? { ...f, status } : f)));
     } else if (formType === "contractor") {
       setContractors(
         contractors.map((c) => (c.id === id ? { ...c, status } : c)),
@@ -301,6 +302,24 @@ export default function EManualDashboardPage() {
       newMenus.forEach((m, i) => (m.order = i + 1));
       setMenus(newMenus);
     }
+  };
+
+  // Form handlers
+  const handleFormBuilderSave = (config: FormConfig) => {
+    setFormConfig(config);
+    alert("Form fields saved successfully!");
+  };
+
+  const handleDynamicChange = (values: Record<string, any>) => {
+    setDynamicValues(values);
+  };
+
+  const handleSaveForm = () => {
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      alert("eManual form saved successfully!");
+    }, 1000);
   };
 
   return (
@@ -339,19 +358,14 @@ export default function EManualDashboardPage() {
       >
         <SimpleTabsList>
           <SimpleTabsTrigger value="menus">Menus</SimpleTabsTrigger>
-
           <SimpleTabsTrigger value="information">Information</SimpleTabsTrigger>
-
           <SimpleTabsTrigger value="forms">Forms</SimpleTabsTrigger>
-
           <SimpleTabsTrigger value="contractors">
             Official Contractors
           </SimpleTabsTrigger>
-
           <SimpleTabsTrigger value="categories">
             Item Categories
           </SimpleTabsTrigger>
-
           <SimpleTabsTrigger value="settings">Settings</SimpleTabsTrigger>
         </SimpleTabsList>
 
@@ -397,21 +411,126 @@ export default function EManualDashboardPage() {
         </SimpleTabsContent>
 
         <SimpleTabsContent value="forms" className="mt-6">
-          <div className="flex justify-end mb-4">
-            <CreateButton
-              label="Add Form"
-              onClick={() => handleOpenForm("form")}
-            />
-          </div>
-          <FormTable
-            forms={forms}
-            onEdit={(form) => handleOpenForm("form", form)}
-            onDelete={(id) => setForms(forms.filter((f) => f.id !== id))}
-            onStatusChange={(id, status) => {
-              setForms(forms.map((f) => (f.id === id ? { ...f, status } : f)));
-            }}
-            onEditFormBuilder={(form) => handleOpenForm("form", form)}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Form Settings</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Configure the eManual form settings
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Menu Name */}
+              <div className="space-y-2">
+                <Label className="text-default">Menu Name *</Label>
+                <select
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  value={formData.menuId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, menuId: e.target.value })
+                  }
+                >
+                  <option value="">Select menu</option>
+                  {menus.map((menu) => (
+                    <option key={menu.id} value={menu.id}>
+                      {menu.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Last Date of Submission */}
+              <div className="space-y-2">
+                <Label className="text-default">
+                  Last Date of Submission *
+                </Label>
+                <Input
+                  type="date"
+                  value={formData.lastDateOfSubmission}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      lastDateOfSubmission: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              {/* Payment */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-default">Payment</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Require payment for form submission
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.payment}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, payment: checked })
+                  }
+                />
+              </div>
+
+              {/* Status */}
+              <div className="space-y-2">
+                <Label className="text-default">Status</Label>
+                <select
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  value={formData.status}
+                  onChange={(e) =>
+                    setFormData({ ...formData, status: e.target.value as any })
+                  }
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setActiveTab("forms-builder")}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Custom Fields
+                </Button>
+              </div>
+
+              {/* Dynamic Fields */}
+              {formConfig.fields.length > 0 && (
+                <div className="space-y-4 pt-4 border-t">
+                  <h4 className="text-sm font-semibold text-muted-foreground">
+                    Additional Fields ({formConfig.fields.length})
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    These fields will appear in the form
+                  </p>
+
+                  <DynamicFormRenderer
+                    config={formConfig}
+                    values={dynamicValues}
+                    onChange={handleDynamicChange}
+                    onFileUpload={async (fieldId, file) => {
+                      console.log(`Uploading file for ${fieldId}:`, file.name);
+                      return URL.createObjectURL(file);
+                    }}
+                  />
+                </div>
+              )}
+
+              <div className="flex justify-end pt-4 border-t">
+                <Button
+                  onClick={handleSaveForm}
+                  disabled={isSubmitting}
+                  className="text-base"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSubmitting ? "Saving..." : "Save Form"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </SimpleTabsContent>
 
         <SimpleTabsContent value="contractors" className="mt-6">
@@ -480,15 +599,6 @@ export default function EManualDashboardPage() {
           open={isFormOpen}
           onOpenChange={setIsFormOpen}
           information={editingItem}
-          menus={menus}
-          onSubmit={handleSubmit}
-        />
-      )}
-      {formType === "form" && (
-        <FormFormSheet
-          open={isFormOpen}
-          onOpenChange={setIsFormOpen}
-          form={editingItem}
           menus={menus}
           onSubmit={handleSubmit}
         />

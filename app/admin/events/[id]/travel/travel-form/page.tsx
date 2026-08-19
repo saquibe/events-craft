@@ -7,16 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Save, Settings2, FormInput, Plus } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { FormBuilder, FormConfig } from "@/components/admin/common/FormBuilder";
 import {
   SimpleTabs,
   SimpleTabsContent,
   SimpleTabsList,
   SimpleTabsTrigger,
 } from "@/components/ui/simple-tabs";
-import { DateTimePicker } from "@/components/admin/common/DateTimePicker";
+import {
+  DateTimePicker,
+  DynamicFormRenderer,
+  FormBuilder,
+  FormConfig,
+} from "@/components/admin/common";
 
 export default function TravelFormPage() {
   const params = useParams();
@@ -35,6 +38,7 @@ export default function TravelFormPage() {
     dropLocation: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dynamicValues, setDynamicValues] = useState<Record<string, any>>({});
 
   const handleFormBuilderSave = (config: FormConfig) => {
     setFormConfig(config);
@@ -48,6 +52,10 @@ export default function TravelFormPage() {
       setIsSubmitting(false);
       alert("Travel form saved successfully!");
     }, 1000);
+  };
+
+  const handleDynamicChange = (values: Record<string, any>) => {
+    setDynamicValues(values);
   };
 
   return (
@@ -151,81 +159,27 @@ export default function TravelFormPage() {
                 </Button>
               </div>
 
-              {/* Dynamic Fields */}
+              {/* Dynamic Fields - Rendered by DynamicFormRenderer */}
               {formConfig.fields.length > 0 && (
                 <div className="space-y-4 pt-4 border-t">
                   <h4 className="text-sm font-semibold text-muted-foreground">
                     Additional Fields ({formConfig.fields.length})
                   </h4>
-
                   <p className="text-sm text-muted-foreground">
                     These fields will appear in the travel form
                   </p>
 
-                  {formConfig.fields.map((field) => (
-                    <div key={field.id} className="space-y-2">
-                      <Label>
-                        {field.label}
-                        {field.required && " *"}
-                      </Label>
-
-                      {field.type === "input" && (
-                        <Input
-                          type={(field as any).inputType || "text"}
-                          placeholder={field.placeholder || field.label}
-                        />
-                      )}
-
-                      {field.type === "textarea" && (
-                        <textarea
-                          className="w-full min-h-[100px] rounded-md border border-input px-3 py-2"
-                          placeholder={field.placeholder || field.label}
-                        />
-                      )}
-
-                      {field.type === "date" && (
-                        <DateTimePicker value="" onChange={() => {}} />
-                      )}
-
-                      {field.type === "checkbox" && (
-                        <div className="flex items-center gap-2">
-                          <input type="checkbox" id={field.id} />
-                          <Label htmlFor={field.id}>{field.label}</Label>
-                        </div>
-                      )}
-
-                      {field.type === "select" && (
-                        <select className="w-full rounded-md border border-input px-3 py-2">
-                          {(field as any).options?.map((option: string) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-
-                      {field.type === "radio" && (
-                        <div className="flex flex-col gap-2">
-                          {(field as any).options?.map((option: string) => (
-                            <div
-                              key={option}
-                              className="flex items-center gap-2"
-                            >
-                              <input
-                                type="radio"
-                                id={`${field.id}-${option}`}
-                                name={field.id}
-                                value={option}
-                              />
-                              <Label htmlFor={`${field.id}-${option}`}>
-                                {option}
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                  <DynamicFormRenderer
+                    config={formConfig}
+                    values={dynamicValues}
+                    onChange={handleDynamicChange}
+                    onFileUpload={async (fieldId, file) => {
+                      // Handle file upload - return the file URL
+                      // In real app, upload to S3 or server
+                      console.log(`Uploading file for ${fieldId}:`, file.name);
+                      return URL.createObjectURL(file);
+                    }}
+                  />
                 </div>
               )}
 

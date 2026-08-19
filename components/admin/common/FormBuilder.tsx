@@ -33,6 +33,8 @@ import {
   Settings2,
   ArrowUp,
   ArrowDown,
+  Hash,
+  Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -64,13 +66,21 @@ export interface FormField {
     | "checkbox"
     | "radio"
     | "date"
-    | "select";
+    | "select"
+    | "number"
+    | "file";
   label: string;
   placeholder?: string;
   required: boolean;
   options?: string[];
   description?: string;
   value?: any;
+  inputType?: string;
+  accept?: string;
+  maxSize?: number;
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
 export interface FormConfig {
@@ -92,28 +102,36 @@ interface FormBuilderProps {
 const fieldTypes = [
   { id: "input", label: "Text Input", icon: Type },
   { id: "textarea", label: "Text Area", icon: FileText },
+  { id: "number", label: "Number", icon: Hash },
   { id: "dropdown", label: "Dropdown", icon: ChevronDown },
   { id: "checkbox", label: "Checkbox", icon: CheckSquare },
   { id: "radio", label: "Radio", icon: Circle },
   { id: "date", label: "Date Picker", icon: Calendar },
+  { id: "file", label: "File Upload", icon: Upload },
 ];
 
 const fieldTypeColors: Record<string, string> = {
   input: "bg-blue-50 border-blue-200 text-blue-700",
   textarea: "bg-green-50 border-green-200 text-green-700",
+  number: "bg-indigo-50 border-indigo-200 text-indigo-700",
   dropdown: "bg-purple-50 border-purple-200 text-purple-700",
+  select: "bg-purple-50 border-purple-200 text-purple-700",
   checkbox: "bg-orange-50 border-orange-200 text-orange-700",
   radio: "bg-pink-50 border-pink-200 text-pink-700",
   date: "bg-cyan-50 border-cyan-200 text-cyan-700",
+  file: "bg-amber-50 border-amber-200 text-amber-700",
 };
 
 const fieldTypeIcons: Record<string, any> = {
   input: Type,
   textarea: FileText,
+  number: Hash,
   dropdown: ChevronDown,
+  select: ChevronDown,
   checkbox: CheckSquare,
   radio: Circle,
   date: Calendar,
+  file: Upload,
 };
 
 // Sortable Field Item Component
@@ -175,7 +193,7 @@ function SortableFieldItem({
       onClick={() => onSelect(field.id)}
     >
       <div className="flex items-center gap-3 flex-1 min-w-0">
-        {/* Drag Handle - Click and drag with mouse */}
+        {/* Drag Handle */}
         <div
           {...attributes}
           {...listeners}
@@ -310,11 +328,10 @@ export function FormBuilder({
   const [formTitle, setFormTitle] = useState(initialConfig?.title || title);
   const [previewMode, setPreviewMode] = useState(false);
 
-  // Configure DnD sensors for mouse drag
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // Minimum distance before drag starts
+        distance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -331,12 +348,14 @@ export function FormBuilder({
       placeholder: type === "input" ? "Enter text..." : "",
       required: false,
       options:
-        type === "dropdown" || type === "radio"
+        type === "dropdown" || type === "select" || type === "radio"
           ? ["Option 1"]
           : type === "checkbox"
             ? ["Checkbox 1"]
             : undefined,
       description: "",
+      ...(type === "number" ? { min: 0, max: 100, step: 1 } : {}),
+      ...(type === "file" ? { accept: "image/*", maxSize: 5 } : {}),
     };
     setFields([...fields, newField]);
     setSelectedFieldId(newField.id);
@@ -378,10 +397,8 @@ export function FormBuilder({
     setFields(newFields);
   };
 
-  // Handle drag end - reorder fields
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
     if (over && active.id !== over.id) {
       setFields((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
@@ -435,13 +452,26 @@ export function FormBuilder({
             className="w-full min-h-[80px] bg-muted/30"
           />
         );
+      case "number":
+        return (
+          <Input
+            type="number"
+            placeholder={field.placeholder}
+            disabled
+            className="w-full bg-muted/30"
+          />
+        );
       case "dropdown":
         return (
-          <Select disabled>
-            <SelectTrigger className="bg-muted/30">
-              <SelectValue placeholder="Select option" />
-            </SelectTrigger>
-          </Select>
+          <div className="w-full p-2 border rounded-md bg-muted/30 text-muted-foreground">
+            {field.options?.[0] || "Select option"}
+          </div>
+        );
+      case "select":
+        return (
+          <div className="w-full p-2 border rounded-md bg-muted/30 text-muted-foreground">
+            {field.options?.[0] || "Select option"}
+          </div>
         );
       case "checkbox":
         return (
@@ -467,6 +497,13 @@ export function FormBuilder({
         );
       case "date":
         return <Input type="date" disabled className="w-full bg-muted/30" />;
+      case "file":
+        return (
+          <div className="w-full p-3 border-2 border-dashed rounded-md bg-muted/30 text-center text-muted-foreground">
+            <Upload className="h-6 w-6 mx-auto mb-1" />
+            <span className="text-sm">Drop files here or click to upload</span>
+          </div>
+        );
       default:
         return null;
     }
@@ -489,7 +526,7 @@ export function FormBuilder({
         </div>
         <div className="flex gap-2">
           <Button
-            variant={previewMode ? "outline" : "outline"}
+            variant="outline"
             size="sm"
             onClick={() => setPreviewMode(!previewMode)}
           >
@@ -510,8 +547,8 @@ export function FormBuilder({
             onClick={handleSave}
             disabled={isSubmitting}
             size="sm"
-            color="primary"
             className="font-bold cursor-pointer"
+            color="primary"
           >
             <Save className="h-4 w-4 mr-1" />
             {isSubmitting ? "Saving..." : "Save Fields"}
@@ -530,7 +567,7 @@ export function FormBuilder({
             ) : (
               fields.map((field) => (
                 <div key={field.id} className="space-y-2">
-                  <Label className="flex items-center gap-1 text-sm font-medium">
+                  <Label className="flex items-center gap-1 text-default font-medium">
                     {field.label}
                     {field.required && (
                       <span className="text-red-500 text-lg">*</span>
@@ -560,7 +597,7 @@ export function FormBuilder({
                   </Label>
                   <Badge color="outline">{fields.length} fields</Badge>
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
                   {fieldTypes.map((type) => {
                     const Icon = type.icon;
                     return (
@@ -592,14 +629,13 @@ export function FormBuilder({
               </CardContent>
             </Card>
 
-            {/* Field List with Scroll and Drag */}
+            {/* Field List */}
             <Card className="w-full overflow-hidden">
               <CardContent className="p-4 overflow-hidden">
                 <div className="flex items-center justify-between mb-3 gap-2">
                   <Label className="text-sm font-medium">
                     Custom Fields List
                   </Label>
-
                   {fields.length > 0 && (
                     <span className="text-xs text-muted-foreground shrink-0">
                       {fields.length} fields • Drag to reorder
@@ -729,9 +765,112 @@ export function FormBuilder({
                         />
                       </div>
 
+                      {/* Number specific settings */}
+                      {selectedField.type === "number" && (
+                        <>
+                          <Separator />
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Number Settings
+                            </Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-xs">Min</Label>
+                                <Input
+                                  type="number"
+                                  value={selectedField.min ?? ""}
+                                  onChange={(e) =>
+                                    updateField(selectedField.id, {
+                                      min: parseFloat(e.target.value) || 0,
+                                    })
+                                  }
+                                  className="h-8"
+                                  placeholder="0"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs">Max</Label>
+                                <Input
+                                  type="number"
+                                  value={selectedField.max ?? ""}
+                                  onChange={(e) =>
+                                    updateField(selectedField.id, {
+                                      max: parseFloat(e.target.value) || 100,
+                                    })
+                                  }
+                                  className="h-8"
+                                  placeholder="100"
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Step</Label>
+                              <Input
+                                type="number"
+                                value={selectedField.step ?? 1}
+                                onChange={(e) =>
+                                  updateField(selectedField.id, {
+                                    step: parseFloat(e.target.value) || 1,
+                                  })
+                                }
+                                className="h-8"
+                                placeholder="1"
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* File specific settings */}
+                      {selectedField.type === "file" && (
+                        <>
+                          <Separator />
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              File Settings
+                            </Label>
+                            <div className="space-y-1">
+                              <Label className="text-xs">
+                                Accepted File Types
+                              </Label>
+                              <Input
+                                value={selectedField.accept || ""}
+                                onChange={(e) =>
+                                  updateField(selectedField.id, {
+                                    accept: e.target.value,
+                                  })
+                                }
+                                className="h-8"
+                                placeholder="image/*, .pdf, .doc"
+                              />
+                              <p className="text-[10px] text-muted-foreground">
+                                Comma separated: image/*, .pdf, .docx
+                              </p>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">
+                                Max File Size (MB)
+                              </Label>
+                              <Input
+                                type="number"
+                                value={selectedField.maxSize ?? 5}
+                                onChange={(e) =>
+                                  updateField(selectedField.id, {
+                                    maxSize: parseFloat(e.target.value) || 5,
+                                  })
+                                }
+                                className="h-8"
+                                placeholder="5"
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+
                       <Separator />
 
                       {(selectedField.type === "dropdown" ||
+                        selectedField.type === "select" ||
                         selectedField.type === "checkbox" ||
                         selectedField.type === "radio") && (
                         <div className="space-y-2">
@@ -828,12 +967,3 @@ export function FormBuilder({
     </div>
   );
 }
-
-// Add Select imports if not already present
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";

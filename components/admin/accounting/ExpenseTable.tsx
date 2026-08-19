@@ -1,3 +1,4 @@
+//app/components/admin/accounting/ExpenseTable.tsx
 "use client";
 
 import { Expense } from "@/lib/types/accounting";

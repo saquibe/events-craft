@@ -2,81 +2,136 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { InvoiceNoteFormSheet } from "@/components/admin/accounting/InvoiceNoteForm";
-import { CreateButton } from "@/components/admin/common/CreateButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Eye, FileText } from "lucide-react";
+import { Edit, Trash2, FileText, Save, X, Plus } from "lucide-react";
+import { RichTextEditor } from "@/components/rich-text-editor";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useToast } from "@/components/ui/use-toast";
+import { CreateButton } from "@/components/admin";
 
 interface InvoiceNote {
   id: string;
-  title: string;
   termsAndConditions: string;
-  note: string;
   createdAt: string;
   updatedAt: string;
 }
 
-const mockNotes: InvoiceNote[] = [];
+const formSchema = z.object({
+  termsAndConditions: z.string().min(1, "Terms and conditions are required"),
+});
+
+const mockNote: InvoiceNote | null = null;
 
 export default function InvoiceNotesPage() {
   const params = useParams();
   const eventId = (params?.id as string) || "";
-  const [notes, setNotes] = useState<InvoiceNote[]>(mockNotes);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingNote, setEditingNote] = useState<InvoiceNote | null>(null);
+  const { toast } = useToast();
+  const [note, setNote] = useState<InvoiceNote | null>(mockNote);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [viewingNote, setViewingNote] = useState<InvoiceNote | null>(null);
 
-  const handleSubmit = async (data: any) => {
-    setIsSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      if (editingNote) {
-        setNotes(
-          notes.map((n) =>
-            n.id === editingNote.id
-              ? {
-                  ...n,
-                  ...data,
-                  updatedAt: new Date().toISOString(),
-                }
-              : n,
-          ),
-        );
-      } else {
-        const newNote: InvoiceNote = {
-          id: String(notes.length + 1),
-          ...data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        setNotes([...notes, newNote]);
-      }
-    } catch (error) {
-      console.error("Error saving note:", error);
-    } finally {
-      setIsSubmitting(false);
-      setIsFormOpen(false);
-      setEditingNote(null);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      termsAndConditions: "",
+    },
+  });
+
+  const handleCreate = () => {
+    setIsCreating(true);
+    setIsEditing(true);
+    form.reset({
+      termsAndConditions: "",
+    });
+  };
+
+  const handleEdit = () => {
+    if (note) {
+      setIsEditing(true);
+      form.reset({
+        termsAndConditions: note.termsAndConditions,
+      });
     }
   };
 
-  const handleEdit = (note: InvoiceNote) => {
-    setEditingNote(note);
-    setIsFormOpen(true);
+  const handleCancel = () => {
+    setIsEditing(false);
+    setIsCreating(false);
+    form.reset();
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this note?")) {
-      setNotes(notes.filter((n) => n.id !== id));
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      if (isCreating) {
+        // Create new note
+        const newNote: InvoiceNote = {
+          id: "1",
+          ...values,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        setNote(newNote);
+        toast({
+          title: "Terms & Conditions created",
+          description:
+            "Invoice terms and conditions have been created successfully.",
+        });
+      } else if (note) {
+        // Update existing note
+        const updatedNote: InvoiceNote = {
+          ...note,
+          ...values,
+          updatedAt: new Date().toISOString(),
+        };
+        setNote(updatedNote);
+        toast({
+          title: "Terms & Conditions updated",
+          description:
+            "Invoice terms and conditions have been updated successfully.",
+        });
+      }
+
+      setIsEditing(false);
+      setIsCreating(false);
+      form.reset();
+    } catch (error) {
+      console.error("Error saving terms:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save terms and conditions. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = () => {
+    if (
+      note &&
+      confirm("Are you sure you want to delete these terms and conditions?")
+    ) {
+      setNote(null);
+      toast({
+        title: "Terms & Conditions deleted",
+        description:
+          "Invoice terms and conditions have been deleted successfully.",
+      });
     }
   };
 
@@ -84,136 +139,136 @@ export default function InvoiceNotesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Invoice Notes</h2>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Terms & Conditions
+          </h2>
           <p className="text-muted-foreground">
-            Manage invoice notes for Event #{eventId}
+            Manage invoice terms and conditions for Event #{eventId}
           </p>
         </div>
-        <CreateButton
-          label="Add Invoice Note"
-          onClick={() => {
-            setEditingNote(null);
-            setIsFormOpen(true);
-          }}
-        />
+        {!note && !isCreating && (
+          <CreateButton label="Add Terms & Conditions" onClick={handleCreate} />
+        )}
       </div>
 
-      {notes.length === 0 ? (
+      {/* Form (Create/Edit) */}
+      {(isEditing || isCreating) && (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No invoice notes found</p>
-            <p className="text-sm text-muted-foreground">
-              Click &quot;Add Invoice Note&quot; to create your first note
+          <CardHeader>
+            <CardTitle>
+              {isCreating
+                ? "Create Terms & Conditions"
+                : "Edit Terms & Conditions"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-6"
+              >
+                <FormField
+                  control={form.control}
+                  name="termsAndConditions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-default">
+                        Terms and Conditions *
+                      </FormLabel>
+                      <FormControl>
+                        <RichTextEditor
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Enter terms and conditions..."
+                          minHeight="300px"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex gap-3">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="cursor-pointer text-base"
+                    color="primary"
+                  >
+                    {isSubmitting ? (
+                      <>{isCreating ? "Creating..." : "Updating..."}</>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        {isCreating ? "Create" : "Update"}
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleCancel}
+                    className="cursor-pointer text-base"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Display Terms & Conditions */}
+      {note && !isEditing && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              Terms & Conditions
+            </CardTitle>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleEdit}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+              <Button color="destructive" size="sm" onClick={handleDelete}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="prose prose-sm max-w-none bg-muted/10 p-6 rounded-lg border min-h-[200px]">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: note.termsAndConditions,
+                }}
+              />
+            </div>
+            <div className="flex justify-between text-xs text-muted-foreground border-t pt-4 mt-4">
+              <span>Created: {new Date(note.createdAt).toLocaleString()}</span>
+              <span>Updated: {new Date(note.updatedAt).toLocaleString()}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Empty State */}
+      {!note && !isCreating && !isEditing && (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <FileText className="h-16 w-16 text-muted-foreground mb-4" />
+            <p className="text-lg font-medium text-muted-foreground">
+              No terms and conditions found
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Click &quot;Add Terms & Conditions&quot; to create one
             </p>
           </CardContent>
         </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {notes.map((note) => (
-            <Card key={note.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                  {note.title}
-                </CardTitle>
-                <div className="flex gap-1">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setViewingNote(note)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>{viewingNote?.title}</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4 mt-4">
-                        <div>
-                          <h4 className="text-sm font-semibold mb-2 text-muted-foreground">
-                            Terms & Conditions
-                          </h4>
-                          <div className="prose prose-sm max-w-none bg-muted/30 p-4 rounded-lg">
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html: viewingNote?.termsAndConditions || "",
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-semibold mb-2 text-muted-foreground">
-                            Note
-                          </h4>
-                          <div className="prose prose-sm max-w-none bg-muted/30 p-4 rounded-lg">
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html: viewingNote?.note || "",
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEdit(note)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(note.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="text-xs font-semibold mb-1 text-muted-foreground uppercase tracking-wider">
-                    Terms & Conditions
-                  </h4>
-                  <div className="prose prose-sm max-w-none line-clamp-2 bg-muted/20 p-2 rounded">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: note.termsAndConditions,
-                      }}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <h4 className="text-xs font-semibold mb-1 text-muted-foreground uppercase tracking-wider">
-                    Note
-                  </h4>
-                  <div className="prose prose-sm max-w-none line-clamp-2 bg-muted/20 p-2 rounded">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: note.note,
-                      }}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
       )}
-
-      <InvoiceNoteFormSheet
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        note={editingNote}
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
-      />
     </div>
   );
 }

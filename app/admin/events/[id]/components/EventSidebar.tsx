@@ -418,7 +418,14 @@ const menuData: MenuItem[] = [
       {
         label: "Expenses",
         subItems: [
-          { label: "Expenses", href: "/admin/events/[id]/accounting/expenses" },
+          {
+            label: "Budget",
+            href: "/admin/events/[id]/accounting/budget",
+          },
+          {
+            label: "Record Expenses",
+            href: "/admin/events/[id]/accounting/expenses",
+          },
           {
             label: "Expense Category",
             href: "/admin/events/[id]/accounting/expense-category",

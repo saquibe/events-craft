@@ -1,3 +1,4 @@
+//app/admin/events/[id]/accounting/expenses/page.tsx
 "use client";
 
 import { useState } from "react";

@@ -127,7 +127,7 @@ export function InvoiceDetails({
             Download
           </Button>
           {invoice.status === "Draft" && (
-            <Button size="sm" onClick={onSend}>
+            <Button size="sm" color="primary" onClick={onSend}>
               <Send className="h-4 w-4 mr-2" />
               Send
             </Button>

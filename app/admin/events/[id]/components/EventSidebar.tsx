@@ -89,7 +89,7 @@ const menuData: MenuItem[] = [
         label: "Forms",
         subItems: [
           {
-            label: "Abstract Submission Form",
+            label: "Abstract Form",
             href: "/admin/events/[id]/abstract/forms/submission",
           },
           {

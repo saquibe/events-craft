@@ -57,7 +57,14 @@ import { CSS } from "@dnd-kit/utilities";
 
 export interface FormField {
   id: string;
-  type: "input" | "textarea" | "dropdown" | "checkbox" | "radio" | "date";
+  type:
+    | "input"
+    | "textarea"
+    | "dropdown"
+    | "checkbox"
+    | "radio"
+    | "date"
+    | "select";
   label: string;
   placeholder?: string;
   required: boolean;

@@ -278,7 +278,19 @@ const menuData: MenuItem[] = [
   {
     label: "Travel",
     icon: Plane,
-    href: "/admin/events/[id]/travel/dashboard",
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/travel/dashboard" },
+      { label: "Travel Form", href: "/admin/events/[id]/travel/travel-form" },
+      {
+        label: "Travel Enquiries",
+        href: "/admin/events/[id]/travel/enquiries",
+      },
+      {
+        label: "Attendee Travel",
+        href: "/admin/events/[id]/travel/attendee-travel",
+      },
+      { label: "Travel Agent", href: "/admin/events/[id]/travel/travel-agent" },
+    ],
   },
   {
     label: "Event App",

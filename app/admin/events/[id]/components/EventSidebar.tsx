@@ -169,7 +169,21 @@ const menuData: MenuItem[] = [
   {
     label: "Certificate",
     icon: Award,
-    href: "/admin/events/[id]/certificate/dashboard",
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/certificate/dashboard" },
+      {
+        label: "Design Certificate",
+        href: "/admin/events/[id]/certificate/design",
+      },
+      {
+        label: "Assign Certificate",
+        href: "/admin/events/[id]/certificate/assign",
+      },
+      {
+        label: "Send Certificate",
+        href: "/admin/events/[id]/certificate/send",
+      },
+    ],
   },
   {
     label: "Exhibitor",

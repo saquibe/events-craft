@@ -336,6 +336,21 @@ const menuData: MenuItem[] = [
     ],
   },
   {
+    label: "RSVP",
+    icon: Calendar,
+    subItems: [
+      { label: "Dashboard", href: "/admin/events/[id]/rsvp/dashboard" },
+      { label: "Event List", href: "/admin/events/[id]/rsvp/event-list" },
+      {
+        label: "Invitation Design",
+        href: "/admin/events/[id]/rsvp/invitation-design",
+      },
+      { label: "Scan Point", href: "/admin/events/[id]/rsvp/scan-point" },
+      { label: "Data Import", href: "/admin/events/[id]/rsvp/data-import" },
+      { label: "RSVP Status", href: "/admin/events/[id]/rsvp/rsvp-status" },
+    ],
+  },
+  {
     label: "Communication",
     icon: Mail,
     subItems: [

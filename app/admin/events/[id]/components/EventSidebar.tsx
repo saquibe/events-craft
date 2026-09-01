@@ -309,7 +309,11 @@ const menuData: MenuItem[] = [
   {
     label: "Event App",
     icon: Smartphone,
-    href: "/admin/events/[id]/app/dashboard",
+    subItems: [
+      { label: "App Home", href: "/admin/events/[id]/eventapp/app-home" },
+      { label: "Branding", href: "/admin/events/[id]/eventapp/branding" },
+      { label: "Modules", href: "/admin/events/[id]/eventapp/modules" },
+    ],
   },
   {
     label: "Onsite Check-in",

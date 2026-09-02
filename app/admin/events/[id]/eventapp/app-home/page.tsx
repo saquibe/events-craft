@@ -7,7 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Plus, Edit2, Trash2, GripVertical, Eye } from "lucide-react";
+import {
+  Upload,
+  Plus,
+  Edit2,
+  Trash2,
+  GripVertical,
+  Eye,
+  Home,
+  Calendar,
+  Users,
+  Building,
+  Menu,
+  Newspaper,
+  Map,
+  QrCode,
+  Mic,
+  X,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -24,6 +41,20 @@ import {
   SimpleTabsList,
   SimpleTabsTrigger,
 } from "@/components/ui/simple-tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface FeaturedTile {
   id: string;
@@ -43,11 +74,49 @@ interface BottomNavItem {
   status: "Active" | "Inactive";
 }
 
+// Icon mapping for lucide icons
+const iconMap: { [key: string]: any } = {
+  Home,
+  Calendar,
+  Users,
+  Building,
+  Menu,
+  Newspaper,
+  Map,
+  QrCode,
+  Mic,
+  // Add more icons as needed
+};
+
+const availableIcons = [
+  { value: "Home", label: "Home" },
+  { value: "Calendar", label: "Calendar" },
+  { value: "Users", label: "Users" },
+  { value: "Building", label: "Building" },
+  { value: "Menu", label: "Menu" },
+  { value: "Newspaper", label: "Newspaper" },
+  { value: "Map", label: "Map" },
+  { value: "QrCode", label: "QR Code" },
+  { value: "Mic", label: "Mic" },
+];
+
+const availablePages = [
+  { value: "/feed", label: "Feed" },
+  { value: "/venue-map", label: "Venue Map" },
+  { value: "/qr-scan", label: "QR Scan" },
+  { value: "/agenda", label: "Agenda" },
+  { value: "/main-stage", label: "Main Stage" },
+  { value: "/people", label: "People" },
+  { value: "/expo", label: "Expo" },
+  { value: "/menu", label: "Menu" },
+  { value: "/", label: "Home" },
+];
+
 const mockFeaturedTiles: FeaturedTile[] = [
   {
     id: "1",
     title: "Feed",
-    icon: "📰",
+    icon: "Newspaper",
     pageLink: "/feed",
     order: 1,
     status: "Active",
@@ -55,7 +124,7 @@ const mockFeaturedTiles: FeaturedTile[] = [
   {
     id: "2",
     title: "Venue Map",
-    icon: "🗺️",
+    icon: "Map",
     pageLink: "/venue-map",
     order: 2,
     status: "Active",
@@ -63,7 +132,7 @@ const mockFeaturedTiles: FeaturedTile[] = [
   {
     id: "3",
     title: "QR Scan",
-    icon: "📱",
+    icon: "QrCode",
     pageLink: "/qr-scan",
     order: 3,
     status: "Active",
@@ -71,7 +140,7 @@ const mockFeaturedTiles: FeaturedTile[] = [
   {
     id: "4",
     title: "Agenda",
-    icon: "📅",
+    icon: "Calendar",
     pageLink: "/agenda",
     order: 4,
     status: "Active",
@@ -79,7 +148,7 @@ const mockFeaturedTiles: FeaturedTile[] = [
   {
     id: "5",
     title: "Main Stage",
-    icon: "🎤",
+    icon: "Mic",
     pageLink: "/main-stage",
     order: 5,
     status: "Active",
@@ -90,7 +159,7 @@ const mockBottomNav: BottomNavItem[] = [
   {
     id: "1",
     label: "Home",
-    icon: "🏠",
+    icon: "Home",
     pageLink: "/",
     order: 1,
     status: "Active",
@@ -98,7 +167,7 @@ const mockBottomNav: BottomNavItem[] = [
   {
     id: "2",
     label: "Agenda",
-    icon: "📅",
+    icon: "Calendar",
     pageLink: "/agenda",
     order: 2,
     status: "Active",
@@ -106,7 +175,7 @@ const mockBottomNav: BottomNavItem[] = [
   {
     id: "3",
     label: "People",
-    icon: "👥",
+    icon: "Users",
     pageLink: "/people",
     order: 3,
     status: "Active",
@@ -114,7 +183,7 @@ const mockBottomNav: BottomNavItem[] = [
   {
     id: "4",
     label: "Expo",
-    icon: "🏢",
+    icon: "Building",
     pageLink: "/expo",
     order: 4,
     status: "Active",
@@ -122,7 +191,7 @@ const mockBottomNav: BottomNavItem[] = [
   {
     id: "5",
     label: "Menu",
-    icon: "☰",
+    icon: "Menu",
     pageLink: "/menu",
     order: 5,
     status: "Active",
@@ -137,6 +206,27 @@ export default function AppHomePage() {
   const [bottomNav, setBottomNav] = useState<BottomNavItem[]>(mockBottomNav);
   const [bannerImage, setBannerImage] = useState<string>("");
 
+  // Dialog states
+  const [isTileDialogOpen, setIsTileDialogOpen] = useState(false);
+  const [isNavDialogOpen, setIsNavDialogOpen] = useState(false);
+  const [editingTile, setEditingTile] = useState<FeaturedTile | null>(null);
+  const [editingNav, setEditingNav] = useState<BottomNavItem | null>(null);
+
+  // Form states
+  const [tileForm, setTileForm] = useState({
+    title: "",
+    icon: "",
+    pageLink: "",
+    status: "Active" as "Active" | "Inactive",
+  });
+
+  const [navForm, setNavForm] = useState({
+    label: "",
+    icon: "",
+    pageLink: "",
+    status: "Active" as "Active" | "Inactive",
+  });
+
   const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -146,6 +236,106 @@ export default function AppHomePage() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  // Featured Tile CRUD operations
+  const handleAddTile = () => {
+    setEditingTile(null);
+    setTileForm({
+      title: "",
+      icon: "",
+      pageLink: "",
+      status: "Active",
+    });
+    setIsTileDialogOpen(true);
+  };
+
+  const handleEditTile = (tile: FeaturedTile) => {
+    setEditingTile(tile);
+    setTileForm({
+      title: tile.title,
+      icon: tile.icon,
+      pageLink: tile.pageLink,
+      status: tile.status,
+    });
+    setIsTileDialogOpen(true);
+  };
+
+  const handleDeleteTile = (id: string) => {
+    setFeaturedTiles(featuredTiles.filter((tile) => tile.id !== id));
+  };
+
+  const handleSaveTile = () => {
+    if (editingTile) {
+      // Edit existing tile
+      setFeaturedTiles(
+        featuredTiles.map((tile) =>
+          tile.id === editingTile.id ? { ...tile, ...tileForm } : tile,
+        ),
+      );
+    } else {
+      // Add new tile
+      const newTile: FeaturedTile = {
+        id: Date.now().toString(),
+        ...tileForm,
+        order: featuredTiles.length + 1,
+      };
+      setFeaturedTiles([...featuredTiles, newTile]);
+    }
+    setIsTileDialogOpen(false);
+  };
+
+  // Bottom Nav CRUD operations
+  const handleAddNav = () => {
+    setEditingNav(null);
+    setNavForm({
+      label: "",
+      icon: "",
+      pageLink: "",
+      status: "Active",
+    });
+    setIsNavDialogOpen(true);
+  };
+
+  const handleEditNav = (nav: BottomNavItem) => {
+    setEditingNav(nav);
+    setNavForm({
+      label: nav.label,
+      icon: nav.icon,
+      pageLink: nav.pageLink,
+      status: nav.status,
+    });
+    setIsNavDialogOpen(true);
+  };
+
+  const handleDeleteNav = (id: string) => {
+    setBottomNav(bottomNav.filter((item) => item.id !== id));
+  };
+
+  const handleSaveNav = () => {
+    if (editingNav) {
+      // Edit existing nav
+      setBottomNav(
+        bottomNav.map((item) =>
+          item.id === editingNav.id ? { ...item, ...navForm } : item,
+        ),
+      );
+    } else {
+      // Add new nav
+      const newNav: BottomNavItem = {
+        id: Date.now().toString(),
+        ...navForm,
+        order: bottomNav.length + 1,
+      };
+      setBottomNav([...bottomNav, newNav]);
+    }
+    setIsNavDialogOpen(false);
+  };
+
+  // Helper function to render icon
+  const renderIcon = (iconName: string, className: string = "h-4 w-4") => {
+    const IconComponent = iconMap[iconName];
+    return IconComponent ? <IconComponent className={className} /> : null;
   };
 
   return (
@@ -236,7 +426,7 @@ export default function AppHomePage() {
                   Shortcuts shown as icons or images on the home screen
                 </p>
               </div>
-              <Button size="sm" color="primary">
+              <Button size="sm" color="primary" onClick={handleAddTile}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Tile
               </Button>
@@ -257,7 +447,9 @@ export default function AppHomePage() {
                   {featuredTiles.map((tile) => (
                     <TableRow key={tile.id}>
                       <TableCell>{tile.order}</TableCell>
-                      <TableCell className="text-2xl">{tile.icon}</TableCell>
+                      <TableCell className="text-2xl">
+                        {renderIcon(tile.icon, "h-6 w-6")}
+                      </TableCell>
                       <TableCell className="font-medium">
                         {tile.title}
                       </TableCell>
@@ -275,13 +467,18 @@ export default function AppHomePage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditTile(tile)}
+                          >
                             <Edit2 className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             className="text-red-500"
+                            onClick={() => handleDeleteTile(tile.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -305,7 +502,7 @@ export default function AppHomePage() {
                   The tabs bar fixed to the bottom of every screen
                 </p>
               </div>
-              <Button size="sm" color="primary">
+              <Button size="sm" color="primary" onClick={handleAddNav}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Tab
               </Button>
@@ -326,7 +523,9 @@ export default function AppHomePage() {
                   {bottomNav.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell>{item.order}</TableCell>
-                      <TableCell className="text-2xl">{item.icon}</TableCell>
+                      <TableCell className="text-2xl">
+                        {renderIcon(item.icon, "h-6 w-6")}
+                      </TableCell>
                       <TableCell className="font-medium">
                         {item.label}
                       </TableCell>
@@ -344,13 +543,18 @@ export default function AppHomePage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditNav(item)}
+                          >
                             <Edit2 className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             className="text-red-500"
+                            onClick={() => handleDeleteNav(item.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -402,8 +606,8 @@ export default function AppHomePage() {
                   <div className="grid grid-cols-4 gap-4">
                     {featuredTiles.slice(0, 8).map((tile) => (
                       <div key={tile.id} className="text-center">
-                        <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center text-2xl mx-auto">
-                          {tile.icon}
+                        <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mx-auto">
+                          {renderIcon(tile.icon, "h-8 w-8")}
                         </div>
                         <span className="text-xs mt-1 block truncate">
                           {tile.title}
@@ -417,7 +621,9 @@ export default function AppHomePage() {
                 <div className="border-t bg-white flex justify-around py-2">
                   {bottomNav.map((item) => (
                     <div key={item.id} className="text-center">
-                      <div className="text-2xl">{item.icon}</div>
+                      <div className="flex justify-center">
+                        {renderIcon(item.icon, "h-6 w-6")}
+                      </div>
                       <span className="text-xs block">{item.label}</span>
                     </div>
                   ))}
@@ -427,6 +633,191 @@ export default function AppHomePage() {
           </Card>
         </SimpleTabsContent>
       </SimpleTabs>
+
+      {/* Add/Edit Tile Dialog */}
+      <Dialog open={isTileDialogOpen} onOpenChange={setIsTileDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingTile ? "Edit Tile" : "Add New Tile"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="tile-title">Title</Label>
+              <Input
+                id="tile-title"
+                value={tileForm.title}
+                onChange={(e) =>
+                  setTileForm({ ...tileForm, title: e.target.value })
+                }
+                placeholder="Enter tile title"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tile-icon">Icon</Label>
+              <Select
+                value={tileForm.icon}
+                onValueChange={(value) =>
+                  setTileForm({ ...tileForm, icon: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an icon" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableIcons.map((icon) => (
+                    <SelectItem key={icon.value} value={icon.value}>
+                      <div className="flex items-center gap-2">
+                        {renderIcon(icon.value, "h-4 w-4")}
+                        <span>{icon.label}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tile-page">Page Link</Label>
+              <Select
+                value={tileForm.pageLink}
+                onValueChange={(value) =>
+                  setTileForm({ ...tileForm, pageLink: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a page" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availablePages.map((page) => (
+                    <SelectItem key={page.value} value={page.value}>
+                      {page.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tile-status">Status</Label>
+              <Select
+                value={tileForm.status}
+                onValueChange={(value: "Active" | "Inactive") =>
+                  setTileForm({ ...tileForm, status: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsTileDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSaveTile}>
+              {editingTile ? "Update" : "Add"} Tile
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add/Edit Navigation Dialog */}
+      <Dialog open={isNavDialogOpen} onOpenChange={setIsNavDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingNav ? "Edit Tab" : "Add New Tab"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="nav-label">Label</Label>
+              <Input
+                id="nav-label"
+                value={navForm.label}
+                onChange={(e) =>
+                  setNavForm({ ...navForm, label: e.target.value })
+                }
+                placeholder="Enter tab label"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="nav-icon">Icon</Label>
+              <Select
+                value={navForm.icon}
+                onValueChange={(value) =>
+                  setNavForm({ ...navForm, icon: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an icon" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableIcons.map((icon) => (
+                    <SelectItem key={icon.value} value={icon.value}>
+                      <div className="flex items-center gap-2">
+                        {renderIcon(icon.value, "h-4 w-4")}
+                        <span>{icon.label}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="nav-page">Page Link</Label>
+              <Select
+                value={navForm.pageLink}
+                onValueChange={(value) =>
+                  setNavForm({ ...navForm, pageLink: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a page" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availablePages.map((page) => (
+                    <SelectItem key={page.value} value={page.value}>
+                      {page.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="nav-status">Status</Label>
+              <Select
+                value={navForm.status}
+                onValueChange={(value: "Active" | "Inactive") =>
+                  setNavForm({ ...navForm, status: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsNavDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveNav}>
+              {editingNav ? "Update" : "Add"} Tab
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -6,14 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Upload,
   Plus,
   Edit2,
   Trash2,
-  GripVertical,
-  Eye,
   Home,
   Calendar,
   Users,
@@ -23,10 +20,8 @@ import {
   Map,
   QrCode,
   Mic,
-  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -85,7 +80,6 @@ const iconMap: { [key: string]: any } = {
   Map,
   QrCode,
   Mic,
-  // Add more icons as needed
 };
 
 const availableIcons = [
@@ -267,14 +261,12 @@ export default function AppHomePage() {
 
   const handleSaveTile = () => {
     if (editingTile) {
-      // Edit existing tile
       setFeaturedTiles(
         featuredTiles.map((tile) =>
           tile.id === editingTile.id ? { ...tile, ...tileForm } : tile,
         ),
       );
     } else {
-      // Add new tile
       const newTile: FeaturedTile = {
         id: Date.now().toString(),
         ...tileForm,
@@ -314,14 +306,12 @@ export default function AppHomePage() {
 
   const handleSaveNav = () => {
     if (editingNav) {
-      // Edit existing nav
       setBottomNav(
         bottomNav.map((item) =>
           item.id === editingNav.id ? { ...item, ...navForm } : item,
         ),
       );
     } else {
-      // Add new nav
       const newNav: BottomNavItem = {
         id: Date.now().toString(),
         ...navForm,
@@ -338,6 +328,126 @@ export default function AppHomePage() {
     return IconComponent ? <IconComponent className={className} /> : null;
   };
 
+  // Phone Preview Component
+  const PhonePreview = () => (
+    <div className="relative">
+      {/* Phone Body */}
+      <div className="w-[375px] h-[812px] bg-black rounded-[40px] p-3 shadow-2xl">
+        {/* Phone Screen */}
+        <div className="relative w-full h-full bg-white rounded-[32px] overflow-hidden">
+          {/* Dynamic Island / Notch */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 z-50">
+            <div className="w-[126px] h-[36px] bg-black rounded-b-[20px] flex items-center justify-center">
+              <div className="w-2.5 h-2.5 bg-[#1a1a2e] rounded-full absolute left-4" />
+              <div className="w-5 h-5 bg-black rounded-full border border-gray-800" />
+            </div>
+          </div>
+
+          {/* Status Bar */}
+          <div className="bg-transparent text-white px-8 py-3 flex justify-between text-xs font-medium relative z-10">
+            <span className="font-semibold">9:41</span>
+            <div className="flex items-center gap-1">
+              <span className="text-[10px]">●●●●○</span>
+              <span className="text-[10px]">WiFi</span>
+              <span className="text-[10px]">🔋</span>
+            </div>
+          </div>
+
+          {/* Content Area - Scrollable */}
+          <div className="h-full overflow-y-auto pb-20">
+            {/* Banner Section */}
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 pt-8 px-4 pb-4 text-white">
+              {bannerImage ? (
+                <div className="rounded-xl overflow-hidden shadow-lg">
+                  <img
+                    src={bannerImage}
+                    alt="Banner"
+                    className="w-full h-auto"
+                  />
+                </div>
+              ) : (
+                <div className="h-32 flex flex-col items-center justify-center bg-white/20 rounded-xl border-2 border-dashed border-white/30">
+                  <Upload className="h-8 w-8 text-white/50 mb-2" />
+                  <span className="text-sm text-white/70">Upload Banner</span>
+                </div>
+              )}
+              <h3 className="text-lg font-bold mt-3">Mintu Nath's Event 8</h3>
+              <p className="text-sm opacity-90 flex items-center gap-2">
+                <Calendar className="h-3.5 w-3.5" />
+                Aug 28 - 30, 2026
+              </p>
+            </div>
+
+            {/* Featured Tiles Grid */}
+            <div className="p-4 bg-gray-50">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold text-gray-700">
+                  Quick Access
+                </h4>
+                <span className="text-xs text-gray-400">
+                  {featuredTiles.length} tiles
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-3">
+                {featuredTiles.slice(0, 8).map((tile) => (
+                  <div key={tile.id} className="text-center group">
+                    <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto transition-transform group-hover:scale-105 border border-gray-100">
+                      {renderIcon(tile.icon, "h-7 w-7 text-gray-700")}
+                    </div>
+                    <span className="text-[10px] mt-1.5 block truncate font-medium text-gray-700">
+                      {tile.title}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom Navigation */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 flex justify-around items-center py-2 px-2">
+              {bottomNav.map((item, index) => (
+                <div
+                  key={item.id}
+                  className={`text-center flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors ${
+                    index === 0
+                      ? "text-blue-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <div className="flex justify-center">
+                    {renderIcon(
+                      item.icon,
+                      `h-5 w-5 ${index === 0 ? "text-blue-600" : ""}`,
+                    )}
+                  </div>
+                  <span
+                    className={`text-[10px] font-medium ${index === 0 ? "text-blue-600" : ""}`}
+                  >
+                    {item.label}
+                  </span>
+                  {index === 0 && (
+                    <div className="w-1 h-1 bg-blue-600 rounded-full mt-0.5" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Home Indicator */}
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-50">
+            <div className="w-[134px] h-[5px] bg-gray-300 rounded-full" />
+          </div>
+        </div>
+      </div>
+
+      {/* Side Buttons */}
+      <div className="absolute left-[-4px] top-[180px] w-[4px] h-12 bg-gray-800 rounded-l-lg" />
+      <div className="absolute left-[-4px] top-[200px] w-[4px] h-12 bg-gray-800 rounded-l-lg" />
+      <div className="absolute left-[-4px] top-[220px] w-[4px] h-12 bg-gray-800 rounded-l-lg" />
+      <div className="absolute right-[-4px] top-[200px] w-[4px] h-20 bg-gray-800 rounded-r-lg" />
+      <div className="absolute right-[-4px] top-[260px] w-[4px] h-12 bg-gray-800 rounded-r-lg" />
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -347,292 +457,267 @@ export default function AppHomePage() {
         </p>
       </div>
 
-      <SimpleTabs defaultValue="banner" className="w-full">
-        <SimpleTabsList>
-          <SimpleTabsTrigger value="banner">Banner</SimpleTabsTrigger>
-          <SimpleTabsTrigger value="featured-tiles">
-            Featured Tiles
-          </SimpleTabsTrigger>
-          <SimpleTabsTrigger value="bottom-nav">
-            Bottom Navigation
-          </SimpleTabsTrigger>
-          <SimpleTabsTrigger value="preview">Preview</SimpleTabsTrigger>
-        </SimpleTabsList>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column - Configuration */}
+        <div className="space-y-6">
+          <SimpleTabs defaultValue="banner" className="w-full">
+            <SimpleTabsList>
+              <SimpleTabsTrigger value="banner">Banner</SimpleTabsTrigger>
+              <SimpleTabsTrigger value="featured-tiles">
+                Featured Tiles
+              </SimpleTabsTrigger>
+              <SimpleTabsTrigger value="bottom-nav">
+                Bottom Navigation
+              </SimpleTabsTrigger>
+            </SimpleTabsList>
 
-        {/* Banner Tab */}
-        <SimpleTabsContent value="banner" className="mt-6">
+            {/* Banner Tab */}
+            <SimpleTabsContent value="banner" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Banner</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    The main image at the top of your app's home screen.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                    {bannerImage ? (
+                      <div className="space-y-4">
+                        <img
+                          src={bannerImage}
+                          alt="Banner"
+                          className="max-w-full h-auto rounded-lg max-h-[200px] mx-auto"
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={() => setBannerImage("")}
+                        >
+                          Remove Banner
+                        </Button>
+                      </div>
+                    ) : (
+                      <div>
+                        <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Click to upload or drag and drop
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          PNG, JPG or GIF (size: 398 x 120px, ratio: 3:1)
+                        </p>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          id="banner-upload"
+                          onChange={handleBannerUpload}
+                        />
+                        <Button
+                          variant="outline"
+                          className="mt-4"
+                          onClick={() =>
+                            document.getElementById("banner-upload")?.click()
+                          }
+                        >
+                          Choose Image
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </SimpleTabsContent>
+
+            {/* Featured Tiles Tab */}
+            <SimpleTabsContent value="featured-tiles" className="mt-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Featured Tiles</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Shortcuts shown as icons or images on the home screen
+                    </p>
+                  </div>
+                  <Button size="sm" color="primary" onClick={handleAddTile}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Tile
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-10">#</TableHead>
+                        <TableHead>Icon</TableHead>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Page Link</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {featuredTiles.map((tile) => (
+                        <TableRow key={tile.id}>
+                          <TableCell>{tile.order}</TableCell>
+                          <TableCell className="text-2xl">
+                            {renderIcon(tile.icon, "h-6 w-6")}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {tile.title}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {tile.pageLink}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              color={
+                                tile.status === "Active"
+                                  ? "success"
+                                  : "secondary"
+                              }
+                            >
+                              {tile.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditTile(tile)}
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-500"
+                                onClick={() => handleDeleteTile(tile.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </SimpleTabsContent>
+
+            {/* Bottom Navigation Tab */}
+            <SimpleTabsContent value="bottom-nav" className="mt-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Bottom Navigation</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      The tabs bar fixed to the bottom of every screen
+                    </p>
+                  </div>
+                  <Button size="sm" color="primary" onClick={handleAddNav}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Tab
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-10">#</TableHead>
+                        <TableHead>Icon</TableHead>
+                        <TableHead>Label</TableHead>
+                        <TableHead>Page Link</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {bottomNav.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>{item.order}</TableCell>
+                          <TableCell className="text-2xl">
+                            {renderIcon(item.icon, "h-6 w-6")}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {item.label}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {item.pageLink}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              color={
+                                item.status === "Active"
+                                  ? "success"
+                                  : "secondary"
+                              }
+                            >
+                              {item.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditNav(item)}
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-500"
+                                onClick={() => handleDeleteNav(item.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </SimpleTabsContent>
+          </SimpleTabs>
+        </div>
+
+        {/* Right Column - Live Preview */}
+        <div className="hidden lg:block">
+          <div className="sticky top-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Live Preview</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Real-time preview of your app's home screen
+                </p>
+              </CardHeader>
+              <CardContent className="flex justify-center">
+                <PhonePreview />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Mobile Preview - Visible on smaller screens */}
+        <div className="lg:hidden">
           <Card>
             <CardHeader>
-              <CardTitle>Banner</CardTitle>
+              <CardTitle>Live Preview</CardTitle>
               <p className="text-sm text-muted-foreground">
-                The main image at the top of your app's home screen.
+                Real-time preview of your app's home screen
               </p>
             </CardHeader>
-            <CardContent>
-              <div className="border-2 border-dashed rounded-lg p-8 text-center">
-                {bannerImage ? (
-                  <div className="space-y-4">
-                    <img
-                      src={bannerImage}
-                      alt="Banner"
-                      className="max-w-full h-auto rounded-lg max-h-[200px] mx-auto"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={() => setBannerImage("")}
-                    >
-                      Remove Banner
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Click to upload or drag and drop
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      PNG, JPG or GIF (size: 398 x 120px, ratio: 3:1)
-                    </p>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      id="banner-upload"
-                      onChange={handleBannerUpload}
-                    />
-                    <Button
-                      variant="outline"
-                      className="mt-4"
-                      onClick={() =>
-                        document.getElementById("banner-upload")?.click()
-                      }
-                    >
-                      Choose Image
-                    </Button>
-                  </div>
-                )}
-              </div>
+            <CardContent className="flex justify-center overflow-x-auto">
+              <PhonePreview />
             </CardContent>
           </Card>
-        </SimpleTabsContent>
-
-        {/* Featured Tiles Tab */}
-        <SimpleTabsContent value="featured-tiles" className="mt-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Featured Tiles</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Shortcuts shown as icons or images on the home screen
-                </p>
-              </div>
-              <Button size="sm" color="primary" onClick={handleAddTile}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Tile
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">#</TableHead>
-                    <TableHead>Icon</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Page Link</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {featuredTiles.map((tile) => (
-                    <TableRow key={tile.id}>
-                      <TableCell>{tile.order}</TableCell>
-                      <TableCell className="text-2xl">
-                        {renderIcon(tile.icon, "h-6 w-6")}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {tile.title}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {tile.pageLink}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          color={
-                            tile.status === "Active" ? "success" : "secondary"
-                          }
-                        >
-                          {tile.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditTile(tile)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500"
-                            onClick={() => handleDeleteTile(tile.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </SimpleTabsContent>
-
-        {/* Bottom Navigation Tab */}
-        <SimpleTabsContent value="bottom-nav" className="mt-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Bottom Navigation</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  The tabs bar fixed to the bottom of every screen
-                </p>
-              </div>
-              <Button size="sm" color="primary" onClick={handleAddNav}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Tab
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">#</TableHead>
-                    <TableHead>Icon</TableHead>
-                    <TableHead>Label</TableHead>
-                    <TableHead>Page Link</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {bottomNav.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.order}</TableCell>
-                      <TableCell className="text-2xl">
-                        {renderIcon(item.icon, "h-6 w-6")}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {item.label}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {item.pageLink}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          color={
-                            item.status === "Active" ? "success" : "secondary"
-                          }
-                        >
-                          {item.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditNav(item)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500"
-                            onClick={() => handleDeleteNav(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </SimpleTabsContent>
-
-        {/* Preview Tab */}
-        <SimpleTabsContent value="preview" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Preview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="max-w-md mx-auto border rounded-xl overflow-hidden shadow-lg">
-                {/* Status Bar */}
-                <div className="bg-black text-white px-4 py-2 flex justify-between text-xs">
-                  <span>9:41</span>
-                  <span>EventsCraft.io</span>
-                </div>
-
-                {/* Banner */}
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 text-white">
-                  {bannerImage ? (
-                    <img
-                      src={bannerImage}
-                      alt="Banner"
-                      className="w-full h-auto rounded-lg"
-                    />
-                  ) : (
-                    <div className="h-24 flex items-center justify-center bg-white/20 rounded-lg">
-                      <span className="text-sm">Image Placeholder</span>
-                    </div>
-                  )}
-                  <h3 className="text-lg font-bold mt-2">
-                    Mintu Nath's Event 8
-                  </h3>
-                  <p className="text-sm opacity-90">Aug 28 - 30, 2026</p>
-                </div>
-
-                {/* Featured Tiles Grid */}
-                <div className="p-4 bg-white">
-                  <div className="grid grid-cols-4 gap-4">
-                    {featuredTiles.slice(0, 8).map((tile) => (
-                      <div key={tile.id} className="text-center">
-                        <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mx-auto">
-                          {renderIcon(tile.icon, "h-8 w-8")}
-                        </div>
-                        <span className="text-xs mt-1 block truncate">
-                          {tile.title}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Bottom Navigation */}
-                <div className="border-t bg-white flex justify-around py-2">
-                  {bottomNav.map((item) => (
-                    <div key={item.id} className="text-center">
-                      <div className="flex justify-center">
-                        {renderIcon(item.icon, "h-6 w-6")}
-                      </div>
-                      <span className="text-xs block">{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </SimpleTabsContent>
-      </SimpleTabs>
+        </div>
+      </div>
 
       {/* Add/Edit Tile Dialog */}
       <Dialog open={isTileDialogOpen} onOpenChange={setIsTileDialogOpen}>
@@ -644,7 +729,9 @@ export default function AppHomePage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="tile-title">Title</Label>
+              <Label className="text-default" htmlFor="tile-title">
+                Title
+              </Label>
               <Input
                 id="tile-title"
                 value={tileForm.title}
@@ -655,7 +742,9 @@ export default function AppHomePage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tile-icon">Icon</Label>
+              <Label className="text-default" htmlFor="tile-icon">
+                Icon
+              </Label>
               <Select
                 value={tileForm.icon}
                 onValueChange={(value) =>
@@ -678,7 +767,9 @@ export default function AppHomePage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tile-page">Page Link</Label>
+              <Label className="text-default" htmlFor="tile-page">
+                Page Link
+              </Label>
               <Select
                 value={tileForm.pageLink}
                 onValueChange={(value) =>
@@ -698,7 +789,9 @@ export default function AppHomePage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tile-status">Status</Label>
+              <Label className="text-default" htmlFor="tile-status">
+                Status
+              </Label>
               <Select
                 value={tileForm.status}
                 onValueChange={(value: "Active" | "Inactive") =>
@@ -718,11 +811,16 @@ export default function AppHomePage() {
           <DialogFooter>
             <Button
               variant="outline"
+              className="text-base"
               onClick={() => setIsTileDialogOpen(false)}
             >
               Cancel
             </Button>
-            <Button onClick={handleSaveTile}>
+            <Button
+              onClick={handleSaveTile}
+              className="text-base"
+              color="primary"
+            >
               {editingTile ? "Update" : "Add"} Tile
             </Button>
           </DialogFooter>
@@ -737,7 +835,9 @@ export default function AppHomePage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="nav-label">Label</Label>
+              <Label className="text-default" htmlFor="nav-label">
+                Label
+              </Label>
               <Input
                 id="nav-label"
                 value={navForm.label}
@@ -748,7 +848,9 @@ export default function AppHomePage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="nav-icon">Icon</Label>
+              <Label className="text-default" htmlFor="nav-icon">
+                Icon
+              </Label>
               <Select
                 value={navForm.icon}
                 onValueChange={(value) =>
@@ -771,7 +873,9 @@ export default function AppHomePage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="nav-page">Page Link</Label>
+              <Label className="text-default" htmlFor="nav-page">
+                Page Link
+              </Label>
               <Select
                 value={navForm.pageLink}
                 onValueChange={(value) =>
@@ -791,7 +895,9 @@ export default function AppHomePage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="nav-status">Status</Label>
+              <Label className="text-default" htmlFor="nav-status">
+                Status
+              </Label>
               <Select
                 value={navForm.status}
                 onValueChange={(value: "Active" | "Inactive") =>
@@ -809,10 +915,18 @@ export default function AppHomePage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsNavDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsNavDialogOpen(false)}
+              className="text-base"
+            >
               Cancel
             </Button>
-            <Button onClick={handleSaveNav}>
+            <Button
+              onClick={handleSaveNav}
+              className="text-base"
+              color="primary"
+            >
               {editingNav ? "Update" : "Add"} Tab
             </Button>
           </DialogFooter>

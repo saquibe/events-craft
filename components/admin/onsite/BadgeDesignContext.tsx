@@ -23,17 +23,19 @@ export interface BadgeField {
   imageUrl?: string;
 }
 
+export type BadgeType =
+  | "common"
+  | "delegate"
+  | "speaker"
+  | "exhibitor"
+  | "staff"
+  | "sponsor"
+  | "organizer";
+
 export interface BadgeTemplate {
   id: string;
   name: string;
-  type:
-    | "common"
-    | "delegate"
-    | "speaker"
-    | "exhibitor"
-    | "staff"
-    | "sponsor"
-    | "organizer";
+  type: BadgeType;
   size: {
     width: number;
     height: number;
@@ -58,19 +60,11 @@ interface BadgeDesignContextType {
   setSelectedTemplate: (template: BadgeTemplate | null) => void;
   addTemplate: (
     template: Omit<BadgeTemplate, "id" | "createdAt" | "updatedAt">,
-  ) => void;
+  ) => BadgeTemplate;
   updateTemplate: (id: string, template: Partial<BadgeTemplate>) => void;
   deleteTemplate: (id: string) => void;
-  duplicateTemplate: (id: string) => void;
+  duplicateTemplate: (id: string) => BadgeTemplate | undefined;
   getTemplateById: (id: string) => BadgeTemplate | undefined;
-  setTemplateSize: (
-    id: string,
-    size: {
-      width: number;
-      height: number;
-      orientation: "portrait" | "landscape";
-    },
-  ) => void;
 }
 
 const BadgeDesignContext = createContext<BadgeDesignContextType | undefined>(
@@ -78,6 +72,7 @@ const BadgeDesignContext = createContext<BadgeDesignContextType | undefined>(
 );
 
 const defaultTemplates: BadgeTemplate[] = [
+  // ... (keep your existing two defaults exactly as-is) ...
   {
     id: "1",
     name: "Attendee Badge",
@@ -181,10 +176,7 @@ const defaultTemplates: BadgeTemplate[] = [
         isEditable: true,
       },
     ],
-    background: {
-      type: "none",
-      value: "#ffffff",
-    },
+    background: { type: "none", value: "#ffffff" },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -311,8 +303,11 @@ export function BadgeDesignProvider({
   const [selectedTemplate, setSelectedTemplate] =
     useState<BadgeTemplate | null>(null);
 
+  // ✅ returns new template (typed)
   const addTemplate = useCallback(
-    (template: Omit<BadgeTemplate, "id" | "createdAt" | "updatedAt">) => {
+    (
+      template: Omit<BadgeTemplate, "id" | "createdAt" | "updatedAt">,
+    ): BadgeTemplate => {
       const newTemplate: BadgeTemplate = {
         ...template,
         id: `template-${Date.now()}`,
@@ -320,83 +315,55 @@ export function BadgeDesignProvider({
         updatedAt: new Date().toISOString(),
       };
       setTemplates((prev) => [...prev, newTemplate]);
-      setSelectedTemplate(newTemplate);
       return newTemplate;
     },
     [],
   );
 
+  // ✅ optimized: no selectedTemplate in deps
   const updateTemplate = useCallback(
     (id: string, updates: Partial<BadgeTemplate>) => {
+      const updatedAt = new Date().toISOString();
       setTemplates((prev) =>
-        prev.map((template) =>
-          template.id === id
-            ? { ...template, ...updates, updatedAt: new Date().toISOString() }
-            : template,
-        ),
+        prev.map((t) => (t.id === id ? { ...t, ...updates, updatedAt } : t)),
       );
-      if (selectedTemplate?.id === id) {
-        setSelectedTemplate((prev) => (prev ? { ...prev, ...updates } : null));
-      }
+      setSelectedTemplate((prev) =>
+        prev?.id === id ? { ...prev, ...updates, updatedAt } : prev,
+      );
     },
-    [selectedTemplate],
+    [],
   );
 
-  const deleteTemplate = useCallback(
-    (id: string) => {
-      setTemplates((prev) => prev.filter((template) => template.id !== id));
-      if (selectedTemplate?.id === id) {
-        setSelectedTemplate(null);
-      }
-    },
-    [selectedTemplate],
-  );
+  const deleteTemplate = useCallback((id: string) => {
+    setTemplates((prev) => prev.filter((t) => t.id !== id));
+    setSelectedTemplate((prev) => (prev?.id === id ? null : prev));
+  }, []);
 
   const duplicateTemplate = useCallback(
-    (id: string) => {
-      const template = templates.find((t) => t.id === id);
-      if (!template) return;
+    (id: string): BadgeTemplate | undefined => {
+      let dup: BadgeTemplate | undefined;
+      setTemplates((prev) => {
+        const template = prev.find((t) => t.id === id);
+        if (!template) return prev;
 
-      const newTemplate: BadgeTemplate = {
-        ...template,
-        id: `template-${Date.now()}`,
-        name: `${template.name} (Copy)`,
-        isDefault: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setTemplates((prev) => [...prev, newTemplate]);
+        dup = {
+          ...template,
+          id: `template-${Date.now()}`,
+          name: `${template.name} (Copy)`,
+          isDefault: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        return [...prev, dup];
+      });
+      return dup;
     },
-    [templates],
+    [],
   );
 
   const getTemplateById = useCallback(
-    (id: string) => {
-      return templates.find((template) => template.id === id);
-    },
+    (id: string) => templates.find((t) => t.id === id),
     [templates],
-  );
-
-  const setTemplateSize = useCallback(
-    (
-      id: string,
-      size: {
-        width: number;
-        height: number;
-        orientation: "portrait" | "landscape";
-      },
-    ) => {
-      const template = templates.find((t) => t.id === id);
-      if (!template) {
-        // If template doesn't exist (new badge), we'll set it later
-        return;
-      }
-      updateTemplate(id, {
-        size: { ...template.size, width: size.width, height: size.height },
-        orientation: size.orientation,
-      });
-    },
-    [templates, updateTemplate],
   );
 
   return (
@@ -410,7 +377,6 @@ export function BadgeDesignProvider({
         deleteTemplate,
         duplicateTemplate,
         getTemplateById,
-        setTemplateSize,
       }}
     >
       {children}

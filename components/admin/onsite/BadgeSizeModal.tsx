@@ -21,14 +21,18 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
+import type { BadgeType } from "./BadgeDesignContext";
 
 interface BadgeSizeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (size: {
+  onConfirm: (config: {
     width: number;
     height: number;
     orientation: "portrait" | "landscape";
+    unit: "mm" | "in";
+    category: BadgeType;
+    name: string;
   }) => void;
   onCancel: () => void;
 }
@@ -40,6 +44,24 @@ const PRESET_SIZES = {
   A7: { width: 74, height: 105, label: "A7" },
   A8: { width: 52, height: 74, label: "A8" },
 };
+
+const BADGE_CATEGORIES: { value: BadgeType; label: string; color: string }[] = [
+  { value: "common", label: "Attendee", color: "bg-blue-100 text-blue-700" },
+  {
+    value: "delegate",
+    label: "Delegate",
+    color: "bg-purple-100 text-purple-700",
+  },
+  { value: "speaker", label: "Speaker", color: "bg-green-100 text-green-700" },
+  {
+    value: "exhibitor",
+    label: "Exhibitor",
+    color: "bg-orange-100 text-orange-700",
+  },
+  { value: "staff", label: "Staff", color: "bg-gray-100 text-gray-700" },
+  { value: "sponsor", label: "Sponsor", color: "bg-pink-100 text-pink-700" },
+  { value: "organizer", label: "Organizer", color: "bg-red-100 text-red-700" },
+];
 
 export function BadgeSizeModal({
   open,
@@ -56,22 +78,35 @@ export function BadgeSizeModal({
   const [customHeight, setCustomHeight] = useState<number>(148);
   const [customUnit, setCustomUnit] = useState<"mm" | "in">("mm");
 
+  // ✅ NEW: category + name
+  const [category, setCategory] = useState<BadgeType>("common");
+  const [badgeName, setBadgeName] = useState<string>("");
+
   const handleConfirm = () => {
-    let width: number, height: number;
+    let width: number, height: number, unit: "mm" | "in";
 
     if (isCustom) {
       width = customWidth;
       height = customHeight;
+      unit = customUnit;
     } else {
       const size = PRESET_SIZES[selectedPreset as keyof typeof PRESET_SIZES];
       width = size.width;
       height = size.height;
+      unit = "mm";
     }
+
+    const finalName =
+      badgeName.trim() ||
+      `${BADGE_CATEGORIES.find((c) => c.value === category)?.label} Badge`;
 
     onConfirm({
       width: orientation === "portrait" ? width : height,
       height: orientation === "portrait" ? height : width,
       orientation,
+      unit,
+      category,
+      name: finalName,
     });
   };
 
@@ -79,7 +114,6 @@ export function BadgeSizeModal({
 
   const getSizeText = () => {
     let width: number, height: number;
-
     if (isCustom) {
       width = customWidth;
       height = customHeight;
@@ -88,12 +122,9 @@ export function BadgeSizeModal({
       width = size.width;
       height = size.height;
     }
-
-    if (orientation === "portrait") {
-      return `${width}×${height}`;
-    } else {
-      return `${height}×${width}`;
-    }
+    return orientation === "portrait"
+      ? `${width}×${height}`
+      : `${height}×${width}`;
   };
 
   const getDisplayLabel = () => {
@@ -101,47 +132,84 @@ export function BadgeSizeModal({
       return `Custom (${customWidth} × ${customHeight} ${customUnit})`;
     }
     const size = PRESET_SIZES[selectedPreset as keyof typeof PRESET_SIZES];
-    if (orientation === "portrait") {
-      return `${selectedPreset} (${size.width} × ${size.height} mm)`;
-    } else {
-      return `${selectedPreset} (${size.height} × ${size.width} mm)`;
-    }
+    return orientation === "portrait"
+      ? `${selectedPreset} (${size.width} × ${size.height} mm)`
+      : `${selectedPreset} (${size.height} × ${size.width} mm)`;
   };
 
   const getFontSize = () => {
-    const text = getSizeText();
-    const length = text.length;
-    if (length <= 5) return "16px";
-    if (length <= 7) return "14px";
-    if (length <= 9) return "12px";
+    const len = getSizeText().length;
+    if (len <= 5) return "16px";
+    if (len <= 7) return "14px";
+    if (len <= 9) return "12px";
     return "10px";
   };
 
   const handleCustomClick = () => {
     setIsCustom(true);
-    // Set default custom values based on current preset
     const size = PRESET_SIZES[selectedPreset as keyof typeof PRESET_SIZES];
     setCustomWidth(size.width);
     setCustomHeight(size.height);
   };
 
-  const handlePresetClick = () => {
-    setIsCustom(false);
-  };
+  const handlePresetClick = () => setIsCustom(false);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px]">
+      <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            Badge Options
+            Create New Badge
           </DialogTitle>
           <DialogDescription>
-            Choose the size and orientation for your badge
+            Choose the badge category, name, size and orientation
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-5 py-2">
+          {/* ✅ NEW: Category + Name */}
+          <div className="space-y-2">
+            <Label className="text-default font-medium">
+              Badge Category <span className="text-destructive">*</span>
+            </Label>
+            <Select
+              value={category}
+              onValueChange={(v) => setCategory(v as BadgeType)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {BADGE_CATEGORIES.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded ${c.color}`}
+                      >
+                        {c.label}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-default font-medium">Badge Name</Label>
+            <Input
+              value={badgeName}
+              onChange={(e) => setBadgeName(e.target.value)}
+              placeholder={`${
+                BADGE_CATEGORIES.find((c) => c.value === category)?.label
+              } Badge`}
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground">
+              Leave blank to use default name
+            </p>
+          </div>
+
           {/* Badge Size */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -156,7 +224,6 @@ export function BadgeSizeModal({
                 >
                   Preset
                 </Button>
-
                 <Button
                   variant={isCustom ? "default" : "outline"}
                   color="primary"
@@ -186,7 +253,7 @@ export function BadgeSizeModal({
               </Select>
             ) : (
               <div className="grid grid-cols-3 gap-2">
-                <div className="col-span-1">
+                <div>
                   <Label className="text-xs text-muted-foreground">Width</Label>
                   <Input
                     type="number"
@@ -199,7 +266,7 @@ export function BadgeSizeModal({
                     step={1}
                   />
                 </div>
-                <div className="col-span-1">
+                <div>
                   <Label className="text-xs text-muted-foreground">
                     Height
                   </Label>
@@ -214,7 +281,7 @@ export function BadgeSizeModal({
                     step={1}
                   />
                 </div>
-                <div className="col-span-1">
+                <div>
                   <Label className="text-xs text-muted-foreground">Unit</Label>
                   <Select
                     value={customUnit}
@@ -259,7 +326,7 @@ export function BadgeSizeModal({
           </div>
 
           {/* Preview */}
-          <div className="mt-4 p-4 bg-muted/20 rounded-lg border">
+          <div className="mt-2 p-4 bg-muted/20 rounded-lg border">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Preview</Label>
               <span className="text-xs text-muted-foreground">
@@ -285,11 +352,9 @@ export function BadgeSizeModal({
                       width = size.width;
                       height = size.height;
                     }
-                    if (orientation === "portrait") {
-                      return `${width}/${height}`;
-                    } else {
-                      return `${height}/${width}`;
-                    }
+                    return orientation === "portrait"
+                      ? `${width}/${height}`
+                      : `${height}/${width}`;
                   })(),
                 }}
               >
@@ -314,7 +379,7 @@ export function BadgeSizeModal({
             Cancel
           </Button>
           <Button onClick={handleConfirm} className="text-base" color="primary">
-            Ok
+            Create Badge
           </Button>
         </DialogFooter>
       </DialogContent>

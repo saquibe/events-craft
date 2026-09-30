@@ -4,66 +4,55 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import {
   BadgeDesignProvider,
   useBadgeDesign,
+  type BadgeType,
 } from "@/components/admin/onsite/BadgeDesignContext";
 import { BadgeTemplateList } from "@/components/admin/onsite/BadgeTemplateList";
-import { BadgeDesignEditor } from "@/components/admin/onsite/BadgeDesignEditor";
+import { BadgeDesigner } from "@/components/admin/onsite/BadgeDesigner";
 import { BadgeSizeModal } from "@/components/admin/onsite/BadgeSizeModal";
 import { CreateButton } from "@/components/admin/common/CreateButton";
 
 function BadgeDesignContent() {
-  const { addTemplate, setTemplateSize, getTemplateById } = useBadgeDesign();
+  const { addTemplate, duplicateTemplate, deleteTemplate } = useBadgeDesign();
+
   const [showEditor, setShowEditor] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
     null,
   );
   const [showSizeModal, setShowSizeModal] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"create" | "edit" | null>(
-    null,
-  );
 
-  const handleCreateBadge = () => {
-    setPendingAction("create");
-    setShowSizeModal(true);
-  };
+  const handleCreateBadge = () => setShowSizeModal(true);
 
   const handleEditBadge = (id: string) => {
-    // For editing, directly open the editor without size modal
     setSelectedTemplateId(id);
     setShowEditor(true);
   };
 
-  const handleSizeConfirm = (size: {
+  const handleSizeConfirm = (config: {
     width: number;
     height: number;
     orientation: "portrait" | "landscape";
+    unit: "mm" | "in";
+    category: BadgeType;
+    name: string;
   }) => {
     setShowSizeModal(false);
 
-    if (pendingAction === "create") {
-      // Create a new template with the selected size
-      const newTemplate = addTemplate({
-        name: "New Badge",
-        type: "common",
-        size: { width: size.width, height: size.height, unit: "mm" },
-        orientation: size.orientation,
-        isDefault: false,
-        frontSide: [],
-        backSide: [],
-        background: { type: "none", value: "#ffffff" },
-      }) as any;
+    const newTemplate = addTemplate({
+      name: config.name,
+      type: config.category,
+      size: { width: config.width, height: config.height, unit: config.unit },
+      orientation: config.orientation,
+      isDefault: false,
+      frontSide: [],
+      backSide: [],
+      background: { type: "none", value: "#ffffff" },
+    });
 
-      if (newTemplate && newTemplate.id) {
-        setSelectedTemplateId(newTemplate.id);
-      } else {
-        // fallback: open editor without a selected template id
-        setSelectedTemplateId(null);
-      }
-      setShowEditor(true);
-    }
+    setSelectedTemplateId(newTemplate.id);
+    setShowEditor(true);
   };
 
   const handleSaveEditor = () => {
@@ -76,7 +65,9 @@ function BadgeDesignContent() {
     setSelectedTemplateId(null);
   };
 
-  // If editor is open, show the editor
+  const handleDuplicate = (id: string) => duplicateTemplate(id);
+  const handleDelete = (id: string) => deleteTemplate(id);
+
   if (showEditor) {
     return (
       <div className="space-y-6">
@@ -97,7 +88,7 @@ function BadgeDesignContent() {
             Back to Templates
           </Button>
         </div>
-        <BadgeDesignEditor
+        <BadgeDesigner
           templateId={selectedTemplateId}
           onSave={handleSaveEditor}
           onCancel={handleCancelEditor}
@@ -106,7 +97,6 @@ function BadgeDesignContent() {
     );
   }
 
-  // Show templates list
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -120,26 +110,16 @@ function BadgeDesignContent() {
       </div>
 
       <BadgeTemplateList
-        onSelectTemplate={(id) => {
-          handleEditBadge(id);
-        }}
-        onDuplicate={(id) => {
-          // Handle duplicate
-        }}
-        onDelete={(id) => {
-          // Handle delete
-        }}
+        onSelectTemplate={handleEditBadge}
+        onDuplicate={handleDuplicate}
+        onDelete={handleDelete}
       />
 
-      {/* Badge Size Modal - Only for creating new badges */}
       <BadgeSizeModal
         open={showSizeModal}
         onOpenChange={setShowSizeModal}
         onConfirm={handleSizeConfirm}
-        onCancel={() => {
-          setShowSizeModal(false);
-          setPendingAction(null);
-        }}
+        onCancel={() => setShowSizeModal(false)}
       />
     </div>
   );

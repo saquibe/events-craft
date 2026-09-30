@@ -1,7 +1,7 @@
-// components/admin/onsite/badge-design/BadgeDesignEditor.tsx - Updated with field presets sidebar
+// components/admin/onsite/BadgeDesignEditor.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useBadgeDesign, BadgeField } from "./BadgeDesignContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,15 +18,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import {
   Save,
   X,
   Eye,
@@ -40,7 +31,6 @@ import { BadgeCanvas } from "./BadgeCanvas";
 import { BadgeProperties } from "./BadgeProperties";
 import { BadgeLayers } from "./BadgeLayers";
 import { BadgeFieldPresets } from "./BadgeFieldPresets";
-import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -63,24 +53,35 @@ export function BadgeDesignEditor({
   onSave,
   onCancel,
 }: BadgeDesignEditorProps) {
-  const { getTemplateById, updateTemplate, addTemplate } = useBadgeDesign();
+  const { getTemplateById, updateTemplate } = useBadgeDesign();
   const existingTemplate = templateId ? getTemplateById(templateId) : null;
 
-  const [template, setTemplate] = useState(
-    existingTemplate || {
-      id: "",
-      name: "New Badge",
-      type: "common" as const,
-      size: { width: 105, height: 148, unit: "mm" as const },
-      orientation: "portrait" as const,
-      isDefault: false,
-      frontSide: [],
-      backSide: [],
-      background: { type: "none" as const, value: "#ffffff" },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
+  // ✅ Local editable state — stays in sync when templateId changes
+  const [template, setTemplate] = useState(() =>
+    existingTemplate
+      ? { ...existingTemplate }
+      : {
+          id: "",
+          name: "New Badge",
+          type: "common" as const,
+          size: { width: 105, height: 148, unit: "mm" as const },
+          orientation: "portrait" as const,
+          isDefault: false,
+          frontSide: [],
+          backSide: [],
+          background: { type: "none" as const, value: "#ffffff" },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
   );
+
+  // ✅ Re-sync if external template changes
+  useEffect(() => {
+    if (existingTemplate) {
+      setTemplate({ ...existingTemplate });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateId]);
 
   const [activeSide, setActiveSide] = useState<"front" | "back">("front");
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
@@ -90,9 +91,13 @@ export function BadgeDesignEditor({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [fieldToDelete, setFieldToDelete] = useState<string | null>(null);
 
-  // Add default fields if empty
+  // ✅ Seed defaults only if BOTH sides empty
   useEffect(() => {
-    if (template.frontSide.length === 0) {
+    if (
+      template.frontSide.length === 0 &&
+      template.backSide.length === 0 &&
+      existingTemplate === null
+    ) {
       const defaultFields: BadgeField[] = [
         {
           id: "event-name",
@@ -165,6 +170,7 @@ export function BadgeDesignEditor({
       ];
       setTemplate((prev) => ({ ...prev, frontSide: defaultFields }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFieldSelect = (fieldId: string) => {
@@ -172,30 +178,31 @@ export function BadgeDesignEditor({
     setIsPropertiesOpen(true);
   };
 
+  // ✅ Cross-side aware update
   const handleFieldUpdate = (fieldId: string, updates: Partial<BadgeField>) => {
-    const side = activeSide;
-    const fields =
-      side === "front" ? [...template.frontSide] : [...template.backSide];
-    const index = fields.findIndex((f) => f.id === fieldId);
-    if (index !== -1) {
-      fields[index] = { ...fields[index], ...updates };
-      setTemplate((prev) => ({
+    setTemplate((prev) => {
+      const inFront = prev.frontSide.some((f) => f.id === fieldId);
+      const inBack = prev.backSide.some((f) => f.id === fieldId);
+      if (!inFront && !inBack) return prev;
+
+      const updateList = (list: BadgeField[]) =>
+        list.map((f) => (f.id === fieldId ? { ...f, ...updates } : f));
+
+      return {
         ...prev,
-        [side === "front" ? "frontSide" : "backSide"]: fields,
+        frontSide: inFront ? updateList(prev.frontSide) : prev.frontSide,
+        backSide: inBack ? updateList(prev.backSide) : prev.backSide,
         updatedAt: new Date().toISOString(),
-      }));
-    }
+      };
+    });
   };
 
+  // ✅ Cross-side aware delete
   const handleFieldDelete = (fieldId: string) => {
-    const side = activeSide;
-    const fields =
-      side === "front" ? [...template.frontSide] : [...template.backSide];
     setTemplate((prev) => ({
       ...prev,
-      [side === "front" ? "frontSide" : "backSide"]: fields.filter(
-        (f) => f.id !== fieldId,
-      ),
+      frontSide: prev.frontSide.filter((f) => f.id !== fieldId),
+      backSide: prev.backSide.filter((f) => f.id !== fieldId),
       updatedAt: new Date().toISOString(),
     }));
     if (selectedFieldId === fieldId) {
@@ -207,9 +214,8 @@ export function BadgeDesignEditor({
   };
 
   const handleToggleVisibility = (fieldId: string) => {
-    const side = activeSide;
-    const fields = side === "front" ? template.frontSide : template.backSide;
-    const field = fields.find((f) => f.id === fieldId);
+    const allFields = [...template.frontSide, ...template.backSide];
+    const field = allFields.find((f) => f.id === fieldId);
     if (!field) return;
     handleFieldUpdate(fieldId, { isVisible: !field.isVisible });
   };
@@ -223,9 +229,7 @@ export function BadgeDesignEditor({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.key === "Delete" || e.key === "Backspace") && selectedFieldId) {
         const target = e.target as HTMLElement;
-        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
-          return;
-        }
+        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
         e.preventDefault();
         handleDeleteWithConfirmation(selectedFieldId);
       }
@@ -239,7 +243,7 @@ export function BadgeDesignEditor({
     fieldData?: Partial<BadgeField>,
   ) => {
     const newField: BadgeField = {
-      id: `field-${Date.now()}`,
+      id: `field-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       type: fieldType as any,
       label: fieldType.charAt(0).toUpperCase() + fieldType.slice(1),
       content:
@@ -262,11 +266,10 @@ export function BadgeDesignEditor({
       ...fieldData,
     };
 
-    const side = activeSide;
     setTemplate((prev) => ({
       ...prev,
-      [side === "front" ? "frontSide" : "backSide"]: [
-        ...prev[side === "front" ? "frontSide" : "backSide"],
+      [activeSide === "front" ? "frontSide" : "backSide"]: [
+        ...prev[activeSide === "front" ? "frontSide" : "backSide"],
         newField,
       ],
       updatedAt: new Date().toISOString(),
@@ -283,11 +286,10 @@ export function BadgeDesignEditor({
     }));
   };
 
+  // ✅ FIX: only update existing. Creation happens upstream (in page).
   const handleSave = () => {
     if (existingTemplate) {
       updateTemplate(existingTemplate.id, template);
-    } else {
-      addTemplate(template as any);
     }
     onSave();
   };
@@ -314,11 +316,10 @@ export function BadgeDesignEditor({
             </h3>
             <p className="text-sm text-muted-foreground">
               {template.size.width} × {template.size.height}{" "}
-              {template.size.unit} • {template.orientation}
+              {template.size.unit} • {template.orientation} • {template.type}
             </p>
           </div>
 
-          {/* Zoom Controls */}
           <div className="flex items-center gap-1">
             <Button
               variant="outline"
@@ -388,14 +389,12 @@ export function BadgeDesignEditor({
         </div>
       </div>
 
-      {/* Main Editor - 5 columns layout */}
+      {/* Main Editor - 5 columns */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        {/* Left Sidebar - Field Presets */}
         <div className="lg:col-span-1 space-y-4">
           <BadgeFieldPresets onAddField={handleAddField} />
         </div>
 
-        {/* Center - Canvas */}
         <div className="lg:col-span-2 space-y-4">
           <BadgeToolbar onAddField={handleAddField} />
 
@@ -432,7 +431,6 @@ export function BadgeDesignEditor({
           </SimpleTabs>
         </div>
 
-        {/* Right Side - Properties & Layers */}
         <div className="lg:col-span-2 space-y-4">
           <BadgeProperties
             template={template}
@@ -477,7 +475,7 @@ export function BadgeDesignEditor({
         </SheetContent>
       </Sheet>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -504,11 +502,8 @@ export function BadgeDesignEditor({
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
-                if (fieldToDelete) {
-                  handleFieldDelete(fieldToDelete);
-                } else if (selectedFieldId) {
-                  handleFieldDelete(selectedFieldId);
-                }
+                if (fieldToDelete) handleFieldDelete(fieldToDelete);
+                else if (selectedFieldId) handleFieldDelete(selectedFieldId);
               }}
             >
               Delete

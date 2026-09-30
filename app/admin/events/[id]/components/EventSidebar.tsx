@@ -594,11 +594,53 @@ export function EventSidebar({
     }
   }, [searchQuery]);
 
-  const toggleMenu = (label: string) => {
-    setOpenMenus((prev) => ({
-      ...prev,
-      [label]: !prev[label],
-    }));
+  const toggleMenu = (label: string, depth: number = 0) => {
+    setOpenMenus((prev) => {
+      const isCurrentlyOpen = prev[label] ?? false;
+
+      // If clicking to CLOSE the current menu, just close it (and its descendants)
+      if (isCurrentlyOpen) {
+        const next = { ...prev };
+        const closeDescendants = (parentLabel: string, items: MenuItem[]) => {
+          items.forEach((item) => {
+            if (item.label === parentLabel) {
+              // Close this + all descendants
+              const closeAll = (subs?: MenuItem[]) => {
+                subs?.forEach((sub) => {
+                  next[sub.label] = false;
+                  closeAll(sub.subItems);
+                });
+              };
+              closeAll(item.subItems);
+              next[item.label] = false;
+            } else if (item.subItems) {
+              closeDescendants(parentLabel, item.subItems);
+            }
+          });
+        };
+        closeDescendants(label, menuData);
+        return next;
+      }
+
+      // If OPENING a top-level menu, close all other top-level menus
+      if (depth === 0) {
+        const next: Record<string, boolean> = {};
+        // Close all top-level menus (and their descendants)
+        const closeAll = (items: MenuItem[]) => {
+          items.forEach((item) => {
+            next[item.label] = false;
+            if (item.subItems) closeAll(item.subItems);
+          });
+        };
+        closeAll(menuData);
+        // Then open the clicked one
+        next[label] = true;
+        return next;
+      }
+
+      // Nested menu (depth > 0): just toggle normally
+      return { ...prev, [label]: true };
+    });
   };
 
   const isActive = (href: string) => {
@@ -626,7 +668,7 @@ export function EventSidebar({
       return (
         <div key={item.label} className="w-full">
           <button
-            onClick={() => toggleMenu(item.label)}
+            onClick={() => toggleMenu(item.label, depth)}
             className={`
               w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm transition-all duration-200
               ${

@@ -8,12 +8,13 @@ import {
   SimpleTabsContent,
 } from "@/components/ui/simple-tabs";
 import { PageHeader } from "../common/PageHeader";
-import { CreateButton } from "../common/CreateButton";
 import { EmptyState } from "../common/EmptyState";
 import { ProfileTable } from "./ProfileTable";
 import { LicenseTable } from "./LicenseTable";
 import { OrganizerFormSheet } from "./OrganizerFormSheet";
 import type { Organizer, OrganizerFormData } from "./types";
+
+type FormMode = "profile" | "license" | "full";
 
 interface OrganizerTabProps {
   organizer: Organizer | null;
@@ -28,6 +29,7 @@ export function OrganizerTab({
   const [editingOrganizer, setEditingOrganizer] = useState<Organizer | null>(
     null,
   );
+  const [formMode, setFormMode] = useState<FormMode>("profile");
   const [activeTab, setActiveTab] = useState("profile");
 
   const handleSave = (data: OrganizerFormData) => {
@@ -46,26 +48,27 @@ export function OrganizerTab({
     setEditingOrganizer(null);
   };
 
-  const handleEdit = () => {
+  // Profile tab → editable
+  const handleEditProfile = () => {
+    setFormMode("profile");
     if (organizer) {
       setEditingOrganizer(organizer);
-      setIsSheetOpen(true);
-    } else {
-      setIsSheetOpen(true);
     }
+    setIsSheetOpen(true);
+  };
+
+  // License tab → read-only view
+  const handleViewLicense = () => {
+    setFormMode("license");
+    if (organizer) {
+      setEditingOrganizer(organizer);
+    }
+    setIsSheetOpen(true);
   };
 
   return (
     <>
-      <PageHeader
-        title="Organizer Settings"
-        // action={
-        //   <CreateButton
-        //     onClick={handleEdit}
-        //     label={organizer ? "Edit Organizer" : "Add Organizer"}
-        //   />
-        // }
-      />
+      <PageHeader title="Organizer Settings" />
 
       <p className="text-muted-foreground text-base font-normal mb-6">
         The table below shows all of the organizer profile and license details.
@@ -90,11 +93,11 @@ export function OrganizerTab({
           </div>
 
           <SimpleTabsContent value="profile" className="mt-6">
-            <ProfileTable organizer={organizer} onEdit={handleEdit} />
+            <ProfileTable organizer={organizer} onEdit={handleEditProfile} />
           </SimpleTabsContent>
 
           <SimpleTabsContent value="license" className="mt-6">
-            <LicenseTable organizer={organizer} onEdit={handleEdit} />
+            <LicenseTable organizer={organizer} onEdit={handleViewLicense} />
           </SimpleTabsContent>
         </SimpleTabs>
       ) : (
@@ -109,6 +112,7 @@ export function OrganizerTab({
         onOpenChange={setIsSheetOpen}
         editingOrganizer={editingOrganizer}
         onSave={handleSave}
+        mode={formMode}
       />
     </>
   );

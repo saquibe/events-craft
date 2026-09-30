@@ -1,6 +1,5 @@
 "use client";
 
-import { Calendar } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -10,21 +9,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { Eye, ShieldCheck } from "lucide-react";
 import type { Organizer } from "./types";
 import { formatDateRange } from "@/lib/date";
 
 interface LicenseTableProps {
   organizer: Organizer;
-  onEdit: () => void;
+  onEdit: () => void; // kept as "onView" for read-only sheet
 }
 
 export function LicenseTable({ organizer, onEdit }: LicenseTableProps) {
-  // const formatDate = (dateString: string) => {
-  //   if (!dateString) return "-";
-  //   return new Date(dateString).toLocaleDateString();
-  // };
-
   return (
     <div className="bg-card rounded-lg border border-border overflow-hidden">
       <Table>
@@ -73,21 +67,30 @@ export function LicenseTable({ organizer, onEdit }: LicenseTableProps) {
             </TableCell>
           </TableRow>
 
-          {/* Actions */}
+          {/* Read-only notice + View action */}
           {/* <TableRow className="border-border hover:bg-muted/50">
             <TableCell className="font-semibold text-foreground">
               Actions
             </TableCell>
             <TableCell>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onEdit}
-                className="text-primary"
-              >
-                <Edit className="h-4 w-4 mr-1" />
-                Edit License
-              </Button>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                  <span>
+                    License details are managed by EventsCraft and cannot be
+                    edited.
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onEdit}
+                  className="text-primary w-fit cursor-pointer"
+                >
+                  <Eye className="h-4 w-4 mr-1" />
+                  View License
+                </Button>
+              </div>
             </TableCell>
           </TableRow> */}
         </TableBody>

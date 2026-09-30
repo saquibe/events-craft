@@ -22,11 +22,14 @@ import type { Organizer, OrganizerFormData } from "./types";
 import Image from "next/image";
 import ReactCrop, { Crop } from "react-image-crop";
 
+type FormMode = "profile" | "license" | "full";
+
 interface OrganizerFormSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingOrganizer: Organizer | null;
   onSave: (data: OrganizerFormData) => void;
+  mode?: FormMode;
 }
 
 export function OrganizerFormSheet({
@@ -34,6 +37,7 @@ export function OrganizerFormSheet({
   onOpenChange,
   editingOrganizer,
   onSave,
+  mode = "profile",
 }: OrganizerFormSheetProps) {
   const [formData, setFormData] = useState<OrganizerFormData>({
     orgLogo: "",
@@ -69,6 +73,12 @@ export function OrganizerFormSheet({
     y: 0,
   });
 
+  // Visibility flags
+  const showProfileFields = mode === "profile" || mode === "full";
+  const showLicenseFields = mode === "license" || mode === "full";
+  const isLicenseReadOnly = mode === "profile";
+  const isProfileReadOnly = mode === "license";
+
   useEffect(() => {
     if (editingOrganizer) {
       setFormData({
@@ -92,6 +102,7 @@ export function OrganizerFormSheet({
         orgValidTill: editingOrganizer.orgValidTill,
         orgEventNo: editingOrganizer.orgEventNo,
       });
+      setCroppedLogo(editingOrganizer.orgLogo || "");
     }
   }, [editingOrganizer]);
 
@@ -154,371 +165,417 @@ export function OrganizerFormSheet({
     "Bangladesh",
   ];
 
+  const title =
+    mode === "license"
+      ? "EventsCraft License"
+      : mode === "profile"
+        ? editingOrganizer
+          ? "Edit Organizer Profile"
+          : "Organizer Profile"
+        : editingOrganizer
+          ? "Edit Organizer"
+          : "Organizer Settings";
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto bg-background border-border">
         <SheetHeader>
-          <SheetTitle className="text-foreground">
-            {editingOrganizer ? "Edit Organizer" : "Organizer Settings"}
-          </SheetTitle>
+          <SheetTitle className="text-foreground">{title}</SheetTitle>
         </SheetHeader>
         <div className="mt-6 space-y-4">
-          {/* Basic Info */}
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-foreground">
-                Organizer Logo <span className="text-destructive">*</span>
-              </Label>
+          {/* ================= PROFILE FIELDS ================= */}
+          {showProfileFields && (
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <Label className="text-foreground">
+                  Organizer Logo <span className="text-destructive">*</span>
+                </Label>
 
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
 
-                  if (file) {
-                    const imageUrl = URL.createObjectURL(file);
+                    if (file) {
+                      const imageUrl = URL.createObjectURL(file);
 
-                    setSelectedLogo(imageUrl);
-                  }
-                }}
-              />
+                      setSelectedLogo(imageUrl);
+                    }
+                  }}
+                />
 
-              {selectedLogo && (
-                <div className="space-y-4">
-                  {/* Crop Area */}
-                  <div className="overflow-hidden rounded-xl border border-border">
-                    <ReactCrop
-                      crop={logoCrop}
-                      onChange={(c) => setLogoCrop(c)}
-                      aspect={1}
-                    >
-                      <img
-                        ref={setLogoRef}
-                        src={selectedLogo}
-                        alt="Organizer Logo"
-                        className="max-h-[300px] w-full object-contain"
-                      />
-                    </ReactCrop>
-                  </div>
+                {selectedLogo && (
+                  <div className="space-y-4">
+                    {/* Crop Area */}
+                    <div className="overflow-hidden rounded-xl border border-border">
+                      <ReactCrop
+                        crop={logoCrop}
+                        onChange={(c) => setLogoCrop(c)}
+                        aspect={1}
+                      >
+                        <img
+                          ref={setLogoRef}
+                          src={selectedLogo}
+                          alt="Organizer Logo"
+                          className="max-h-[300px] w-full object-contain"
+                        />
+                      </ReactCrop>
+                    </div>
 
-                  {/* Save Crop Button */}
-                  <div className="flex justify-end">
-                    <Button
-                      color="primary"
-                      onClick={handleLogoCropSave}
-                      className="cursor-pointer"
-                    >
-                      Save Logo
-                    </Button>
-                  </div>
+                    {/* Save Crop Button */}
+                    <div className="flex justify-end">
+                      <Button
+                        color="primary"
+                        onClick={handleLogoCropSave}
+                        className="cursor-pointer"
+                      >
+                        Save Logo
+                      </Button>
+                    </div>
 
-                  {/* Preview */}
-                  <div className="flex justify-center">
-                    <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-border bg-muted">
-                      <Image
-                        src={croppedLogo || selectedLogo}
-                        alt="Preview"
-                        fill
-                        className="object-cover"
-                      />
+                    {/* Preview */}
+                    <div className="flex justify-center">
+                      <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-border bg-muted">
+                        <Image
+                          src={croppedLogo || selectedLogo}
+                          alt="Preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
                     </div>
                   </div>
+                )}
+              </div>
+
+              <div>
+                <Label className="text-foreground">
+                  Organizer Banner URL{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  value={formData.orgBanner}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgBanner: e.target.value })
+                  }
+                  placeholder="Enter banner URL"
+                />
+              </div>
+
+              <div>
+                <Label className="text-foreground">
+                  Organizer Name <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  value={formData.orgName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgName: e.target.value })
+                  }
+                  placeholder="Enter organizer name"
+                />
+              </div>
+
+              <div>
+                <Label className="text-foreground">
+                  About the Organizer{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
+                <Textarea
+                  value={formData.orgAbout}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgAbout: e.target.value })
+                  }
+                  placeholder="Tell us about the organizer"
+                  rows={4}
+                />
+              </div>
+
+              <div>
+                <Label className="text-foreground">
+                  Website <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  value={formData.orgWebsite}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgWebsite: e.target.value })
+                  }
+                  placeholder="https://example.com"
+                />
+              </div>
+
+              <div>
+                <Label className="text-foreground">
+                  Tax ID <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  value={formData.orgTaxId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, orgTaxId: e.target.value })
+                  }
+                  placeholder="GST / VAT / Tax ID"
+                />
+              </div>
+
+              {/* Address */}
+              <div className="space-y-4 pt-2 border-t border-border">
+                <Label className="text-foreground text-base font-semibold">
+                  Address
+                </Label>
+
+                <div>
+                  <Label className="text-foreground">
+                    Address Line 1 <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    value={formData.orgAddress1}
+                    onChange={(e) =>
+                      setFormData({ ...formData, orgAddress1: e.target.value })
+                    }
+                    placeholder="Street address"
+                  />
                 </div>
+
+                <div>
+                  <Label className="text-foreground">Address Line 2</Label>
+                  <Input
+                    value={formData.orgAddress2}
+                    onChange={(e) =>
+                      setFormData({ ...formData, orgAddress2: e.target.value })
+                    }
+                    placeholder="Apartment, suite, unit, etc."
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-foreground">
+                      City <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      value={formData.orgCity}
+                      onChange={(e) =>
+                        setFormData({ ...formData, orgCity: e.target.value })
+                      }
+                      placeholder="City"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-foreground">
+                      State <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      value={formData.orgState}
+                      onChange={(e) =>
+                        setFormData({ ...formData, orgState: e.target.value })
+                      }
+                      placeholder="State / Province"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-foreground">
+                      Country <span className="text-destructive">*</span>
+                    </Label>
+                    <Select
+                      value={formData.orgCountry}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, orgCountry: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {countries.map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-foreground">
+                      Zip Code <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      value={formData.orgZip}
+                      onChange={(e) =>
+                        setFormData({ ...formData, orgZip: e.target.value })
+                      }
+                      placeholder="Postal code"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Media */}
+              <div className="space-y-4 pt-2 border-t border-border">
+                <Label className="text-foreground text-base font-semibold">
+                  Social Media
+                </Label>
+
+                <div>
+                  <Label className="text-foreground">
+                    Facebook <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    value={formData.orgFb}
+                    onChange={(e) =>
+                      setFormData({ ...formData, orgFb: e.target.value })
+                    }
+                    placeholder="https://facebook.com/yourpage"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-foreground">
+                    LinkedIn <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    value={formData.orgLin}
+                    onChange={(e) =>
+                      setFormData({ ...formData, orgLin: e.target.value })
+                    }
+                    placeholder="https://linkedin.com/company/yourpage"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-foreground">
+                    X (formerly Twitter){" "}
+                    <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    value={formData.orgX}
+                    onChange={(e) =>
+                      setFormData({ ...formData, orgX: e.target.value })
+                    }
+                    placeholder="https://x.com/yourhandle"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ================= LICENSE FIELDS ================= */}
+          {showLicenseFields && (
+            <div className="space-y-4 pt-2 border-t border-border">
+              <div className="flex items-center justify-between">
+                <Label className="text-foreground text-base font-semibold">
+                  EventsCraft License
+                </Label>
+                {isLicenseReadOnly && (
+                  <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
+                    Read-only
+                  </span>
+                )}
+              </div>
+
+              {isLicenseReadOnly && (
+                <p className="text-sm text-muted-foreground">
+                  License details are managed by EventsCraft and cannot be
+                  edited here.
+                </p>
               )}
-            </div>
 
-            <div>
-              <Label className="text-foreground">
-                Organizer Banner URL <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={formData.orgBanner}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgBanner: e.target.value })
-                }
-                placeholder="Enter banner URL"
-              />
-            </div>
-
-            <div>
-              <Label className="text-foreground">
-                Organizer Name <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={formData.orgName}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgName: e.target.value })
-                }
-                placeholder="Enter organizer name"
-              />
-            </div>
-
-            <div>
-              <Label className="text-foreground">
-                About the Organizer <span className="text-destructive">*</span>
-              </Label>
-              <Textarea
-                value={formData.orgAbout}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgAbout: e.target.value })
-                }
-                placeholder="Tell us about the organizer"
-                rows={4}
-              />
-            </div>
-
-            <div>
-              <Label className="text-foreground">
-                Website <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={formData.orgWebsite}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgWebsite: e.target.value })
-                }
-                placeholder="https://example.com"
-              />
-            </div>
-
-            <div>
-              <Label className="text-foreground">
-                Tax ID <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={formData.orgTaxId}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgTaxId: e.target.value })
-                }
-                placeholder="GST / VAT / Tax ID"
-              />
-            </div>
-          </div>
-
-          {/* Address */}
-          <div className="space-y-4 pt-2 border-t border-border">
-            <Label className="text-foreground text-base font-semibold">
-              Address
-            </Label>
-
-            <div>
-              <Label className="text-foreground">
-                Address Line 1 <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={formData.orgAddress1}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgAddress1: e.target.value })
-                }
-                placeholder="Street address"
-              />
-            </div>
-
-            <div>
-              <Label className="text-foreground">Address Line 2</Label>
-              <Input
-                value={formData.orgAddress2}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgAddress2: e.target.value })
-                }
-                placeholder="Apartment, suite, unit, etc."
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-foreground">
-                  City <span className="text-destructive">*</span>
+                  Organizer Code <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  value={formData.orgCity}
+                  value={formData.orgCode}
+                  disabled={isLicenseReadOnly}
                   onChange={(e) =>
-                    setFormData({ ...formData, orgCity: e.target.value })
+                    setFormData({ ...formData, orgCode: e.target.value })
                   }
-                  placeholder="City"
+                  placeholder="Unique organizer code"
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-foreground">
+                    Validity From <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    type="date"
+                    disabled={isLicenseReadOnly}
+                    value={formData.orgValidFrom}
+                    onChange={(e) =>
+                      setFormData({ ...formData, orgValidFrom: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-foreground">
+                    Validity Till <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    type="date"
+                    disabled={isLicenseReadOnly}
+                    value={formData.orgValidTill}
+                    onChange={(e) =>
+                      setFormData({ ...formData, orgValidTill: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
               <div>
                 <Label className="text-foreground">
-                  State <span className="text-destructive">*</span>
+                  Number of Events <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  value={formData.orgState}
+                  type="number"
+                  disabled={isLicenseReadOnly}
+                  value={formData.orgEventNo}
                   onChange={(e) =>
-                    setFormData({ ...formData, orgState: e.target.value })
+                    setFormData({
+                      ...formData,
+                      orgEventNo: parseInt(e.target.value) || 0,
+                    })
                   }
-                  placeholder="State / Province"
+                  placeholder="Total events organized"
                 />
               </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-foreground">
-                  Country <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={formData.orgCountry}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, orgCountry: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countries.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label className="text-foreground">
-                  Zip Code <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  value={formData.orgZip}
-                  onChange={(e) =>
-                    setFormData({ ...formData, orgZip: e.target.value })
-                  }
-                  placeholder="Postal code"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Social Media */}
-          <div className="space-y-4 pt-2 border-t border-border">
-            <Label className="text-foreground text-base font-semibold">
-              Social Media
-            </Label>
-
-            <div>
-              <Label className="text-foreground">
-                Facebook <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={formData.orgFb}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgFb: e.target.value })
-                }
-                placeholder="https://facebook.com/yourpage"
-              />
-            </div>
-
-            <div>
-              <Label className="text-foreground">
-                LinkedIn <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={formData.orgLin}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgLin: e.target.value })
-                }
-                placeholder="https://linkedin.com/company/yourpage"
-              />
-            </div>
-
-            <div>
-              <Label className="text-foreground">
-                X (formerly Twitter) <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={formData.orgX}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgX: e.target.value })
-                }
-                placeholder="https://x.com/yourhandle"
-              />
-            </div>
-          </div>
-
-          {/* License */}
-          <div className="space-y-4 pt-2 border-t border-border">
-            <Label className="text-foreground text-base font-semibold">
-              EventsCraft License
-            </Label>
-
-            <div>
-              <Label className="text-foreground">
-                Organizer Code <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                value={formData.orgCode}
-                onChange={(e) =>
-                  setFormData({ ...formData, orgCode: e.target.value })
-                }
-                placeholder="Unique organizer code"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-foreground">
-                  Validity From <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  type="date"
-                  value={formData.orgValidFrom}
-                  onChange={(e) =>
-                    setFormData({ ...formData, orgValidFrom: e.target.value })
-                  }
-                />
-              </div>
-
-              <div>
-                <Label className="text-foreground">
-                  Validity Till <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  type="date"
-                  value={formData.orgValidTill}
-                  onChange={(e) =>
-                    setFormData({ ...formData, orgValidTill: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-foreground">
-                Number of Events <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                type="number"
-                value={formData.orgEventNo}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    orgEventNo: parseInt(e.target.value) || 0,
-                  })
-                }
-                placeholder="Total events organized"
-              />
-            </div>
-          </div>
-
-          {/* Actions */}
+          {/* ================= ACTIONS ================= */}
           <div className="flex gap-3 pt-4 border-t border-border">
-            <Button
-              onClick={handleSubmit}
-              color="primary"
-              className="flex-1 cursor-pointer"
-            >
-              {editingOrganizer ? "Update" : "Save Settings"}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="flex-1 cursor-pointer"
-            >
-              Cancel
-            </Button>
+            {isLicenseReadOnly ? (
+              <Button
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="flex-1 cursor-pointer"
+              >
+                Close
+              </Button>
+            ) : (
+              <>
+                <Button
+                  onClick={handleSubmit}
+                  color="primary"
+                  className="flex-1 cursor-pointer"
+                >
+                  {editingOrganizer ? "Update" : "Save Settings"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="flex-1 cursor-pointer"
+                >
+                  Cancel
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </SheetContent>

@@ -203,8 +203,8 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
             </TableCell>
           </TableRow>
 
-          {/* Actions */}
-          {/* <TableRow className="border-border hover:bg-muted/50">
+          {/* Actions — EDIT PROFILE */}
+          <TableRow className="border-border hover:bg-muted/50">
             <TableCell className="font-semibold text-foreground">
               Actions
             </TableCell>
@@ -213,13 +213,13 @@ export function ProfileTable({ organizer, onEdit }: ProfileTableProps) {
                 variant="ghost"
                 size="sm"
                 onClick={onEdit}
-                className="text-primary"
+                className="text-primary cursor-pointer"
               >
                 <Edit className="h-4 w-4 mr-1" />
                 Edit Profile
               </Button>
             </TableCell>
-          </TableRow> */}
+          </TableRow>
         </TableBody>
       </Table>
     </div>

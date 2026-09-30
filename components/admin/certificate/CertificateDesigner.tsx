@@ -1,9 +1,11 @@
 // components/admin/certificate/CertificateDesigner.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Rnd } from "react-rnd";
 import { useCertificate } from "./CertificateContext";
+import { resolveTemplate, formatDate } from "./templateResolver";
+import { CertificateAssignDialog } from "./CertificateAssignDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,18 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Save,
   X,
-  Eye,
-  EyeOff,
   Maximize2,
   Minimize2,
   Trash2,
   Image as ImageIcon,
   Square,
   Upload,
+  UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -61,17 +61,72 @@ interface CertificateField {
   imageUrl?: string;
 }
 
+// ✅ Fix 3: handle styles as classes only
+const RESIZE_HANDLE_CLASS =
+  "bg-blue-500 border-2 border-white shadow-md rounded-full transition-transform hover:scale-125";
+const CORNER_HANDLE_CLASS = `${RESIZE_HANDLE_CLASS} w-3 h-3`;
+const EDGE_H_HANDLE_CLASS = `${RESIZE_HANDLE_CLASS} w-3 h-2`;
+const EDGE_V_HANDLE_CLASS = `${RESIZE_HANDLE_CLASS} w-2 h-3`;
+
 export function CertificateDesigner() {
-  const { designs, selectedDesign, addDesign, updateDesign, selectDesign } =
-    useCertificate();
+  const {
+    designs,
+    selectedDesign,
+    addDesign,
+    updateDesign,
+    selectDesign,
+    attendees,
+    getAttendanceByAttendee,
+  } = useCertificate();
+
   const [activeTab, setActiveTab] = useState<"design" | "preview">("design");
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [showGrid, setShowGrid] = useState(true);
   const [isBackgroundDialogOpen, setIsBackgroundDialogOpen] = useState(false);
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageFileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // ✅ Fix 1: preview context state
+  const [previewAttendeeId, setPreviewAttendeeId] = useState<string>(
+    attendees[0]?.id ?? "",
+  );
+  const [previewEventName, setPreviewEventName] = useState(
+    "Global Tech Summit 2024",
+  );
+  const [previewEventDate, setPreviewEventDate] = useState("2024-10-15");
+  const [previewOrganizer, setPreviewOrganizer] =
+    useState("Zylker Corporation");
+
+  // ✅ Fix 1: build template context
+  const previewContext = useMemo(() => {
+    const attendee = attendees.find((a) => a.id === previewAttendeeId);
+    const attendance = attendee
+      ? getAttendanceByAttendee(attendee.id)
+      : undefined;
+    return {
+      attendee,
+      attendance,
+      eventName: previewEventName,
+      eventDate: formatDate(previewEventDate),
+      organizer: previewOrganizer,
+    };
+  }, [
+    attendees,
+    previewAttendeeId,
+    getAttendanceByAttendee,
+    previewEventName,
+    previewEventDate,
+    previewOrganizer,
+  ]);
+
+  // ✅ Fix 1: resolve a field's display content
+  const resolveFieldDisplay = (field: CertificateField): string => {
+    return resolveTemplate(field.content, previewContext);
+  };
 
   // Field presets
   const fieldCategories = {
@@ -214,9 +269,13 @@ export function CertificateDesigner() {
     }
   };
 
-  const getFieldContent = (field: CertificateField) => {
+  // ✅ Fix 1: getFieldContent now supports preview mode
+  const getFieldContent = (field: CertificateField, forPreview = false) => {
     if (field.type === "text") {
-      return field.content || "Text Field";
+      const text = forPreview
+        ? resolveFieldDisplay(field)
+        : field.content || "Text Field";
+      return text;
     }
     if (field.type === "image") {
       if (field.imageUrl) {
@@ -235,10 +294,7 @@ export function CertificateDesigner() {
         </div>
       );
     }
-    if (field.type === "shape") {
-      return null;
-    }
-    return field.content;
+    return null;
   };
 
   const handleAddField = (category: string, fieldData: any) => {
@@ -251,8 +307,8 @@ export function CertificateDesigner() {
       content: fieldData.content,
       x: 20 + Math.random() * 20,
       y: 30 + Math.random() * 30,
-      width: 60,
-      height: 25,
+      width: 80,
+      height: 12,
       fontSize: 16,
       fontFamily: "Georgia, serif",
       color: "#1a1a2e",
@@ -342,7 +398,9 @@ export function CertificateDesigner() {
     }
   };
 
-  // Handle field drag stop
+  // ✅ Fix 2: with scale prop, `data.x/y` are in unscaled parent pixels.
+  // We divide by canvas width/height * design size. Because scale is applied
+  // via react-rnd itself, the returned `data.x/y` is already corrected for us.
   const handleDragStop = (
     fieldId: string,
     e: any,
@@ -362,7 +420,6 @@ export function CertificateDesigner() {
     });
   };
 
-  // Handle field resize stop
   const handleResizeStop = (
     fieldId: string,
     e: any,
@@ -544,6 +601,16 @@ export function CertificateDesigner() {
             <Upload className="h-3 w-3 mr-1" />
             Upload Background
           </Button>
+          {/* ✅ Fix 6: Assign button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs h-8"
+            onClick={() => setIsAssignDialogOpen(true)}
+          >
+            <UserPlus className="h-3 w-3 mr-1" />
+            Assign
+          </Button>
           <Button variant="outline" size="sm" className="text-xs h-8">
             <X className="h-3 w-3 mr-1" />
             Cancel
@@ -684,7 +751,6 @@ export function CertificateDesigner() {
                   const pixelHeight =
                     (field.height / selectedDesign.size.height) * canvasHeight;
 
-                  // Field style
                   const fieldStyle: React.CSSProperties = {
                     display: field.isVisible ? "flex" : "none",
                     alignItems: "center",
@@ -744,7 +810,7 @@ export function CertificateDesigner() {
                       bounds="parent"
                       dragGrid={[1, 1]}
                       resizeGrid={[1, 1]}
-                      scale={1}
+                      scale={zoomLevel} /* ✅ Fix 2 */
                       className={cn(
                         "transition-shadow duration-200",
                         isSelected
@@ -752,71 +818,16 @@ export function CertificateDesigner() {
                           : "z-10 hover:ring-1 hover:ring-primary/30",
                         !field.isVisible && "opacity-40",
                       )}
-                      resizeHandleStyles={{
-                        bottomRight: {
-                          backgroundColor: "#3b82f6",
-                          borderRadius: "50%",
-                          width: "12px",
-                          height: "12px",
-                        },
-                        bottomLeft: {
-                          backgroundColor: "#3b82f6",
-                          borderRadius: "50%",
-                          width: "12px",
-                          height: "12px",
-                        },
-                        topRight: {
-                          backgroundColor: "#3b82f6",
-                          borderRadius: "50%",
-                          width: "12px",
-                          height: "12px",
-                        },
-                        topLeft: {
-                          backgroundColor: "#3b82f6",
-                          borderRadius: "50%",
-                          width: "12px",
-                          height: "12px",
-                        },
-                        bottom: {
-                          backgroundColor: "#3b82f6",
-                          borderRadius: "50%",
-                          width: "8px",
-                          height: "12px",
-                        },
-                        top: {
-                          backgroundColor: "#3b82f6",
-                          borderRadius: "50%",
-                          width: "8px",
-                          height: "12px",
-                        },
-                        left: {
-                          backgroundColor: "#3b82f6",
-                          borderRadius: "50%",
-                          width: "12px",
-                          height: "8px",
-                        },
-                        right: {
-                          backgroundColor: "#3b82f6",
-                          borderRadius: "50%",
-                          width: "12px",
-                          height: "8px",
-                        },
-                      }}
+                      /* ✅ Fix 3: classes only, no styles */
                       resizeHandleClasses={{
-                        bottomRight:
-                          "border-2 border-white shadow-md hover:scale-125 transition-transform",
-                        bottomLeft:
-                          "border-2 border-white shadow-md hover:scale-125 transition-transform",
-                        topRight:
-                          "border-2 border-white shadow-md hover:scale-125 transition-transform",
-                        topLeft:
-                          "border-2 border-white shadow-md hover:scale-125 transition-transform",
-                        bottom:
-                          "border-2 border-white shadow-md hover:scale-125 transition-transform",
-                        top: "border-2 border-white shadow-md hover:scale-125 transition-transform",
-                        left: "border-2 border-white shadow-md hover:scale-125 transition-transform",
-                        right:
-                          "border-2 border-white shadow-md hover:scale-125 transition-transform",
+                        bottomRight: CORNER_HANDLE_CLASS,
+                        bottomLeft: CORNER_HANDLE_CLASS,
+                        topRight: CORNER_HANDLE_CLASS,
+                        topLeft: CORNER_HANDLE_CLASS,
+                        bottom: EDGE_V_HANDLE_CLASS,
+                        top: EDGE_V_HANDLE_CLASS,
+                        left: EDGE_H_HANDLE_CLASS,
+                        right: EDGE_H_HANDLE_CLASS,
                       }}
                       onClick={() => handleFieldSelect(field.id)}
                     >
@@ -827,14 +838,12 @@ export function CertificateDesigner() {
                   );
                 })}
 
-                {/* Size label */}
                 <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-gray-400 whitespace-nowrap">
                   {selectedDesign.size.width} × {selectedDesign.size.height} mm
                   • {selectedDesign.orientation}
                 </div>
               </div>
 
-              {/* Help text */}
               <div className="text-center text-xs text-muted-foreground mt-2">
                 {selectedFieldId ? (
                   <span>
@@ -1140,39 +1149,133 @@ export function CertificateDesigner() {
           </div>
         </SimpleTabsContent>
 
+        {/* ✅ Fix 1: Real merged Preview */}
         <SimpleTabsContent value="preview">
-          <div className="flex items-center justify-center p-8 bg-muted/20 rounded-lg min-h-[500px]">
-            <div
-              className="bg-white rounded-lg shadow-lg overflow-hidden"
-              style={{
-                width: "400px",
-                aspectRatio:
-                  selectedDesign.orientation === "portrait"
-                    ? `${selectedDesign.size.width}/${selectedDesign.size.height}`
-                    : `${selectedDesign.size.height}/${selectedDesign.size.width}`,
-              }}
-            >
-              <div className="w-full h-full p-8 flex flex-col items-center justify-center text-center">
-                <h1 className="text-2xl font-bold text-gray-800">
-                  Certificate Preview
-                </h1>
-                <p className="text-sm text-muted-foreground mt-2">
-                  {selectedDesign.name}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {selectedDesign.size.width} × {selectedDesign.size.height} mm
-                  • {selectedDesign.orientation}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {selectedDesign.fields.map((field) => (
-                    <span
-                      key={field.id}
-                      className="text-xs bg-muted px-2 py-1 rounded"
-                    >
-                      {field.label}
-                    </span>
-                  ))}
-                </div>
+          <div className="space-y-4">
+            {/* Preview Controls */}
+            <div className="flex flex-wrap items-center gap-3 p-4 bg-muted/20 rounded-lg border">
+              <div className="flex items-center gap-2">
+                <Label className="text-xs whitespace-nowrap">Preview as</Label>
+                <Select
+                  value={previewAttendeeId}
+                  onValueChange={setPreviewAttendeeId}
+                >
+                  <SelectTrigger className="h-8 w-[220px] text-xs">
+                    <SelectValue placeholder="Select attendee" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {attendees.map((a) => (
+                      <SelectItem key={a.id} value={a.id}>
+                        {a.name} ({a.registrationNumber})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Label className="text-xs whitespace-nowrap">Event</Label>
+                <Input
+                  value={previewEventName}
+                  onChange={(e) => setPreviewEventName(e.target.value)}
+                  className="h-8 w-[200px] text-xs"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Label className="text-xs whitespace-nowrap">Organizer</Label>
+                <Input
+                  value={previewOrganizer}
+                  onChange={(e) => setPreviewOrganizer(e.target.value)}
+                  className="h-8 w-[180px] text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Real Merged Preview */}
+            <div className="flex items-center justify-center p-8 bg-muted/20 rounded-lg min-h-[500px]">
+              <div
+                className="relative bg-white shadow-lg overflow-hidden"
+                style={{
+                  width: `${canvasWidth}px`,
+                  height: `${canvasHeight}px`,
+                  borderRadius: `${selectedDesign.settings.borderRadius}px`,
+                }}
+              >
+                {/* Background */}
+                {selectedDesign.background.type !== "none" && (
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        selectedDesign.background.type === "gradient"
+                          ? selectedDesign.background.value
+                          : selectedDesign.background.type === "color"
+                            ? selectedDesign.background.value
+                            : undefined,
+                      backgroundImage:
+                        selectedDesign.background.type === "image" &&
+                        selectedDesign.background.imageUrl
+                          ? `url(${selectedDesign.background.imageUrl})`
+                          : undefined,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  />
+                )}
+
+                {/* Fields rendered with resolved data */}
+                {selectedDesign.fields
+                  .filter((f) => f.isVisible)
+                  .map((field) => {
+                    const pixelX =
+                      (field.x / selectedDesign.size.width) * canvasWidth;
+                    const pixelY =
+                      (field.y / selectedDesign.size.height) * canvasHeight;
+                    const pixelWidth =
+                      (field.width / selectedDesign.size.width) * canvasWidth;
+                    const pixelHeight =
+                      (field.height / selectedDesign.size.height) *
+                      canvasHeight;
+
+                    const fieldStyle: React.CSSProperties = {
+                      position: "absolute",
+                      left: pixelX,
+                      top: pixelY,
+                      width: pixelWidth,
+                      height: pixelHeight,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent:
+                        field.alignment === "center"
+                          ? "center"
+                          : field.alignment === "right"
+                            ? "flex-end"
+                            : "flex-start",
+                      padding: "4px 6px",
+                      overflow: "hidden",
+                      wordBreak: "break-word",
+                      fontSize: `${field.fontSize || 14}px`,
+                      fontFamily: field.fontFamily || "Georgia, serif",
+                      fontWeight: field.fontWeight || "normal",
+                      color: field.color || "#1a1a2e",
+                      lineHeight: "1.3",
+                      backgroundColor:
+                        field.type === "shape"
+                          ? field.color || "#e5e7eb"
+                          : "transparent",
+                      border:
+                        field.type === "shape"
+                          ? `2px solid ${field.color || "#6b7280"}`
+                          : undefined,
+                    };
+
+                    return (
+                      <div key={field.id} style={fieldStyle}>
+                        {getFieldContent(field, true)}
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           </div>
@@ -1262,6 +1365,13 @@ export function CertificateDesigner() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ✅ Fix 6: Assign / Send Dialog */}
+      <CertificateAssignDialog
+        open={isAssignDialogOpen}
+        onOpenChange={setIsAssignDialogOpen}
+        designId={selectedDesign.id}
+      />
     </div>
   );
 }

@@ -98,7 +98,7 @@ interface CertificateContextType {
   selectDesign: (id: string | null) => void;
   addCertificate: (
     certificate: Omit<Certificate, "id" | "createdAt" | "status">,
-  ) => void;
+  ) => Certificate;
   updateCertificate: (id: string, updates: Partial<Certificate>) => void;
   deleteCertificate: (id: string) => void;
   assignCertificate: (certificateId: string, attendeeIds: string[]) => void;
@@ -206,10 +206,10 @@ const defaultDesign: CertificateDesign = {
       type: "text",
       label: "Title",
       content: "Certificate of Participation",
-      x: 20,
-      y: 30,
-      width: 80,
-      height: 25,
+      x: 15,
+      y: 40,
+      width: 180,
+      height: 15,
       fontSize: 28,
       fontFamily: "Georgia, serif",
       fontWeight: "bold",
@@ -223,10 +223,10 @@ const defaultDesign: CertificateDesign = {
       type: "text",
       label: "Full Name",
       content: "{{fullName}}",
-      x: 20,
-      y: 65,
-      width: 80,
-      height: 35,
+      x: 15,
+      y: 80,
+      width: 180,
+      height: 20,
       fontSize: 32,
       fontFamily: "Georgia, serif",
       fontWeight: "bold",
@@ -240,10 +240,10 @@ const defaultDesign: CertificateDesign = {
       type: "text",
       label: "Description",
       content: "for attending and actively participating in the",
-      x: 20,
-      y: 105,
-      width: 80,
-      height: 20,
+      x: 15,
+      y: 115,
+      width: 180,
+      height: 10,
       fontSize: 14,
       fontFamily: "Georgia, serif",
       fontWeight: "normal",
@@ -257,10 +257,10 @@ const defaultDesign: CertificateDesign = {
       type: "text",
       label: "Event Name",
       content: "Global Tech Summit 2024",
-      x: 20,
-      y: 130,
-      width: 80,
-      height: 25,
+      x: 15,
+      y: 135,
+      width: 180,
+      height: 15,
       fontSize: 20,
       fontFamily: "Georgia, serif",
       fontWeight: "bold",
@@ -274,10 +274,10 @@ const defaultDesign: CertificateDesign = {
       type: "text",
       label: "Date",
       content: "15th October 2024",
-      x: 20,
+      x: 15,
       y: 160,
-      width: 80,
-      height: 18,
+      width: 180,
+      height: 10,
       fontSize: 14,
       fontFamily: "Georgia, serif",
       fontWeight: "normal",
@@ -291,10 +291,10 @@ const defaultDesign: CertificateDesign = {
       type: "text",
       label: "Organizer",
       content: "Zylker Corporation",
-      x: 20,
+      x: 15,
       y: 185,
-      width: 80,
-      height: 16,
+      width: 180,
+      height: 10,
       fontSize: 12,
       fontFamily: "Georgia, serif",
       fontWeight: "normal",
@@ -343,31 +343,27 @@ export function CertificateProvider({
     [],
   );
 
+  // ✅ Fix 5: optimized dependency
   const updateDesign = useCallback(
     (id: string, updates: Partial<CertificateDesign>) => {
+      const updatedAt = new Date().toISOString();
+
       setDesigns((prev) =>
-        prev.map((d) =>
-          d.id === id
-            ? { ...d, ...updates, updatedAt: new Date().toISOString() }
-            : d,
-        ),
+        prev.map((d) => (d.id === id ? { ...d, ...updates, updatedAt } : d)),
       );
-      if (selectedDesign?.id === id) {
-        setSelectedDesign((prev) => (prev ? { ...prev, ...updates } : null));
-      }
+
+      setSelectedDesign((prev) =>
+        prev?.id === id ? { ...prev, ...updates, updatedAt } : prev,
+      );
     },
-    [selectedDesign],
+    [],
   );
 
-  const deleteDesign = useCallback(
-    (id: string) => {
-      setDesigns((prev) => prev.filter((d) => d.id !== id));
-      if (selectedDesign?.id === id) {
-        setSelectedDesign(null);
-      }
-    },
-    [selectedDesign],
-  );
+  // ✅ Fix 5: optimized dependency
+  const deleteDesign = useCallback((id: string) => {
+    setDesigns((prev) => prev.filter((d) => d.id !== id));
+    setSelectedDesign((prev) => (prev?.id === id ? null : prev));
+  }, []);
 
   const getDesignById = useCallback(
     (id: string) => {
@@ -388,8 +384,11 @@ export function CertificateProvider({
     [designs],
   );
 
+  // ✅ Fix 6: return the new certificate
   const addCertificate = useCallback(
-    (certificate: Omit<Certificate, "id" | "createdAt" | "status">) => {
+    (
+      certificate: Omit<Certificate, "id" | "createdAt" | "status">,
+    ): Certificate => {
       const newCert: Certificate = {
         ...certificate,
         id: `cert-${Date.now()}`,
@@ -397,33 +396,29 @@ export function CertificateProvider({
         status: "draft",
       };
       setCertificates((prev) => [...prev, newCert]);
+      return newCert;
     },
     [],
   );
 
+  // ✅ Fix 5: optimized dependency
   const updateCertificate = useCallback(
     (id: string, updates: Partial<Certificate>) => {
       setCertificates((prev) =>
         prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
       );
-      if (selectedCertificate?.id === id) {
-        setSelectedCertificate((prev) =>
-          prev ? { ...prev, ...updates } : null,
-        );
-      }
+      setSelectedCertificate((prev) =>
+        prev && prev.id === id ? { ...prev, ...updates } : prev,
+      );
     },
-    [selectedCertificate],
+    [],
   );
 
-  const deleteCertificate = useCallback(
-    (id: string) => {
-      setCertificates((prev) => prev.filter((c) => c.id !== id));
-      if (selectedCertificate?.id === id) {
-        setSelectedCertificate(null);
-      }
-    },
-    [selectedCertificate],
-  );
+  // ✅ Fix 5: optimized dependency
+  const deleteCertificate = useCallback((id: string) => {
+    setCertificates((prev) => prev.filter((c) => c.id !== id));
+    setSelectedCertificate((prev) => (prev?.id === id ? null : prev));
+  }, []);
 
   const assignCertificate = useCallback(
     (certificateId: string, attendeeIds: string[]) => {

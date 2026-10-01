@@ -6,11 +6,14 @@ import { useParams, usePathname } from "next/navigation";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { PaginatedTable } from "@/components/paginated-table";
 import { FormBuilder as SharedFormBuilder, type FormConfig } from "@/components/admin/common/FormBuilder";
 import { DatePicker } from "@/components/admin/common/DatePicker";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { RegistrationConfigPanel } from "./RegistrationConfigPanel";
 import { CreateButton } from "@/components/admin/common/CreateButton";
 
@@ -76,13 +79,44 @@ function FormBuilder({ section }: { section: string }) {
   const type = section.split("/")[1];
   const title = type === "visitor" ? "Visitor Registration Form" : type === "exhibitor" ? "Exhibitor Badge Form" : type === "custom-link" ? "Custom Registration Form" : "Attendee Registration Form";
   const [saved, setSaved] = useState(false);
-  const fixedFields = type === "attendee" ? ["Select Registration Slab", "First Name", "Middle & Last Name", "Email", "Mobile", "Accompany Registration", "Workshop Registration", "Functions Registration"] : ["First Name", "Middle & Last Name", "Email", "Mobile"];
-  const [enabledFixed, setEnabledFixed] = useState(fixedFields);
   const [initialConfig] = useState<FormConfig | undefined>(() => {
     if (typeof window === "undefined") return undefined;
     try { return JSON.parse(localStorage.getItem(`registration-form-${type}`) ?? "null") ?? undefined; } catch { return undefined; }
   });
-  const [slabOptions] = useState<string[]>(() => type === "attendee" && typeof window !== "undefined" ? (JSON.parse(localStorage.getItem("registration-slabs-attendee") ?? "[]") as { name: string }[]).map((slab) => slab.name) : []);
-  const [payment, setPayment] = useState(type === "custom-link");
-  return <div className="space-y-5"><div><h2 className="font-semibold">Full form builder</h2><p className="text-sm text-muted-foreground">Choose which fixed fields appear, then add more fields with the form builder.</p></div><Card><CardContent className="p-5"><h3 className="mb-3 font-semibold">Fixed fields</h3><div className="grid gap-2 sm:grid-cols-2">{fixedFields.map((field) => <label key={field} className="flex min-h-11 items-center gap-3 rounded-md border p-3 text-sm"><Checkbox checked={enabledFixed.includes(field)} onCheckedChange={(checked) => setEnabledFixed(checked ? [...enabledFixed, field] : enabledFixed.filter((f) => f !== field))}/><span>{field}</span></label>)}</div>{type === "attendee" && enabledFixed.includes("Select Registration Slab") && <div className="mt-4 rounded-lg border p-4"><p className="mb-2 text-sm font-medium">Slabs shown to registrants</p>{slabOptions.length ? <div className="grid gap-2 sm:grid-cols-2">{slabOptions.map((name) => <label key={name} className="flex items-center gap-2 rounded-md bg-muted/40 p-2.5 text-sm"><Checkbox defaultChecked/>{name}</label>)}</div> : <p className="text-sm text-muted-foreground">No slabs created yet. Add slabs under Registration Slab.</p>}</div>}</CardContent></Card><Card><CardContent className="p-5"><div className="mb-4"><h3 className="font-semibold">Custom fields</h3><p className="text-sm text-muted-foreground">Add fields beyond the fixed registration information.</p></div><SharedFormBuilder title={title} initialConfig={initialConfig} onSave={(config: FormConfig) => { localStorage.setItem(`registration-form-${type}`, JSON.stringify({ ...config, fixedFields: enabledFixed, payment })); setSaved(true); setTimeout(() => setSaved(false), 2500); }}/>{saved && <p className="mt-3 text-sm font-medium text-emerald-600">Form saved.</p>}</CardContent></Card><Card><CardContent className="flex items-center justify-between p-4"><div><p className="font-medium">Payment</p><p className="text-sm text-muted-foreground">Collect payment during registration</p></div><Checkbox checked={payment} onCheckedChange={(checked) => setPayment(!!checked)}/></CardContent></Card></div>;
+  const [fixedValues, setFixedValues] = useState<Record<string, string>>({});
+  const [shownSlabs, setShownSlabs] = useState<string[]>(() => (initialConfig as any)?.shownSlabs ?? []);
+  const [registrationChoices, setRegistrationChoices] = useState<Record<string, string>>(() => (initialConfig as any)?.registrationChoices ?? { accompany: "no", workshop: "no", functions: "no" });
+  const [slabOptions] = useState<string[]>(() => {
+    if (type !== "attendee" || typeof window === "undefined") return [];
+    try { return (JSON.parse(localStorage.getItem("registration-slabs-attendee") ?? "[]") as { name: string }[]).map((slab) => slab.name); } catch { return []; }
+  });
+  const [payment, setPayment] = useState(type === "custom-link" && (initialConfig as any)?.payment === true);
+  const fixedField = (name: string, inputType = "text") => (
+    <div key={name} className="space-y-2">
+      <Label className="text-default">{name}{["First Name", "Last Name", "Email", "Mobile"].includes(name) && " *"}</Label>
+      <Input type={inputType} value={fixedValues[name] ?? ""} onChange={(event) => setFixedValues({ ...fixedValues, [name]: event.target.value })} placeholder={`Enter ${name.toLowerCase()}`} />
+    </div>
+  );
+  const yesNoField = (label: string, key: "accompany" | "workshop" | "functions") => (
+    <div key={key} className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3">
+      <Label className="text-default">{label}</Label>
+      <RadioGroup value={registrationChoices[key]} onValueChange={(value) => setRegistrationChoices({ ...registrationChoices, [key]: value })} className="flex items-center gap-5">
+        {[{ value: "yes", label: "Yes" }, { value: "no", label: "No" }].map((option) => <label key={option.value} htmlFor={`${type}-${key}-${option.value}`} className="flex cursor-pointer items-center gap-2 text-sm"><RadioGroupItem id={`${type}-${key}-${option.value}`} value={option.value} color="primary"/>{option.label}</label>)}
+      </RadioGroup>
+    </div>
+  );
+  return <div className="space-y-5">
+    <div><h2 className="font-semibold">Full form builder</h2><p className="text-sm text-muted-foreground">Fixed fields are ready to fill in. Add more fields with the form builder below.</p></div>
+    <Card><CardContent className="space-y-5 p-5">
+      <div><h3 className="font-semibold">Fixed fields</h3><p className="mt-1 text-sm text-muted-foreground">Registrant information</p></div>
+      <div className="grid gap-4 sm:grid-cols-3">{fixedField("First Name")}{fixedField("Middle Name")}{fixedField("Last Name")}</div>
+      <div className="grid gap-4 sm:grid-cols-2">{fixedField("Email", "email")}{fixedField("Mobile", "tel")}</div>
+      {type === "attendee" && <>
+        <div className="space-y-3 rounded-md border p-4"><Label className="text-default">Select Registration Slab</Label>{slabOptions.length ? <div className="grid gap-2 sm:grid-cols-2">{slabOptions.map((name) => <label key={name} className="flex items-center gap-2 rounded-md bg-muted/40 p-2.5 text-sm"><Checkbox checked={shownSlabs.includes(name)} onCheckedChange={(checked) => setShownSlabs(checked ? [...shownSlabs, name] : shownSlabs.filter((item) => item !== name))}/>{name}</label>)}</div> : <p className="text-sm text-muted-foreground">No attendee slabs created yet.</p>}</div>
+        <div className="space-y-3">{yesNoField("Accompany Registration", "accompany")}{yesNoField("Workshop Registration", "workshop")}{yesNoField("Functions Registration", "functions")}</div>
+      </>}
+    </CardContent></Card>
+    <Card><CardContent className="p-5"><div className="mb-4"><h3 className="font-semibold">Custom fields</h3><p className="text-sm text-muted-foreground">Add optional fields beyond the fixed registration information.</p></div><SharedFormBuilder title={title} initialConfig={initialConfig} onSave={(config: FormConfig) => { localStorage.setItem(`registration-form-${type}`, JSON.stringify({ ...config, fixedFields: ["First Name", "Middle Name", "Last Name", "Email", "Mobile"], fixedValues, shownSlabs, registrationChoices, ...(type === "custom-link" ? { payment } : {}) })); setSaved(true); setTimeout(() => setSaved(false), 2500); }}/>{saved && <p className="mt-3 text-sm font-medium text-emerald-600">Form saved.</p>}</CardContent></Card>
+    {type === "custom-link" && <Card><CardContent className="flex items-center justify-between p-4"><div><p className="font-medium">Payment</p><p className="text-sm text-muted-foreground">Collect payment during registration</p></div><Checkbox checked={payment} onCheckedChange={(checked) => setPayment(!!checked)}/></CardContent></Card>}
+  </div>;
 }

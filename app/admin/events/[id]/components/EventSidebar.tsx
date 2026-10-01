@@ -45,7 +45,12 @@ const menuData: MenuItem[] = [
   {
     label: "Event Setting",
     icon: Settings,
-    href: "/admin/events/[id]/settings",
+    subItems: [
+      { label: "Event Info", href: "/admin/events/[id]/settings/info" },
+      { label: "Branding", href: "/admin/events/[id]/settings/branding" },
+      { label: "Manage Team", href: "/admin/events/[id]/settings/team" },
+      { label: "Payment Gateway", href: "/admin/events/[id]/settings/payment-gateway" },
+    ],
   },
   {
     label: "User",

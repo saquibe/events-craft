@@ -3,6 +3,7 @@
 import ComingSoon from "@/components/admin/common/ComingSoon";
 import { useParams } from "next/navigation";
 import RegistrationWorkspace from "@/components/admin/registration/RegistrationWorkspace";
+import EventSettingsWorkspace from "@/components/admin/event-settings/EventSettingsWorkspace";
 
 // Map of URL patterns to feature names and descriptions
 const featureMap: Record<string, { title: string; description: string }> = {
@@ -229,6 +230,10 @@ export default function CatchAllComingSoonPage() {
   const params = useParams();
   const slug = (params?.slug as string[]) || [];
   const slugPath = slug.join("/");
+
+  if (slugPath.startsWith("settings/")) {
+    return <EventSettingsWorkspace section={slugPath.split("/")[1] || "info"} />;
+  }
 
   if (slugPath.startsWith("registration/")) {
     return <RegistrationWorkspace />;

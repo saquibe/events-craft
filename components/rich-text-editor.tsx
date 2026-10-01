@@ -99,6 +99,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class: "prose prose-sm max-w-none focus:outline-none",
+        style: `min-height: ${minHeight}; cursor: text; box-sizing: border-box;`,
       },
     },
   });
@@ -314,7 +315,25 @@ export function RichTextEditor({
       </div>
 
       {/* Editor Content */}
-      <div style={{ minHeight }} className="prose-max-w-none p-5">
+      <div
+        style={{ minHeight }}
+        className="prose-max-w-none cursor-text p-5"
+        onMouseDown={(event) => {
+          const position = editor.view.posAtCoords({
+            left: event.clientX,
+            top: event.clientY,
+          });
+
+          if (!position) return;
+
+          // The editable node used to shrink to the text height, so clicks in
+          // the rest of the editor surface could not place the caret there.
+          // Map the click against the full-height ProseMirror node directly.
+          event.preventDefault();
+          editor.commands.setTextSelection(position.pos);
+          editor.commands.focus();
+        }}
+      >
         <EditorContent editor={editor} />
       </div>
     </div>

@@ -57,12 +57,49 @@ const menuData: MenuItem[] = [
     icon: ClipboardCheck,
     subItems: [
       {
-        label: "Registration Types",
-        href: "/admin/events/[id]/registration/types",
+        label: "Dashboard",
+        href: "/admin/events/[id]/registration/dashboard",
       },
       {
-        label: "Registration Dashboard",
-        href: "/admin/events/[id]/registration/dashboard",
+        label: "Registered",
+        subItems: [
+          { label: "Attendee (Conference)", href: "/admin/events/[id]/registration/registered/attendee" },
+          { label: "Accompany (Conference)", href: "/admin/events/[id]/registration/registered/accompany" },
+          { label: "Functions (Conference)", href: "/admin/events/[id]/registration/registered/functions" },
+          { label: "Visitor (Free/Exhibition)", href: "/admin/events/[id]/registration/registered/visitor" },
+        ],
+      },
+      {
+        label: "Registration Form",
+        subItems: [
+          { label: "Attendee Registration (Conference)", href: "/admin/events/[id]/registration/forms/attendee" },
+          { label: "Visitor Registration (Free/Exhibition)", href: "/admin/events/[id]/registration/forms/visitor" },
+          { label: "Exhibitor Badge (Stall Manager)", href: "/admin/events/[id]/registration/forms/exhibitor" },
+          { label: "Custom Registration Link (Free/Paid)", href: "/admin/events/[id]/registration/forms/custom-link" },
+        ],
+      },
+      {
+        label: "Registration Slab",
+        subItems: [
+          { label: "Attendee Registration Slab", href: "/admin/events/[id]/registration/slabs/attendee" },
+          { label: "Accompany Registration Slab", href: "/admin/events/[id]/registration/slabs/accompany" },
+          { label: "Functions Registration Slab", href: "/admin/events/[id]/registration/slabs/functions" },
+        ],
+      },
+      {
+        label: "Workshop",
+        subItems: [
+          { label: "Registered", href: "/admin/events/[id]/registration/workshop/registered" },
+          { label: "Registration Slab", href: "/admin/events/[id]/registration/workshop/slabs" },
+          { label: "Workshop Category", href: "/admin/events/[id]/registration/workshop/categories" },
+          { label: "Create Workshop", href: "/admin/events/[id]/registration/workshop/create" },
+        ],
+      },
+      { label: "Discount Code", href: "/admin/events/[id]/registration/discount-codes" },
+      { label: "Cancellation Policy", href: "/admin/events/[id]/registration/cancellation-policy" },
+      {
+        label: "Registration settings",
+        href: "/admin/events/[id]/registration/settings",
       },
     ],
   },
@@ -670,7 +707,7 @@ export function EventSidebar({
           <button
             onClick={() => toggleMenu(item.label, depth)}
             className={`
-              w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm transition-all duration-200
+              w-full min-w-0 flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm transition-all duration-200
               ${
                 isActiveItem
                   ? "bg-primary/10 text-primary font-semibold"
@@ -683,7 +720,7 @@ export function EventSidebar({
             {item.icon && (
               <item.icon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             )}
-            <span className="flex-1 text-left truncate">{item.label}</span>
+            <span className="min-w-0 flex-1 whitespace-normal break-words text-left leading-snug">{item.label}</span>
             {isOpen ? (
               <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 transition-transform" />
             ) : (
@@ -706,19 +743,19 @@ export function EventSidebar({
         key={item.label}
         href={resolvedHref}
         className={`
-          flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm transition-all duration-200
+          min-w-0 flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm transition-all duration-200
           ${
             isActiveItem
               ? "bg-primary/10 text-primary font-semibold"
               : "text-muted-foreground hover:bg-primary/8 hover:text-primary"
           }
-          ${depth > 0 ? "pl-6 sm:pl-8" : ""}
+          ${depth > 0 ? "pl-5 sm:pl-6" : ""}
         `}
       >
         {item.icon && (
           <item.icon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
         )}
-        <span className="truncate">{item.label}</span>
+        <span className="min-w-0 whitespace-normal break-words leading-snug">{item.label}</span>
       </Link>
     );
   };
